@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
 from Content import ROUNDS
+from question_content import DeckError, load_rounds
 from store import Store
 
 app = FastAPI(title="AI or Human", docs_url=None, redoc_url=None, openapi_url=None)
@@ -138,9 +139,12 @@ def view(state, role, player_id):
     if state["phase"] in ("live", "revealed"):
         question = state["rounds"][state["index"]]
         result["question"] = {k: question[k] for k in
-                              ("title", "kind", "body", "media", "alt", "image_fit", "image_position") if k in question}
+                              ("title", "kind", "body", "media", "alt", "image_fit", "image_position",
+                               "difficulty", "context") if k in question}
         if state["phase"] == "revealed":
-            result["reveal"] = {k: question[k] for k in ("answer", "explanation", "source", "source_url") if k in question}
+            result["reveal"] = {k: question[k] for k in
+                                ("answer", "explanation", "source", "source_url", "technical_note",
+                                 "discussion", "technical_source_url") if k in question}
             result["reveal"]["distribution"] = {
                 choice: sum(v["answer"] == choice for v in state["votes"].values()) for choice in ("AI", "HUMAN")}
     if player_id:
@@ -195,8 +199,12 @@ def create_room(body: CreateRoom, request: Request):
         raise HTTPException(503, "Set PRESENTER_PASSWORD in Vercel before creating a game.")
     if password and not secrets.compare_digest(body.password.encode(), password.encode()):
         raise HTTPException(403, "Presenter password is incorrect.")
-    if not ROUNDS or any(r.get("answer") not in ("AI", "HUMAN") or r.get("kind") not in
-                         ("code", "commit", "text", "image", "audio") for r in ROUNDS):
+    try:
+        rounds = load_rounds(ROOT, fallback=ROUNDS)
+    except DeckError as error:
+        raise HTTPException(503, "Question deck cannot load. Fix or save it in the local question manager.") from error
+    if not rounds or any(r.get("answer") not in ("AI", "HUMAN") or r.get("kind") not in
+                         ("code", "commit", "text", "image", "audio") for r in rounds):
         raise HTTPException(503, "Fix the round definitions in Content.py.")
     token = secrets.token_urlsafe(32)
     for _ in range(5):
@@ -204,7 +212,7 @@ def create_room(body: CreateRoom, request: Request):
         state = {"code": code, "title": body.title.strip() or "AI or Human", "host": digest(token),
                  "join_url": join_link(request, code),
                  "expires_at": time.time() + ROOM_LIFETIME_HOURS * 3600, "players": {},
-                 "rounds": copy.deepcopy(ROUNDS), "phase": "lobby", "index": 0, "revision": 0,
+                 "rounds": copy.deepcopy(rounds), "phase": "lobby", "index": 0, "revision": 0,
                  "deadline": None, "duration": body.seconds, "default_seconds": body.seconds, "votes": {}}
         if store.create(code, state):
             return {"code": code, "token": token, "join_url": state["join_url"]}

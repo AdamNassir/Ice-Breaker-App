@@ -1,6 +1,26 @@
 # AI or Human? — Ice Breaker Game
 
-A complete browser game for an AI presentation: a presenter opens a room, players join on their phones with pseudonyms, and everyone decides **AI OR HUMAN**. The default deck has **10 rounds**: 2 commits, 2 code snippets, 4 images, and 2 short texts, split evenly between AI and human origins.
+A complete browser game for an AI presentation: a presenter opens a room, players join on their phones with pseudonyms, and everyone decides **AI OR HUMAN**. The bundled starter deck has **10 rounds**: 2 commits, 5 code snippets, 2 electronics images, and 1 incident note, split evenly between AI and human origins.
+
+## Edit questions with the local manager
+
+Run **`python question_manager.py`** using your virtual environment, then open **http://127.0.0.1:8765**. This is a separate local editor for adding, editing, reordering and previewing text, code, commits, images and audio questions. Click **Save deck to game** to write `questions.json`. Uploads are copied into `static/images/` or `static/audio/`.
+
+Full Windows/macOS/Linux launch commands and the editing/deployment workflow are in **`QuestionManager.md`**. No new packages or Supabase setup are needed for the editor. The public game uses `main.py` as before; the manager is not a public Vercel page.
+
+For Vercel, commit the saved `questions.json` and uploaded media, redeploy and create a **new room**. The game reads a saved JSON deck before falling back to `Content.py`. Once `questions.json` exists, changes to `Content.py` alone do not replace that managed deck.
+
+**First install of this update:** replace `main.py`; add `question_content.py`, `question_manager.py` and `manager_assets/`; update `.gitignore`, documentation and tests. Keep your existing `Content.py` as the starter if desired. No requirements or SQL changes are needed.
+
+## Bundled starter deck
+
+The ten rounds rise through five levels: Unicode/rejection sampling; electronics inspection; cancellation/PostgreSQL queue claiming; C++ memory ordering/Go mutexes; Redis cursors/distributed fencing. Difficulty appears on both screens. Each reveal includes the origin, a technical explanation and a discussion prompt. Answers stay AI OR HUMAN.
+
+The historical human samples come from tagged CPython, Go and Redis sources and a credited camera photograph. AI samples are original fictional artifacts generated for this deck. `ContentSources.md` contains the private answer key, exact source transformations, licenses, design inspiration and image prompt. The levels are an editorial progression, not measured detection probabilities.
+
+The starter deck and its media are included. Use the local question manager to replace or adapt these examples; you can also keep your previous Content.py starter.
+
+Per-round timers range from 30 to 60 seconds, totaling 7 minutes 25 seconds of voting. They override the initial room timer slider. Allow about 12–18 minutes with discussion, or remove the `seconds` keys in `Content.py` to use a uniform timer.
 
 ## 1. Necessary downloads and installs
 
@@ -15,7 +35,7 @@ A complete browser game for an AI presentation: a presenter opens a room, player
 | Node.js LTS + Vercel CLI | Not required | Only for the alternative CLI route | https://nodejs.org/ then `npm install -g vercel` |
 | Editor | Recommended | Recommended | VS Code or any text editor |
 
-No Supabase CLI, Docker, local PostgreSQL, Node build system, paid AI API key, or frontend framework is needed. All four images are bundled. Supabase is used as PostgreSQL storage through **server-side psycopg**, so there is no Supabase browser SDK or exposed database key. This project does not use Supabase Auth: pseudonyms and random game tokens are sufficient for an ice breaker.
+No Supabase CLI, Docker, local PostgreSQL, Node build system, paid AI API key, or frontend framework is needed. Both technical images are bundled; the four earlier images remain available as optional replacements. Supabase is used as PostgreSQL storage through **server-side psycopg**, so there is no Supabase browser SDK or exposed database key. This project does not use Supabase Auth: pseudonyms and random game tokens are sufficient for an ice breaker.
 
 The delivered folder is the project root. Commands below run **inside `Ice_Breaker_Game_App`**. The app works immediately with a local SQLite file; cloud deployment requires your own Supabase and Vercel setup. Credentials are intentionally absent.
 
@@ -111,7 +131,7 @@ The implementation follows Vercel's native FastAPI deployment: `main.py` exports
 
 1. Commit this folder's contents to a **private** GitHub repository. Check that `.env`, `.venv`, SQLite files and credentials are excluded. A public source repository would expose `Content.py` and the game answers to curious participants.
 2. In Vercel, choose **Add New → Project**, import the repository, and select the project root. If the repository contains a parent folder, set **Root Directory** to `Ice_Breaker_Game_App`.
-3. Use the **FastAPI** framework preset/detection. Leave build and output-directory overrides unset. Let Vercel install from `requirements.txt` (which uses `constraints.txt`). Use Python 3.12 in the project's Python runtime selection/configuration where available.
+3. Use the **FastAPI** framework preset/detection. Leave build and output-directory overrides unset. Let Vercel install from the self-contained `requirements.txt`. Use Python 3.12 in the project's Python runtime selection/configuration where available.
 4. Set `DATABASE_URL` and `PRESENTER_PASSWORD` as production environment variables **before deploying**. `PUBLIC_BASE_URL` is optional: use the real production URL, or leave it unset so the request URL is used. Do not use `localhost` for the deployed app. Only add Preview values if you deliberately want preview builds to access that database; a separate Supabase project is preferable for testing.
 5. Deploy. Open `https://YOUR-URL/api/health` and check storage. Then open `/presenter`, enter your presenter password, create a room and test from a phone.
 6. Ensure the production URL is reachable without a Vercel login for your audience. Inspect the project's **Deployment Protection** settings if a phone sees a sign-in screen. Retain protection on previews where appropriate. The app itself requires a room token for game state and the presenter password to create a room.
@@ -137,7 +157,7 @@ Each `env add` prompts for the secret rather than putting it into command histor
 ## 5. How to run the ice breaker
 
 1. Open `/presenter` on the screen you will project. Create a room, choose a title and a default timer (5–120 seconds; 25 by default). Enter the presenter password if configured.
-2. Show the room code or copy the player link. Players open `/`, enter the code and choose unique pseudonyms. No account or email is required.
+2. The presenter screen automatically generates and displays a QR code for the room. Players scan it with their phone camera, open the link, and choose a unique pseudonym; the room code is already filled in. You can also share the room code or copy the player link. No account or email is required.
 3. Click **Start round 1**. Content appears on both the projector and every phone, and the server deadline begins. The player has exactly two choices: **AI** or **HUMAN**.
 4. The first accepted vote is final. The presenter sees the count of answers; individual choices and the correct answer stay hidden during voting.
 5. When the timer reaches zero, the server rejects late answers and reveals the origin, source note and explanation. Scores update on both views.
@@ -147,6 +167,12 @@ Each `env add` prompts for the secret rather than putting it into command histor
 Reconnect by refreshing the same tab/browser. A player's random token lives in local browser storage; the presenter's token lives in session storage and survives a refresh in that tab. Tokens never appear in the shared link. Keep the presenter tab open and do not share its stored credentials. Clearing storage, using another browser or an incognito window creates a new identity; scores cannot be recovered by pseudonym alone. Players may join an ongoing game and begin scoring in the active round if its deadline has not passed. Tied scores share a rank; names determine display order within a tie.
 
 The room expires **12 hours after creation**. New rooms opportunistically remove expired rows. For scheduled/manual retention cleanup, run the SQL comment at the end of `supabase.sql`. A game does not have an always-running scheduler: the first API request after a deadline commits the reveal exactly once. With the default polling, active screens see it within approximately **1.5 seconds** plus network latency. If every tab is closed, the deadline still holds; the state settles when someone returns.
+
+### Automatic QR codes
+
+The QR pattern is generated by Python inside this app, using `qrcode==8.2`; no external QR service is contacted. It encodes only the public player link and room code. It regenerates when the presenter tab refreshes, and rooms created before this feature continue to work. For phones on a local network, set `PUBLIC_BASE_URL` to your reachable LAN address before creating the room. For Vercel, use your public production URL and ensure it does not require a Vercel login. The browser draws the generated pattern directly onto a canvas, without waiting for an image to load. If generation fails, an error and Retry QR code button appear; the displayed room code and Copy player link remain available. The QR request times out after 12 seconds.
+
+For the first manager installation, use the changed-file list in QuestionManager.md. Afterward, routine question edits only require deploying questions.json, new media and relevant source/license files. Keep your existing environment settings.
 
 ## 6. Scoring and modifications
 
@@ -162,9 +188,11 @@ An incorrect or missed answer awards 0 and resets the streak. There is no speed 
 
 | Change | File / symbol |
 | --- | --- |
-| Round text, origin, source, image or audio | `Content.py` → `ROUNDS` |
+| Round text, origin, source, image or audio | Local question manager → `questions.json`; `Content.py` is the fallback starter |
 | Add/remove/reorder rounds | Add/remove/reorder dictionary entries in `ROUNDS`; UI count updates automatically |
-| Override one round's timer | Add `"seconds": 40` to that round |
+| Override one round's timer | Edit `"seconds": 40`; remove per-round seconds to use the room slider |
+| Difficulty and neutral setup | `Content.py` → `difficulty` (1–5) and `context` |
+| Reveal engineering explanation / debate | `Content.py` → `technical_note`, `discussion`, `technical_source_url` |
 | Point and streak rules | `main.py` → `BASE_POINTS`, `STREAK_STEP`, `MAX_STREAK_BONUS` |
 | Room lifetime / player cap | `main.py` → `ROOM_LIFETIME_HOURS`, `MAX_PLAYERS` |
 | Red/orange/white/gold palette | `static/style.css` → `:root` variables |
@@ -174,43 +202,49 @@ An incorrect or missed answer awards 0 and resets the streak. There is no speed 
 | Shared browser behavior / polling | `static/app.js` |
 | Database transactions | `store.py` |
 
-After changing scoring constants, also update the scoring note in both HTML files. Make changes between events: Python/JS changes need a restart/redeploy, and content changes need a **new room**. Text and code are rendered as text, never HTML or executable code. Only files in `static/` are public; do not put answer keys or credentials there. Asset filenames are neutral to avoid revealing answers in network requests.
+After changing scoring constants, also update the scoring note in both HTML files. Make changes between events: Python/JS changes need a restart/redeploy, and content changes need a **new room**. Managed decks are read on new room creation, so local JSON edits do not require a running game to restart. Text and code are rendered as text, never HTML or executable code. Only files in `static/` are public; do not put answer keys or credentials there. Asset filenames are neutral to avoid revealing answers in network requests.
 
 Audio playback is supported but no recordings are bundled. Interesting replacements for technical audiences: a real versus generated release note, a terse versus polished PR review, a synthetic voice versus a consenting colleague's reading, or a generated architecture explanation versus an old public specification excerpt. Use recordings you own or have permission to share. Keep the wording identical for voice comparisons to test the audio rather than the script. A typical audio round needs a longer timer and a presenter click on the audio control; browser autoplay is intentionally not used.
 
-This is a perception game, not an AI detector. Labels describe known origin, not quality, truth or “AI assistance” in general. The historical examples are intentionally verifiable; replace recognizable samples with your own documented human originals to increase difficulty. Preserve a source/prompt and label mixed-origin material explicitly rather than inventing a binary ground truth.
+This is a perception game, not an AI detector. Labels describe known origin, not quality, truth or “AI assistance” in general. The historical examples are intentionally verifiable and less recognizable than famous first commits or language aphorisms; use your own documented human originals if your colleagues recognize these sources. Preserve a source/prompt and label mixed-origin material explicitly rather than inventing a binary ground truth.
 
 ## 7. Folder structure
 
 ```text
 Ice_Breaker_Game_App/
   ReadMe.md
+  QuestionManager.md
   HowToAddImages.md
+  Content.py                       Bundled fallback starter deck
+  questions.json                   Created by the manager on first save
+  question_content.py              Shared deck loader/validation
+  question_manager.py              Separate local editor server
+  manager_assets/index.html, app.js, style.css
   ContentSources.md
-  Content.py
-  main.py
+  ContentSources_Legacy.md
+  main.py                          Public game entrypoint
   store.py
   supabase.sql
   requirements.txt
   requirements-dev.txt
-  constraints.txt
   vercel.json
-  .env.example
-  .gitignore
   static/
-    index.html
-    presenter.html
-    app.js
-    style.css
-    imagestyle.css
-    images/sample03.jpg, sample04.jpg, sample09.jpg, sample10.jpg
-    audio/README.md
-  licenses/CPython-LICENSE.txt
-  tests/test_game.py
+    index.html, presenter.html, app.js, style.css, imagestyle.css
+    images/                        Bundled images and uploaded copies
+    audio/                         Uploaded recordings
+  licenses/
+  tests/test_game.py, test_question_manager.py
   Verification.md
 ```
 
+The manager's UI and API are served only by `question_manager.py`, not the public game. Automatic backups are kept locally in `.question-manager-backups/`.
+
 ## 8. Verification and troubleshooting
+
+### Updating the QR display
+
+This archive includes the working canvas QR implementation. Install the manager update using `QuestionManager.md` (including the shared `question_content.py` module), commit and redeploy. Reload `/presenter` once the deployment finishes. No Supabase migration or new environment variable is required. Existing rooms continue to work. Python still generates the QR pattern inside the app; the browser now draws it directly instead of waiting for a base64 SVG image-load event. An explicit failure message and Retry QR code button replace an indefinitely pending QR display.
+
 
 Install optional verification dependencies and run:
 
@@ -223,13 +257,14 @@ Use `.venv/bin/python` on Linux/macOS or `.\.venv\Scripts\python.exe` on Windows
 
 | Symptom | Check / resolution |
 | --- | --- |
+| Build cannot parse an included requirements file at position 0 | Replace requirements.txt with the corrected self-contained version from this archive; it must not start with `-c constraints.txt`. Commit the change and redeploy the latest source. |
 | Cannot create a hosted room | Configure both production secrets; redeploy; inspect `/api/health` |
 | Database unavailable | Confirm transaction-pooler host, port, URL-encoded app password, custom username and project status; ensure SQL migration ran |
 | Role or policy already exists | Initial SQL already ran; do not rerun creation statements; inspect existing role/table/policy |
 | Phones cannot reach laptop | Correct LAN IP, same Wi-Fi, firewall, no client isolation; use Vercel if event Wi-Fi blocks peers |
 | Vercel sign-in required | Review Deployment Protection for the production URL |
 | Pseudonym taken | Use another name or reopen the original browser session |
-| Content changes not visible | Restart/redeploy, then create a new room |
+| Content changes not visible | Save the manager deck; deploy questions.json/media for Vercel; create a new room. Managed JSON takes priority over Content.py. |
 | Image missing | Check exact case-sensitive path and extension in Content.py and static/images |
 | Timer reads zero before reveal | Network/polling delay; votes remain server-protected; do not advance until reveal appears |
 | Scores don't survive Vercel request | Confirm health says Supabase PostgreSQL, not a local demo |

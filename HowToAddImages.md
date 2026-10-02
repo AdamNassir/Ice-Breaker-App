@@ -1,6 +1,10 @@
 # Add and edit images (and audio)
 
-Everything is changed in plain files. There is no admin upload form. Use an editor; restart locally or redeploy to Vercel, then create a **new room**. Existing rooms deliberately retain their original round definitions.
+The easiest method is the **local question manager**: run `python question_manager.py` in your virtual environment, open http://127.0.0.1:8765, choose Image or Voice/audio, upload the file and save the deck. Windows/macOS/Linux commands and complete steps are in `QuestionManager.md`.
+
+The manager writes `questions.json` and copies media into the app. For Vercel, commit that JSON and new media, redeploy, then create a **new room**. Existing rooms keep their original questions.
+
+The remaining instructions describe advanced manual file editing. If `questions.json` exists, edit the managed deck through the tool (or edit its JSON): it takes priority over `Content.py`. The `Content.py` examples below apply to the fallback starter when no managed JSON file exists.
 
 ## Add an image
 
@@ -11,6 +15,8 @@ Everything is changed in plain files. There is no admin upload form. Use an edit
 {
     "title": "A familiar scene",                 # CHANGE the on-screen title.
     "kind": "image",                            # KEEP this for image rounds.
+    "difficulty": 2,                            # CHANGE 1–5; reading/deception level.
+    "context": "Inspect this workshop image.",   # CHANGE neutral setup, no origin hint.
     "media": "/static/images/sample11.jpg",      # CHANGE to your exact filename.
     "alt": "A bicycle leaning against a wall.",  # CHANGE accessible description.
     "image_fit": "contain",                      # CHANGE to "cover" to crop.
@@ -18,6 +24,8 @@ Everything is changed in plain files. There is no admin upload form. Use an edit
     "seconds": 30,                               # Optional per-round timer.
     "answer": "HUMAN",                           # CHANGE to the known origin.
     "explanation": "Describe what actually created this image.",
+    "technical_note": "Explain the engineering detail after reveal.",
+    "discussion": "Which physical detail influenced your guess?",
     "source": "Photographer name, date, permission or license.",
     "source_url": "https://your-source.example/photo", # Optional, revealed afterward.
 },
@@ -26,7 +34,7 @@ Everything is changed in plain files. There is no admin upload form. Use an edit
 3. Save and restart/redeploy. Create a new room. The round count adjusts automatically. To keep exactly ten rounds, replace a round instead of appending one.
 4. Rehearse on the projector and a phone. Confirm the whole image loads and the title/alt text do not reveal its origin.
 
-The path begins with `/static/images/`, not a local path such as `C:\Pictures\photo.jpg`. Match filename case exactly: Vercel/Linux are case-sensitive. `sample11.JPG` and `sample11.jpg` differ. Keep filenames simple with no spaces. Assets are public, so avoid embedding an answer key, identifying metadata that gives away the classification, or confidential source material. Keep attribution in `source`, which the server exposes only at reveal.
+The path begins with `/static/images/`, not a local path such as `C:\Pictures\photo.jpg`. Match filename case exactly: Vercel/Linux are case-sensitive. `sample11.JPG` and `sample11.jpg` differ. Keep filenames simple with no spaces. Assets are public, so avoid embedding an answer key, identifying metadata that gives away the classification, or confidential source material. Keep attribution in `source`, which the server exposes only at reveal. Preserve source licenses when editing or redistributing assets: the bundled `sample11.jpg` camera photo is by Jguarin under CC BY-SA 4.0; its resized derivative keeps the same license. The default technical image rounds are `sample11.jpg` and `sample12.jpg`; the four older assets remain optional.
 
 ## Change image appearance through code
 

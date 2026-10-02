@@ -3,6 +3,9 @@ import os
 import sys
 import tempfile
 import unittest
+import base64
+import shutil
+import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from unittest.mock import patch
@@ -16,6 +19,10 @@ from store import Store
 class GameTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
+        # Verify the bundled game independently of any deck the presenter saved.
+        shutil.copytree(main.ROOT / 'static', Path(self.temp.name) / 'static')
+        self.root_patch = patch.object(main, 'ROOT', Path(self.temp.name))
+        self.root_patch.start()
         self.environment = patch.dict(os.environ, {"DATABASE_URL": "", "PRESENTER_PASSWORD": "", "VERCEL": ""})
         self.environment.start()
         main.store = Store()
@@ -30,6 +37,7 @@ class GameTests(unittest.TestCase):
     def tearDown(self):
         self.client.close()
         self.environment.stop()
+        self.root_patch.stop()
         self.temp.cleanup()
 
     def join(self, name):
@@ -54,6 +62,12 @@ class GameTests(unittest.TestCase):
     def test_complete_game_streak_scores_and_results(self):
         for index, question in enumerate(main.ROUNDS):
             self.assertEqual(self.control('start').status_code, 200)
+            live = self.state(self.p1)
+            self.assertEqual(live['duration'], question.get('seconds', 5))
+            self.assertEqual(live['question'].get('difficulty'), question.get('difficulty'))
+            for private_field in ('answer', 'explanation', 'source', 'source_url',
+                                  'technical_note', 'discussion', 'technical_source_url'):
+                self.assertNotIn(private_field, live['question'])
             self.assertEqual(self.vote(self.p1, question['answer'], index).status_code, 200)
             wrong = 'HUMAN' if question['answer'] == 'AI' else 'AI'
             self.vote(self.p2, wrong, index)
@@ -63,6 +77,8 @@ class GameTests(unittest.TestCase):
                 s = self.state(self.p1)
                 self.assertEqual(s['phase'], 'revealed')
                 self.assertEqual(s['reveal']['answer'], question['answer'])
+                self.assertEqual(s['reveal'].get('technical_note'), question.get('technical_note'))
+                self.assertEqual(s['reveal'].get('discussion'), question.get('discussion'))
                 score = s['me']['score']
                 self.assertEqual(self.state(self.p1)['me']['score'], score)
             self.assertEqual(self.control('next').status_code, 200)
@@ -154,6 +170,43 @@ class GameTests(unittest.TestCase):
         for question in main.ROUNDS:
             if question.get('media'):
                 self.assertEqual(self.client.get(question['media']).status_code, 200)
+
+    def test_room_qr_access_and_svg(self):
+        url = f'/api/rooms/{self.code}/qr'
+        self.assertEqual(self.client.get(url).status_code, 401)
+        self.assertEqual(self.client.get(url, headers=self.p1).status_code, 403)
+        response = self.client.get(url, headers=self.host)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['cache-control'], 'no-store')
+        result = response.json()
+        self.assertEqual(result['join_url'], self.room['join_url'])
+        matrix = result['qr_matrix']
+        self.assertTrue(21 <= len(matrix) <= 185)
+        self.assertTrue(all(len(row) == len(matrix) for row in matrix))
+        self.assertTrue(all(type(cell) is bool for row in matrix for cell in row))
+        # Four quiet-zone modules on every edge are necessary for phone scanning.
+        self.assertTrue(all(not cell for row in matrix[:4] + matrix[-4:] for cell in row))
+        self.assertTrue(all(not cell for row in matrix for cell in row[:4] + row[-4:]))
+        self.assertTrue(any(cell for row in matrix for cell in row))
+        self.assertTrue(result['qr_data_uri'].startswith('data:image/svg+xml;base64,'))
+        svg = base64.b64decode(result['qr_data_uri'].split(',', 1)[1])
+        document = ET.fromstring(svg)
+        self.assertTrue(document.tag.endswith('svg'))
+        self.assertTrue(document.findall('{http://www.w3.org/2000/svg}path'))
+        self.assertNotIn(self.room['token'], svg.decode())
+        self.assertNotIn('Bearer', svg.decode())
+        self.assertEqual(self.client.get(url, headers=self.host).json(), result)
+
+    def test_room_qr_public_url_and_older_rooms(self):
+        with patch.dict(os.environ, {"PUBLIC_BASE_URL":"https://icebreaker.example.test"}):
+            room = self.client.post('/api/rooms', json={}).json()
+            headers = {"Authorization":"Bearer " + room['token']}
+            result = self.client.get(f"/api/rooms/{room['code']}/qr", headers=headers).json()
+            self.assertEqual(result['join_url'], f"https://icebreaker.example.test/?room={room['code']}")
+            with main.store.room(room['code']) as saved:
+                del saved['join_url']
+            fallback = self.client.get(f"/api/rooms/{room['code']}/qr", headers=headers).json()
+            self.assertEqual(fallback['join_url'], result['join_url'])
 
 
 if __name__ == '__main__':

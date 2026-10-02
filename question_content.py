@@ -1,0 +1,135 @@
+"""Shared deck format. questions.json takes priority; Content.py is the starter deck."""
+import copy
+import json
+from pathlib import Path, PurePosixPath
+from typing import Literal
+from urllib.parse import urlsplit
+
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
+
+ROOT = Path(__file__).resolve().parent
+DECK_FILE = "questions.json"
+MAX_DECK_BYTES = 2 * 1024 * 1024
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif", ".bmp"}
+AUDIO_EXTENSIONS = {".mp3", ".wav", ".ogg", ".opus", ".flac", ".m4a", ".aac", ".webm"}
+
+
+class DeckError(ValueError):
+    pass
+
+
+class Question(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    title: str = Field(min_length=1, max_length=120)
+    kind: Literal["text", "code", "commit", "image", "audio"]
+    answer: Literal["AI", "HUMAN"]
+    body: str = Field(default="", max_length=50000)
+    context: str = Field(default="", max_length=2000)
+    seconds: int | None = Field(default=None, ge=5, le=120, strict=True)
+    difficulty: int | None = Field(default=None, ge=1, le=5, strict=True)
+    media: str = Field(default="", max_length=300)
+    alt: str = Field(default="", max_length=1000)
+    image_fit: Literal["contain", "cover"] = "contain"
+    image_position: str = Field(default="center", max_length=60)
+    explanation: str = Field(default="", max_length=6000)
+    technical_note: str = Field(default="", max_length=6000)
+    discussion: str = Field(default="", max_length=2000)
+    source: str = Field(default="", max_length=3000)
+    source_url: str = Field(default="", max_length=2000)
+    technical_source_url: str = Field(default="", max_length=2000)
+
+    @model_validator(mode="after")
+    def content_valid(self):
+        for name in type(self).model_fields:
+            value = getattr(self, name)
+            if isinstance(value, str):
+                if '\x00' in value:
+                    raise ValueError("Remove null characters from the question text.")
+                try:
+                    value.encode('utf-8')
+                except UnicodeError as error:
+                    raise ValueError("Use valid Unicode text in the question fields.") from error
+        self.title = self.title.strip()
+        self.source_url = self.source_url.strip()
+        self.technical_source_url = self.technical_source_url.strip()
+        if not self.title:
+            raise ValueError("Give the question a title.")
+        if self.kind in {"text", "code", "commit"} and not self.body.strip():
+            raise ValueError("Enter the question text or code.")
+        if self.kind in {"image", "audio"}:
+            expected = "images" if self.kind == "image" else "audio"
+            path = PurePosixPath(self.media)
+            if (not self.media.startswith(f"/static/{expected}/") or ".." in path.parts or
+                    "\\" in self.media or "%" in self.media or "?" in self.media or "#" in self.media):
+                raise ValueError(f"Choose a file from static/{expected} or upload one.")
+            extensions = IMAGE_EXTENSIONS if self.kind == "image" else AUDIO_EXTENSIONS
+            if path.suffix.lower() not in extensions:
+                raise ValueError("This media format is not supported. Choose a browser-compatible file.")
+        for value in (self.source_url, self.technical_source_url):
+            if value:
+                parsed = urlsplit(value)
+                if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
+                    raise ValueError("Reference links must be full https:// URLs without credentials.")
+        return self
+
+
+def validate_rounds(rounds, root=ROOT, allow_empty=False):
+    if not isinstance(rounds, list):
+        raise DeckError("The deck must contain a list of questions.")
+    if not rounds and not allow_empty:
+        raise DeckError("Add at least one question before saving the deck.")
+    if len(rounds) > 200:
+        raise DeckError("A deck can contain up to 200 questions.")
+    result = []
+    for index, row in enumerate(rounds, 1):
+        try:
+            question = Question.model_validate(row)
+        except ValidationError as error:
+            first = error.errors()[0]
+            field = ".".join(str(p) for p in first["loc"])
+            message = first["msg"].removeprefix("Value error, ")
+            raise DeckError(f"Question {index}{' (' + field + ')' if field else ''}: {message}") from error
+        if question.kind in {"image", "audio"}:
+            base = (Path(root) / "static" / ("images" if question.kind == "image" else "audio")).resolve()
+            media = (Path(root) / question.media.lstrip("/")).resolve()
+            if not media.is_relative_to(base) or not media.is_file():
+                raise DeckError(f"Question {index}: the selected media file is missing.")
+        result.append(question.model_dump(exclude_none=True))
+    return result
+
+
+def deck_bytes(rounds):
+    data = (json.dumps({"schema_version": 1, "rounds": rounds}, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    if len(data) > MAX_DECK_BYTES:
+        raise DeckError("The deck is too large (maximum 2 MB of question text). Media files are stored separately.")
+    return data
+
+
+def parse_deck(data, root=ROOT, allow_empty=False):
+    if len(data) > MAX_DECK_BYTES:
+        raise DeckError("The question file is too large (maximum 2 MB).")
+    try:
+        value = json.loads(data)
+    except (ValueError, UnicodeError) as error:
+        raise DeckError("The question file is not valid UTF-8 JSON.") from error
+    if isinstance(value, dict):
+        if value.get("schema_version", 1) != 1:
+            raise DeckError("This question file uses an unsupported format version.")
+        value = value.get("rounds")
+    return validate_rounds(value, root, allow_empty)
+
+
+def load_rounds(root=ROOT, fallback=None):
+    path = Path(root) / DECK_FILE
+    if path.exists():
+        try:
+            # Limit the read even if the file was edited outside the manager.
+            with path.open("rb") as file:
+                data = file.read(MAX_DECK_BYTES + 1)
+        except OSError as error:
+            raise DeckError("Could not read questions.json.") from error
+        return parse_deck(data, root)
+    if fallback is None:
+        from Content import ROUNDS
+        fallback = ROUNDS
+    return validate_rounds(copy.deepcopy(fallback), root)
