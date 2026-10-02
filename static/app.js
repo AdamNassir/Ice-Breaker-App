@@ -6,7 +6,7 @@
   const storage = host ? sessionStorage : localStorage;
   const key = code => `icebreaker:${host ? 'host' : 'player'}:${code}`;
   let session = null, state = null, polling = false, votePending = false, controlPending = false;
-  let stageKey = '', boardKey = '', clockEnd = 0, noticeTimeout = null;
+  let stageKey = '', boardKey = '', clockEnd = 0, noticeTimeout = null, qrAttempt = 0;
   const query = new URLSearchParams(location.search);
   let lastHost = '';
   try { if (host) lastHost = sessionStorage.getItem('icebreaker:last-host') || ''; } catch {}
@@ -54,6 +54,43 @@
       $('share-code').textContent = value.code;
       const link = value.join_url || `${location.origin}/?room=${value.code}`;
       $('join-url').textContent = link; $('join-url').href = link;
+      loadQR(value);
+    }
+  }
+
+  async function loadQR(value) {
+    const qr = $('join-qr'), status = $('qr-status'), retry = $('retry-qr');
+    const attempt = ++qrAttempt;
+    qr.hidden = true; retry.hidden = true;
+    status.textContent = 'Creating QR code…';
+    try {
+      const result = await api(`/api/rooms/${value.code}/qr`);
+      if (session !== value || attempt !== qrAttempt) return;
+      // Draw the server-generated modules directly. No image-load event or
+      // data-URL support is needed to finish showing the QR code.
+      const matrix = result.qr_matrix;
+      if (!Array.isArray(matrix) || matrix.length < 21 || matrix.length > 185 ||
+          !matrix.every(row => Array.isArray(row) && row.length === matrix.length &&
+            row.every(cell => typeof cell === 'boolean'))) {
+        throw new Error('QR response is outdated or invalid. Refresh this page after updating the app.');
+      }
+      const context = qr.getContext('2d');
+      if (!context) throw new Error('This browser cannot draw the QR code.');
+      const scale = 10;
+      qr.width = qr.height = matrix.length * scale;
+      context.fillStyle = '#ffffff'; context.fillRect(0, 0, qr.width, qr.height);
+      context.fillStyle = '#000000';
+      matrix.forEach((row, y) => row.forEach((dark, x) => {
+        if (dark) context.fillRect(x * scale, y * scale, scale, scale);
+      }));
+      $('join-url').textContent = result.join_url; $('join-url').href = result.join_url;
+      qr.hidden = false;
+      status.textContent = 'Scan with your phone camera.';
+    } catch (error) {
+      if (session === value && attempt === qrAttempt) {
+        status.textContent = `QR code unavailable: ${error.message} Use the player link or room code.`;
+        retry.hidden = false;
+      }
     }
   }
 
@@ -213,6 +250,7 @@
   }
 
   if (host) {
+    $('retry-qr').addEventListener('click', () => { if (session) loadQR(session); });
     $('seconds').addEventListener('input', () => { $('seconds-output').textContent = `${$('seconds').value} sec`; });
     $('create-form').addEventListener('submit', async event => {
       event.preventDefault(); $('create-button').disabled = true;

@@ -1,5 +1,6 @@
 """FastAPI entrypoint: python -m uvicorn main:app --reload"""
 import copy
+import base64
 import hashlib
 import os
 import re
@@ -74,6 +75,25 @@ def room_code(code):
     if not re.fullmatch(r"[A-Z2-9]{6}", code):
         raise HTTPException(400, "Enter a six-character room code.")
     return code
+
+
+def join_link(request, code):
+    base = os.getenv("PUBLIC_BASE_URL", "").rstrip("/") or str(request.base_url).rstrip("/")
+    return f"{base}/?room={code}"
+
+
+def qr_payload(link):
+    """Generate locally; encode only the public join link, never game credentials."""
+    import qrcode
+    from qrcode.image.svg import SvgPathFillImage
+    qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M,
+                       box_size=10, border=4)
+    qr.add_data(link)
+    qr.make(fit=True)
+    svg = qr.make_image(image_factory=SvgPathFillImage).to_string()
+    return {"join_url": link, "qr_matrix": qr.get_matrix(),
+            # Retain the image field for older presenter tabs during a redeploy.
+            "qr_data_uri": "data:image/svg+xml;base64," + base64.b64encode(svg).decode("ascii")}
 
 
 def settle(state):
@@ -182,13 +202,25 @@ def create_room(body: CreateRoom, request: Request):
     for _ in range(5):
         code = "".join(secrets.choice("ABCDEFGHJKLMNPQRSTUVWXYZ23456789") for _ in range(6))
         state = {"code": code, "title": body.title.strip() or "AI or Human", "host": digest(token),
+                 "join_url": join_link(request, code),
                  "expires_at": time.time() + ROOM_LIFETIME_HOURS * 3600, "players": {},
                  "rounds": copy.deepcopy(ROUNDS), "phase": "lobby", "index": 0, "revision": 0,
                  "deadline": None, "duration": body.seconds, "default_seconds": body.seconds, "votes": {}}
         if store.create(code, state):
-            base = os.getenv("PUBLIC_BASE_URL", "").rstrip("/") or str(request.base_url).rstrip("/")
-            return {"code": code, "token": token, "join_url": f"{base}/?room={code}"}
+            return {"code": code, "token": token, "join_url": state["join_url"]}
     raise HTTPException(503, "Could not allocate a room. Try again.")
+
+
+@app.get("/api/rooms/{code}/qr")
+def room_qr(code: str, request: Request, authorization: str | None = Header(default=None)):
+    code = room_code(code)
+    with store.room(code) as state:
+        role, _ = identity(state, authorization)
+        if role != "host":
+            raise HTTPException(403, "Only the presenter can request the room QR code.")
+        # Older rooms did not store a link; they continue to work after this upgrade.
+        link = state.get("join_url") or join_link(request, code)
+    return qr_payload(link)
 
 
 @app.post("/api/rooms/{code}/join")
