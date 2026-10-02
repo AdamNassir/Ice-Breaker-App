@@ -1,0 +1,19 @@
+/* EDIT global image presentation here. Per-round overrides live in Content.py. */
+.round-image {
+  width: 100%;
+  max-height: 420px;       /* CHANGE image height on laptop/projector. */
+  min-height: 180px;
+  object-fit: contain;    /* contain = entire image; cover = crop to fill. */
+  object-position: center;
+  background: #f5f3f4;
+  border-radius: 12px;    /* CHANGE corner rounding. */
+  display: block;
+}
+.round-audio { width: 100%; margin: 16px 0; }
+.image-error { color: #981b27; font-size: 14px; }
+@media (max-width: 760px) {
+  .round-image { max-height: 300px; min-height: 140px; }
+}
+@media (min-width: 1600px) {
+  .presenter-page .round-image { max-height: 580px; }
+}
