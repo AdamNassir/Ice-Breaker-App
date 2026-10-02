@@ -9,3 +9,5 @@
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 .game-heading>div:first-child{min-width:0}.room-title{overflow-wrap:anywhere}.game-heading>div:first-child{flex:1}.score-tray,.join-box{flex-shrink:0}
 @media(max-width:760px){.game-heading>div:first-child{flex-basis:100%}.score-tray,.join-box{max-width:100%}}
+.qr-panel{padding-bottom:22px;margin-bottom:22px;border-bottom:1px solid var(--line);text-align:center}.qr-panel h2{font-size:18px;margin:0 0 12px}.join-qr{display:block;width:232px;height:232px;max-width:100%;margin:0 auto;background:white;object-fit:contain;image-rendering:pixelated}.qr-panel .small{margin:10px 0 0}.qr-panel .qr-help{font-size:13px;margin:4px 0 0}
+@media(max-width:1000px){.join-qr{width:210px;height:210px}}
