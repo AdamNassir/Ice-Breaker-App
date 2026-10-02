@@ -204,7 +204,7 @@ def create_room(body: CreateRoom, request: Request):
     except DeckError as error:
         raise HTTPException(503, "Question deck cannot load. Fix or save it in the local question manager.") from error
     if not rounds or any(r.get("answer") not in ("AI", "HUMAN") or r.get("kind") not in
-                         ("code", "commit", "text", "image", "audio") for r in rounds):
+                         ("code", "commit", "text", "image", "audio", "video") for r in rounds):
         raise HTTPException(503, "Fix the round definitions in Content.py.")
     token = secrets.token_urlsafe(32)
     for _ in range(5):

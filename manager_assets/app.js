@@ -3,11 +3,17 @@
   const $ = id => document.getElementById(id);
   let rounds = [], selected = -1, revision = '', token = '', source = '';
   let dirty = false, busy = false, mediaBusy = false, loaded = false;
-  let media = {image: [], audio: []};
+  let media = {image: [], audio: [], video: []};
+  const mediaFolders = {image:'images', audio:'audio', video:'videos'};
+  const formats = {
+    image:{accept:'.jpg,.jpeg,.png,.webp,.gif,.avif,.bmp', extensions:['jpg','jpeg','png','webp','gif','avif','bmp'], help:'JPG, PNG, WebP, GIF, AVIF or BMP · up to 25 MB. Convert HEIC or SVG to PNG/JPG first.'},
+    audio:{accept:'.mp3,.wav,.ogg,.opus,.flac,.m4a,.aac,.webm', extensions:['mp3','wav','ogg','opus','flac','m4a','aac','webm'], help:'MP3, WAV, OGG/Opus, FLAC, M4A, AAC or WebM · up to 25 MB. Playback depends on the browser; MP3/WAV are convenient choices.'},
+    video:{accept:'.mp4,.webm,.ogv,.mov,.m4v', extensions:['mp4','webm','ogv','mov','m4v'], help:'MP4, WebM, OGV, MOV or M4V · up to 25 MB. For phones, use MP4 with H.264 video and AAC audio. Convert AVI/MKV or incompatible MOV files first.'}
+  };
   const textFields = {title:'title', context:'context', alt:'alt', explanation:'explanation',
     source:'source', source_url:'source-url', technical_note:'technical-note',
     discussion:'discussion', technical_source_url:'technical-url'};
-  const toolbar = ['add-question','empty-add','empty-deck','starter-deck','import-deck','export-deck'];
+  const toolbar = ['add-question','add-image','add-audio','add-video','empty-add','empty-deck','starter-deck','import-deck','export-deck'];
 
   function node(tag, className, text) {
     const value = document.createElement(tag);
@@ -40,15 +46,15 @@
     const q = rounds[selected];
     Object.entries(textFields).forEach(([key,id]) => q[key] = $(id).value);
     q.kind = $('kind').value; q.answer = $('answer').value;
-    q.body = q.kind === 'audio' ? $('audio-body').value : q.kind === 'image' ? '' : $('body').value;
+    q.body = ['audio','video'].includes(q.kind) ? $('audio-body').value : q.kind === 'image' ? '' : $('body').value;
     if ($('seconds').value !== '') q.seconds = Number($('seconds').value); else delete q.seconds;
     if ($('difficulty').value !== '') q.difficulty = Number($('difficulty').value); else delete q.difficulty;
-    q.media = ['image','audio'].includes(q.kind) ? $('media-path').value : '';
+    q.media = formats[q.kind] ? $('media-path').value : '';
     q.image_fit = $('image-fit').value; q.image_position = $('image-position').value || 'center';
   }
   function chooseMedia() {
     const q = rounds[selected], picker = $('media-choice'); picker.replaceChildren(new Option('Choose a file', ''));
-    if (!q || !['image','audio'].includes(q.kind)) return;
+    if (!q || !formats[q.kind]) return;
     const choices = media[q.kind] || [];
     if (q.media && !choices.some(row => row.path === q.media)) picker.append(new Option(q.media.split('/').pop(), q.media));
     choices.forEach(row => picker.append(new Option(row.name, row.path)));
@@ -56,12 +62,12 @@
   }
   function showFields() {
     if (selected < 0) return;
-    const kind = $('kind').value, hasMedia = ['image','audio'].includes(kind);
+    const kind = $('kind').value, hasMedia = Boolean(formats[kind]);
     $('text-fields').hidden = hasMedia; $('media-fields').hidden = !hasMedia;
-    $('image-options').hidden = kind !== 'image'; $('audio-description').hidden = kind !== 'audio';
+    $('image-options').hidden = kind !== 'image'; $('audio-description').hidden = !['audio','video'].includes(kind);
     $('body').classList.toggle('code-editor', kind === 'code' || kind === 'commit');
-    $('media-file').accept = kind === 'image' ? 'image/*,.avif,.bmp' : 'audio/*,.m4a,.opus,.webm';
-    $('format-help').textContent = kind === 'image' ? 'JPG, PNG, WebP, GIF, AVIF or BMP · up to 25 MB. Convert HEIC or SVG to PNG/JPG first.' : 'MP3, WAV, OGG/Opus, FLAC, M4A, AAC or WebM · up to 25 MB. Playback depends on the browser; MP3/WAV are convenient choices.';
+    $('media-file').accept = formats[kind]?.accept || '';
+    $('format-help').textContent = formats[kind]?.help || '';
   }
   function renderList() {
     const list = $('question-list'); list.replaceChildren();
@@ -98,11 +104,12 @@
       const img = node('img'); img.src = q.media; img.alt = q.alt || 'Question image'; img.style.objectFit = q.image_fit || 'contain'; img.style.objectPosition = q.image_position || 'center';
       img.addEventListener('error',()=>{if(box.contains(img))box.append(node('p','field-help','This image cannot be previewed. Check the file or upload a PNG/JPG copy.'));});
       box.append(img);
-    } else if (q.kind === 'audio' && q.media) {
+    } else if (['audio','video'].includes(q.kind) && q.media) {
       if (q.body) box.append(node('p','preview-context',q.body));
-      const audio = node('audio'); audio.src = q.media; audio.controls = true; audio.preload = 'metadata'; audio.setAttribute('aria-label',q.alt || 'Question recording');
-      audio.addEventListener('error',()=>{if(box.contains(audio))box.append(node('p','field-help','This recording cannot be previewed in this browser. Try an MP3 or WAV copy.'));}); box.append(audio);
-    } else if (q.kind === 'image' || q.kind === 'audio') box.append(node('p','preview-context','Upload a file or choose an existing one.'));
+      const player = node(q.kind); player.src = q.media; player.controls = true; player.preload = 'metadata'; player.setAttribute('aria-label',q.alt || 'Question recording');
+      if(q.kind==='video')player.setAttribute('playsinline','');
+      player.addEventListener('error',()=>{if(box.contains(player))box.append(node('p','field-help',q.kind==='video'?'This video cannot be previewed in this browser. Try an MP4 with H.264 video and AAC audio.':'This recording cannot be previewed in this browser. Try an MP3 or WAV copy.'));}); box.append(player);
+    } else if (formats[q.kind]) box.append(node('p','preview-context','Upload a file or choose an existing one.'));
     else box.append(node(q.kind === 'text' ? 'p' : 'pre',q.kind === 'text' ? 'preview-text' : '',q.body || 'Your question content appears here.'));
     const reveal = $('preview-reveal'); reveal.replaceChildren(); reveal.hidden = !$('preview-answer').checked;
     reveal.append(node('h3','',`Answer: ${q.answer || 'choose AI or HUMAN'}`));
@@ -137,16 +144,17 @@
       const [data,files] = await Promise.all([api('/api/deck'),api('/api/media')]);
       rounds=data.rounds;revision=data.revision;token=data.manager_token;source=data.source;media=files;
       selected=rounds.length?0:-1;dirty=false;loaded=true;renderList();loadEditor();
-      if(data.warning)tell(`The saved question file needs repair: ${data.warning} Import a backup or build a new deck, then save.`,true);
+      if(data.warning)tell(`Deck needs repair: ${data.warning} Edit the affected question, or import a backup, then save.`,true);
       else $('status').hidden=true;
     } catch(error) {tell(`Cannot load the manager: ${error.message} Keep the terminal running, then choose Reload saved.`,true);}
     finally {busy=false;updateControls();}
   }
-  function addQuestion() {
-    readEditor();rounds.push({title:'',kind:'text',answer:'',body:'',image_fit:'contain',image_position:'center'});
+  function addQuestion(kind = 'text') {
+    readEditor();rounds.push({title:'',kind,answer:'',body:'',image_fit:'contain',image_position:'center'});
     selected=rounds.length-1;markDirty();renderList();loadEditor();$('title').focus();
   }
-  $('add-question').addEventListener('click',addQuestion);$('empty-add').addEventListener('click',addQuestion);
+  $('add-question').addEventListener('click',()=>addQuestion());$('empty-add').addEventListener('click',()=>addQuestion());
+  for(const kind of Object.keys(formats))$('add-'+kind).addEventListener('click',()=>addQuestion(kind));
   $('question-form').addEventListener('submit',event=>event.preventDefault());
   $('question-form').addEventListener('input',event=>{
     if(['media-file','media-choice'].includes(event.target.id))return;
@@ -154,7 +162,7 @@
   });
   $('kind').addEventListener('change',()=>{
     readEditor();const q=rounds[selected];
-    if(q.media && !q.media.startsWith(q.kind==='image'?'/static/images/':'/static/audio/'))q.media='';
+    if(q.media && !q.media.startsWith(`/static/${mediaFolders[q.kind]}/`))q.media='';
     $('media-path').value=q.media||'';showFields();chooseMedia();markDirty();renderList();renderPreview();
   });
   $('media-choice').addEventListener('change',()=>{
@@ -162,7 +170,8 @@
   });
   $('media-file').addEventListener('change',async()=>{
     const file=$('media-file').files[0],q=rounds[selected];if(!file||!q)return;
-    const kind=q.kind, extension='.'+file.name.split('.').pop().toLowerCase();
+    const kind=q.kind, suffix=file.name.split('.').pop().toLowerCase(), extension='.'+suffix;
+    if(!formats[kind]||!formats[kind].extensions.includes(suffix)){tell(`Choose a supported ${kind} file. ${formats[kind]?.help || 'Select Image, Audio or Video first.'}`,true);$('media-file').value='';return;}
     if(file.size>25*1024*1024){tell('This file exceeds 25 MB. Choose a smaller copy.',true);$('media-file').value='';return;}
     mediaBusy=true;updateControls();tell('Copying the selected file into the app…');
     try {
@@ -187,7 +196,7 @@
   $('delete-question').addEventListener('click',()=>{if(selected<0||!confirm('Remove this question from the draft? Its media file will be kept.'))return;rounds.splice(selected,1);selected=Math.min(selected,rounds.length-1);markDirty();renderList();loadEditor();});
   function replaceDraft(values) {rounds=values;selected=rounds.length?0:-1;markDirty();renderList();loadEditor();}
   $('empty-deck').addEventListener('click',()=>{if(confirm('Replace the current draft with an empty deck? The saved deck stays intact until you save.'))replaceDraft([]);});
-  $('starter-deck').addEventListener('click',async()=>{if(!confirm('Replace the draft with the bundled starter deck? You can edit it before saving.'))return;busy=true;updateControls();try{replaceDraft((await api('/api/starter')).rounds);}catch(error){tell(error.message,true);}finally{busy=false;updateControls();}});
+  $('starter-deck').addEventListener('click',async()=>{if(!confirm('Replace the draft with the bundled starter deck? You can edit it before saving.'))return;busy=true;updateControls();try{const data=await api('/api/starter');replaceDraft(data.rounds);if(data.warning)tell(`Starter needs repair: ${data.warning}`,true);}catch(error){tell(error.message,true);}finally{busy=false;updateControls();}});
   $('reload-deck').addEventListener('click',loadDeck);
   $('preview-answer').addEventListener('change',renderPreview);
   $('import-text').addEventListener('click',()=>$('text-file').click());

@@ -15,7 +15,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from Content import ROUNDS
-from question_content import (AUDIO_EXTENSIONS, DECK_FILE, IMAGE_EXTENSIONS, MAX_DECK_BYTES,
+from question_content import (MEDIA_EXTENSIONS, MEDIA_FOLDERS, DECK_FILE, MAX_DECK_BYTES,
                               ROOT, DeckError, deck_bytes, parse_deck, validate_rounds)
 
 MAX_UPLOAD_BYTES = 25 * 1024 * 1024
@@ -54,6 +54,13 @@ def create_manager(root=ROOT, starter=None):
         response.headers["Referrer-Policy"] = "no-referrer"
         return response
 
+    def media_warning(rounds):
+        try:
+            validate_rounds(rounds, root, allow_empty=True)
+        except DeckError as error:
+            return str(error)
+        return ""
+
     def current():
         path = root / DECK_FILE
         if path.exists():
@@ -63,14 +70,14 @@ def create_manager(root=ROOT, starter=None):
                 data = file.read(MAX_DECK_BYTES + 1)
             revision = hashlib.sha256(data).hexdigest()
             try:
-                rounds = parse_deck(data, root, allow_empty=True)
-                return rounds, revision, data, "questions.json", ""
+                rounds = parse_deck(data, root, allow_empty=True, require_media=False)
+                return rounds, revision, data, "questions.json", media_warning(rounds)
             except DeckError as error:
                 # Allow repairing a broken external edit, while preserving its backup.
                 return [], revision, data, "questions.json", str(error)
-        rounds = validate_rounds(starter, root, allow_empty=True)
+        rounds = validate_rounds(starter, root, allow_empty=True, require_media=False)
         data = deck_bytes(rounds)
-        return rounds, "starter-" + hashlib.sha256(data).hexdigest(), data, "Content.py starter deck", ""
+        return rounds, "starter-" + hashlib.sha256(data).hexdigest(), data, "Content.py starter deck", media_warning(rounds)
 
     @manager.get("/")
     def editor():
@@ -91,7 +98,8 @@ def create_manager(root=ROOT, starter=None):
     @manager.get("/api/starter")
     def get_starter():
         try:
-            return {"rounds": validate_rounds(starter, root, allow_empty=True)}
+            rounds = validate_rounds(starter, root, allow_empty=True, require_media=False)
+            return {"rounds": rounds, "warning": media_warning(rounds)}
         except DeckError as error:
             raise HTTPException(400, str(error)) from error
 
@@ -130,8 +138,9 @@ def create_manager(root=ROOT, starter=None):
 
     @manager.get("/api/media")
     def list_media():
-        result = {"image": [], "audio": []}
-        for kind, folder, extensions in (("image", "images", IMAGE_EXTENSIONS), ("audio", "audio", AUDIO_EXTENSIONS)):
+        result = {kind: [] for kind in MEDIA_FOLDERS}
+        for kind, folder in MEDIA_FOLDERS.items():
+            extensions = MEDIA_EXTENSIONS[kind]
             directory = root / "static" / folder
             if directory.exists():
                 for file in sorted(directory.iterdir()):
@@ -141,14 +150,14 @@ def create_manager(root=ROOT, starter=None):
 
     @manager.post("/api/media")
     async def upload(request: Request, kind: str, extension: str):
-        extensions = IMAGE_EXTENSIONS if kind == "image" else AUDIO_EXTENSIONS if kind == "audio" else set()
+        extensions = MEDIA_EXTENSIONS.get(kind, set())
         extension = extension.lower()
         if extension not in extensions:
-            raise HTTPException(400, "Choose a supported image or audio file. See the format list beside the upload field.")
+            raise HTTPException(400, "Choose a supported image, audio or video file. See the format list beside the upload field.")
         length = request.headers.get("content-length", "")
         if length.isdigit() and int(length) > MAX_UPLOAD_BYTES:
             raise HTTPException(413, "This file exceeds 25 MB. Use a smaller copy.")
-        directory = root / "static" / ("images" if kind == "image" else "audio")
+        directory = root / "static" / MEDIA_FOLDERS[kind]
         name = "sample_" + secrets.token_hex(12) + extension
         path = directory / name
         complete = False

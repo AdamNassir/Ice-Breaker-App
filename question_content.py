@@ -12,6 +12,9 @@ DECK_FILE = "questions.json"
 MAX_DECK_BYTES = 2 * 1024 * 1024
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif", ".bmp"}
 AUDIO_EXTENSIONS = {".mp3", ".wav", ".ogg", ".opus", ".flac", ".m4a", ".aac", ".webm"}
+VIDEO_EXTENSIONS = {".mp4", ".webm", ".ogv", ".mov", ".m4v"}
+MEDIA_FOLDERS = {"image": "images", "audio": "audio", "video": "videos"}
+MEDIA_EXTENSIONS = {"image": IMAGE_EXTENSIONS, "audio": AUDIO_EXTENSIONS, "video": VIDEO_EXTENSIONS}
 
 
 class DeckError(ValueError):
@@ -21,7 +24,7 @@ class DeckError(ValueError):
 class Question(BaseModel):
     model_config = ConfigDict(extra="forbid")
     title: str = Field(min_length=1, max_length=120)
-    kind: Literal["text", "code", "commit", "image", "audio"]
+    kind: Literal["text", "code", "commit", "image", "audio", "video"]
     answer: Literal["AI", "HUMAN"]
     body: str = Field(default="", max_length=50000)
     context: str = Field(default="", max_length=2000)
@@ -56,13 +59,13 @@ class Question(BaseModel):
             raise ValueError("Give the question a title.")
         if self.kind in {"text", "code", "commit"} and not self.body.strip():
             raise ValueError("Enter the question text or code.")
-        if self.kind in {"image", "audio"}:
-            expected = "images" if self.kind == "image" else "audio"
+        if self.kind in MEDIA_FOLDERS:
+            expected = MEDIA_FOLDERS[self.kind]
             path = PurePosixPath(self.media)
             if (not self.media.startswith(f"/static/{expected}/") or ".." in path.parts or
                     "\\" in self.media or "%" in self.media or "?" in self.media or "#" in self.media):
                 raise ValueError(f"Choose a file from static/{expected} or upload one.")
-            extensions = IMAGE_EXTENSIONS if self.kind == "image" else AUDIO_EXTENSIONS
+            extensions = MEDIA_EXTENSIONS[self.kind]
             if path.suffix.lower() not in extensions:
                 raise ValueError("This media format is not supported. Choose a browser-compatible file.")
         for value in (self.source_url, self.technical_source_url):
@@ -73,7 +76,7 @@ class Question(BaseModel):
         return self
 
 
-def validate_rounds(rounds, root=ROOT, allow_empty=False):
+def validate_rounds(rounds, root=ROOT, allow_empty=False, *, require_media=True):
     if not isinstance(rounds, list):
         raise DeckError("The deck must contain a list of questions.")
     if not rounds and not allow_empty:
@@ -89,11 +92,13 @@ def validate_rounds(rounds, root=ROOT, allow_empty=False):
             field = ".".join(str(p) for p in first["loc"])
             message = first["msg"].removeprefix("Value error, ")
             raise DeckError(f"Question {index}{' (' + field + ')' if field else ''}: {message}") from error
-        if question.kind in {"image", "audio"}:
-            base = (Path(root) / "static" / ("images" if question.kind == "image" else "audio")).resolve()
+        if question.kind in MEDIA_FOLDERS:
+            base = (Path(root) / "static" / MEDIA_FOLDERS[question.kind]).resolve()
             media = (Path(root) / question.media.lstrip("/")).resolve()
-            if not media.is_relative_to(base) or not media.is_file():
-                raise DeckError(f"Question {index}: the selected media file is missing.")
+            if not media.is_relative_to(base):
+                raise DeckError(f"Question {index}: media must stay inside static/{base.name}.")
+            if require_media and not media.is_file():
+                raise DeckError(f"Question {index}: the selected media file is missing ({question.media}). Upload a replacement or remove this question.")
         result.append(question.model_dump(exclude_none=True))
     return result
 
@@ -105,7 +110,7 @@ def deck_bytes(rounds):
     return data
 
 
-def parse_deck(data, root=ROOT, allow_empty=False):
+def parse_deck(data, root=ROOT, allow_empty=False, *, require_media=True):
     if len(data) > MAX_DECK_BYTES:
         raise DeckError("The question file is too large (maximum 2 MB).")
     try:
@@ -116,7 +121,7 @@ def parse_deck(data, root=ROOT, allow_empty=False):
         if value.get("schema_version", 1) != 1:
             raise DeckError("This question file uses an unsupported format version.")
         value = value.get("rounds")
-    return validate_rounds(value, root, allow_empty)
+    return validate_rounds(value, root, allow_empty, require_media=require_media)
 
 
 def load_rounds(root=ROOT, fallback=None):

@@ -131,7 +131,14 @@
       stage.append(wrap);
     } else {
       const q = s.question;
-      stage.append(element('span', 'kind', q.kind === 'text' ? 'Written content' : q.kind), element('h2', '', q.title));
+      const heading = element('div', 'content-meta');
+      heading.append(element('span', 'kind', q.kind === 'text' ? 'Written content' : q.kind));
+      if (Number.isInteger(q.difficulty) && q.difficulty >= 1 && q.difficulty <= 5) {
+        const levels = ['Warm-up', 'Inspection', 'Subtle behavior', 'Concurrency', 'Expert'];
+        heading.append(element('span', 'difficulty', `Level ${q.difficulty}/5 · ${levels[q.difficulty - 1]}`));
+      }
+      stage.append(heading, element('h2', '', q.title));
+      if (q.context) stage.append(element('p', 'question-context', q.context));
       if (q.kind === 'image') {
         const img = element('img', 'round-image'); img.src = q.media; img.alt = q.alt || 'Round image';
         if (['contain', 'cover'].includes(q.image_fit)) img.style.objectFit = q.image_fit;
@@ -140,12 +147,15 @@
           if (!stage.querySelector('.image-error')) stage.append(element('p', 'image-error', 'Image could not load. Tell the presenter before voting.'));
         });
         stage.append(img);
-      } else if (q.kind === 'audio') {
-        stage.append(element('p', 'small', q.body || 'Listen, then choose AI or Human.'));
-        const audio = element('audio', 'round-audio'); audio.src = q.media; audio.controls = true; audio.preload = 'auto';
-        audio.setAttribute('aria-label', q.alt || 'Round audio');
-        audio.addEventListener('error', () => stage.append(element('p', 'image-error', 'Audio could not load. Tell the presenter.')));
-        stage.append(audio);
+      } else if (q.kind === 'audio' || q.kind === 'video') {
+        const isVideo = q.kind === 'video';
+        stage.append(element('p', 'small', q.body || (isVideo ? 'Watch, then choose AI or Human.' : 'Listen, then choose AI or Human.')));
+        const player = element(q.kind, isVideo ? 'round-video' : 'round-audio');
+        player.src = q.media; player.controls = true; player.preload = 'metadata';
+        if (isVideo) player.setAttribute('playsinline', '');
+        player.setAttribute('aria-label', q.alt || (isVideo ? 'Round video' : 'Round audio'));
+        player.addEventListener('error', () => stage.append(element('p', 'image-error', `${isVideo ? 'Video' : 'Audio'} could not play. Tell the presenter and check the file format.`)));
+        stage.append(player);
       } else stage.append(element(q.kind === 'text' ? 'p' : 'pre', q.kind === 'text' ? 'text-content' : 'code-block', q.body));
     }
   }
@@ -158,6 +168,10 @@
     if (panel.dataset.signature === signature) return;
     panel.dataset.signature = signature; panel.replaceChildren();
     panel.append(element('h3', '', `The answer is ${r.answer}.`), element('p', '', r.explanation));
+    if (r.technical_note) {
+      panel.append(element('h4', 'reveal-subtitle', 'Technical detail'), element('p', '', r.technical_note));
+    }
+    if (r.discussion) panel.append(element('p', 'discussion-prompt', `Discuss: ${r.discussion}`));
     if (s.me) {
       const last = s.me.history.find(row => row.round === s.round_number);
       const message = last ? (last.correct ? `Correct! +${last.points} points · ${s.me.streak} in a row` :
@@ -168,6 +182,10 @@
     const source = element('p', 'source', r.source);
     if (r.source_url && /^https:\/\//.test(r.source_url)) {
       const link = element('a', '', ' View source'); link.href = r.source_url; link.target = '_blank'; link.rel = 'noopener noreferrer'; source.append(link);
+    }
+    if (r.technical_source_url && /^https:\/\//.test(r.technical_source_url)) {
+      const link = element('a', '', ' Technical reference');
+      link.href = r.technical_source_url; link.target = '_blank'; link.rel = 'noopener noreferrer'; source.append(link);
     }
     panel.append(source);
   }
