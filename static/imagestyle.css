@@ -1,4 +1,4 @@
-/* EDIT global image presentation here. Per-round overrides live in Content.py. */
+/* EDIT global image presentation here. Per-round overrides live in questions.json or the Content.py fallback. */
 .round-image {
   width: 100%;
   max-height: 420px;       /* CHANGE image height on laptop/projector. */
@@ -11,6 +11,7 @@
 }
 .round-audio { width: 100%; margin: 16px 0; }
 .round-video { display: block; width: 100%; max-height: 420px; margin: 16px 0; background: #171215; border-radius: 12px; }
+.youtube-player { width: 100%; aspect-ratio: 16 / 9; min-height: 200px; border: 0; }
 .image-error { color: #981b27; font-size: 14px; }
 @media (max-width: 760px) {
   .round-image { max-height: 300px; min-height: 140px; }

@@ -1,9 +1,10 @@
 """Shared deck format. questions.json takes priority; Content.py is the starter deck."""
 import copy
 import json
+import re
 from pathlib import Path, PurePosixPath
 from typing import Literal
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, parse_qs
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
@@ -15,6 +16,23 @@ AUDIO_EXTENSIONS = {".mp3", ".wav", ".ogg", ".opus", ".flac", ".m4a", ".aac", ".
 VIDEO_EXTENSIONS = {".mp4", ".webm", ".ogv", ".mov", ".m4v"}
 MEDIA_FOLDERS = {"image": "images", "audio": "audio", "video": "videos"}
 MEDIA_EXTENSIONS = {"image": IMAGE_EXTENSIONS, "audio": AUDIO_EXTENSIONS, "video": VIDEO_EXTENSIONS}
+
+
+def youtube_id(value):
+    parsed = urlsplit(value)
+    host = parsed.hostname
+    if host == "youtu.be":
+        identifier = parsed.path.strip('/')
+    elif host in {"youtube.com", "www.youtube.com", "m.youtube.com", "www.youtube-nocookie.com"}:
+        if parsed.path == '/watch':
+            identifier = parse_qs(parsed.query).get('v', [''])[0]
+        elif parsed.path.startswith(('/embed/', '/shorts/')):
+            identifier = parsed.path.split('/')[2]
+        else:
+            return None
+    else:
+        return None
+    return identifier if re.fullmatch(r'[A-Za-z0-9_-]{11}', identifier) else None
 
 
 class DeckError(ValueError):
@@ -31,6 +49,9 @@ class Question(BaseModel):
     seconds: int | None = Field(default=None, ge=5, le=120, strict=True)
     difficulty: int | None = Field(default=None, ge=1, le=5, strict=True)
     media: str = Field(default="", max_length=300)
+    media_url: str = Field(default="", max_length=2000)
+    media_start: int | None = Field(default=None, ge=0, le=7200, strict=True)
+    media_end: int | None = Field(default=None, ge=1, le=7200, strict=True)
     alt: str = Field(default="", max_length=1000)
     image_fit: Literal["contain", "cover"] = "contain"
     image_position: str = Field(default="center", max_length=60)
@@ -54,12 +75,27 @@ class Question(BaseModel):
                     raise ValueError("Use valid Unicode text in the question fields.") from error
         self.title = self.title.strip()
         self.source_url = self.source_url.strip()
+        self.media_url = self.media_url.strip()
         self.technical_source_url = self.technical_source_url.strip()
         if not self.title:
             raise ValueError("Give the question a title.")
         if self.kind in {"text", "code", "commit"} and not self.body.strip():
             raise ValueError("Enter the question text or code.")
         if self.kind in MEDIA_FOLDERS:
+            if self.media and self.media_url:
+                raise ValueError("Choose either an uploaded file or an online link, not both.")
+            if self.media_end is not None and self.media_end <= (self.media_start or 0):
+                raise ValueError("Clip end must be after clip start (seconds from the beginning).")
+        if self.media_url:
+            if self.kind not in {"audio", "video"}:
+                raise ValueError("Online links are supported for audio and video; upload images locally.")
+            parsed = urlsplit(self.media_url)
+            if parsed.scheme != 'https' or not parsed.hostname or parsed.username or parsed.password:
+                raise ValueError("Media links must be full https:// URLs without credentials.")
+            if not (self.kind == 'video' and youtube_id(self.media_url)):
+                if PurePosixPath(parsed.path).suffix.lower() not in MEDIA_EXTENSIONS[self.kind]:
+                    raise ValueError("Use a direct audio/video file URL, or a YouTube watch/share link for video.")
+        elif self.kind in MEDIA_FOLDERS:
             expected = MEDIA_FOLDERS[self.kind]
             path = PurePosixPath(self.media)
             if (not self.media.startswith(f"/static/{expected}/") or ".." in path.parts or
@@ -92,7 +128,7 @@ def validate_rounds(rounds, root=ROOT, allow_empty=False, *, require_media=True)
             field = ".".join(str(p) for p in first["loc"])
             message = first["msg"].removeprefix("Value error, ")
             raise DeckError(f"Question {index}{' (' + field + ')' if field else ''}: {message}") from error
-        if question.kind in MEDIA_FOLDERS:
+        if question.kind in MEDIA_FOLDERS and not question.media_url:
             base = (Path(root) / "static" / MEDIA_FOLDERS[question.kind]).resolve()
             media = (Path(root) / question.media.lstrip("/")).resolve()
             if not media.is_relative_to(base):

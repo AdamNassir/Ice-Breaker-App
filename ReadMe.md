@@ -1,26 +1,28 @@
 # AI or Human? — Ice Breaker Game
 
-A complete browser game for an AI presentation: a presenter opens a room, players join on their phones with pseudonyms, and everyone decides **AI OR HUMAN**. The bundled starter deck has **10 rounds**: 2 commits, 5 code snippets, 2 electronics images, and 1 incident note, split evenly between AI and human origins.
+A complete browser game for an AI presentation: a presenter opens a room, players join on their phones with pseudonyms, and everyone decides **AI OR HUMAN**. The bundled **English** deck has **10 rounds**: four strange images, two funny tech texts, two voices and two videos, split evenly between AI and human origins. See `UpdateGuide.md` to install this deck in an existing deployment.
 
 ## Edit questions with the local manager
 
-Run **`python question_manager.py`** using your virtual environment, then open **http://127.0.0.1:8765**. This is a separate local editor for adding, editing, reordering and previewing text, code, commits, images and audio questions. Click **Save deck to game** to write `questions.json`. Uploads are copied into `static/images/` or `static/audio/`.
+Run **`python question_manager.py`** using your virtual environment, then open **http://127.0.0.1:8765**. This is a separate local editor for adding, editing, reordering and previewing text, code, commits, images, audio and video questions. Click **Save deck to game** to write `questions.json`. Uploads are copied into `static/images/`, `static/audio/` or `static/videos/`.
 
 Full Windows/macOS/Linux launch commands and the editing/deployment workflow are in **`QuestionManager.md`**. No new packages or Supabase setup are needed for the editor. The public game uses `main.py` as before; the manager is not a public Vercel page.
 
 For Vercel, commit the saved `questions.json` and uploaded media, redeploy and create a **new room**. The game reads a saved JSON deck before falling back to `Content.py`. Once `questions.json` exists, changes to `Content.py` alone do not replace that managed deck.
 
-**First install of this update:** replace `main.py`; add `question_content.py`, `question_manager.py` and `manager_assets/`; update `.gitignore`, documentation and tests. Keep your existing `Content.py` as the starter if desired. No requirements or SQL changes are needed.
+**Installing this update:** follow `UpdateGuide.md`. Copy both the bundled `questions.json` and its local media along with the updated game/editor code. No requirements or SQL changes are needed.
 
 ## Bundled starter deck
 
-The ten rounds rise through five levels: Unicode/rejection sampling; electronics inspection; cancellation/PostgreSQL queue claiming; C++ memory ordering/Go mutexes; Redis cursors/distributed fencing. Difficulty appears on both screens. Each reveal includes the origin, a technical explanation and a discussion prompt. Answers stay AI OR HUMAN.
+The deck includes a fictional founder's professional-network post, motorcycle football, a historical Tesla double exposure, a bird-powered networking RFC, Napoleon with a hidden Inspector Gadget, a mainframe cat, English synthesized speech, authentic Grace Hopper audio, dancing robots and a generated astronaut clip. Each reveal includes a source, explanation and discussion prompt. Questions stay AI OR HUMAN; difficult code parsing is no longer the focus.
 
-The historical human samples come from tagged CPython, Go and Redis sources and a credited camera photograph. AI samples are original fictional artifacts generated for this deck. `ContentSources.md` contains the private answer key, exact source transformations, licenses, design inspiration and image prompt. The levels are an editorial progression, not measured detection probabilities.
+**Explain the rule:** AI means generated writing/image/voice/footage. HUMAN includes human-written jokes and human camera tricks. For audio judge the voice; for video judge the footage, even when it depicts robots. The labels come from documented origins, not a style detector. The founder is fictional; no real public figure is accused of using AI.
 
-The starter deck and its media are included. Use the local question manager to replace or adapt these examples; you can also keep your previous Content.py starter.
+`ContentSources.md` has the private answer key, credits, source links, changes and full image-generation prompts. `ContentSources_Technical.md` retains credits for the previous deck.
 
-Per-round timers range from 30 to 60 seconds, totaling 7 minutes 25 seconds of voting. They override the initial room timer slider. Allow about 12–18 minutes with discussion, or remove the `seconds` keys in `Content.py` to use a uniform timer.
+The ready-to-play `questions.json`, matching `Content.py` fallback, four image files and one human voice excerpt are included. **Three rounds need internet:** the linked synthetic voice, YouTube robots and linked generated video. No paid API key is required. Remote sites may show branding or become unavailable; rehearse and replace a blocked clip in the manager.
+
+Timers range from 25 to 35 seconds, totaling **4 minutes 35 seconds** of voting. Allow about 10–15 minutes with introductions/discussion. Timers override the initial room slider; clear per-question timers in the manager for a uniform timer. Start each recording manually after starting its round; the countdown does not wait for playback. Use the projector's speakers and invite phones to stay silent unless headphones are available.
 
 ## 1. Necessary downloads and installs
 
@@ -35,7 +37,7 @@ Per-round timers range from 30 to 60 seconds, totaling 7 minutes 25 seconds of v
 | Node.js LTS + Vercel CLI | Not required | Only for the alternative CLI route | https://nodejs.org/ then `npm install -g vercel` |
 | Editor | Recommended | Recommended | VS Code or any text editor |
 
-No Supabase CLI, Docker, local PostgreSQL, Node build system, paid AI API key, or frontend framework is needed. Both technical images are bundled; the four earlier images remain available as optional replacements. Supabase is used as PostgreSQL storage through **server-side psycopg**, so there is no Supabase browser SDK or exposed database key. This project does not use Supabase Auth: pseudonyms and random game tokens are sufficient for an ice breaker.
+No Supabase CLI, Docker, local PostgreSQL, Node build system, paid AI API key, or frontend framework is needed. The current local image/audio files are bundled; previous assets remain available for old rooms and backups. Supabase is used as PostgreSQL storage through **server-side psycopg**, so there is no Supabase browser SDK or exposed database key. This project does not use Supabase Auth: pseudonyms and random game tokens are sufficient for an ice breaker.
 
 The delivered folder is the project root. Commands below run **inside `Ice_Breaker_Game_App`**. The app works immediately with a local SQLite file; cloud deployment requires your own Supabase and Vercel setup. Credentials are intentionally absent.
 
@@ -172,7 +174,7 @@ The room expires **12 hours after creation**. New rooms opportunistically remove
 
 The QR pattern is generated by Python inside this app, using `qrcode==8.2`; no external QR service is contacted. It encodes only the public player link and room code. It regenerates when the presenter tab refreshes, and rooms created before this feature continue to work. For phones on a local network, set `PUBLIC_BASE_URL` to your reachable LAN address before creating the room. For Vercel, use your public production URL and ensure it does not require a Vercel login. The browser draws the generated pattern directly onto a canvas, without waiting for an image to load. If generation fails, an error and Retry QR code button appear; the displayed room code and Copy player link remain available. The QR request times out after 12 seconds.
 
-For the first manager installation, use the changed-file list in QuestionManager.md. Afterward, routine question edits only require deploying questions.json, new media and relevant source/license files. Keep your existing environment settings.
+For this English deck update, use the exact changed-file list in UpdateGuide.md. Afterward, routine question edits only require deploying questions.json, new media and relevant source/license files. Keep your existing environment settings.
 
 ## 6. Scoring and modifications
 
@@ -188,11 +190,12 @@ An incorrect or missed answer awards 0 and resets the streak. There is no speed 
 
 | Change | File / symbol |
 | --- | --- |
-| Round text, origin, source, image or audio | Local question manager → `questions.json`; `Content.py` is the fallback starter |
+| Round text, origin, source, image, audio or video | Local question manager → `questions.json`; `Content.py` is the fallback starter |
 | Add/remove/reorder rounds | Add/remove/reorder dictionary entries in `ROUNDS`; UI count updates automatically |
 | Override one round's timer | Edit `"seconds": 40`; remove per-round seconds to use the room slider |
-| Difficulty and neutral setup | `Content.py` → `difficulty` (1–5) and `context` |
-| Reveal engineering explanation / debate | `Content.py` → `technical_note`, `discussion`, `technical_source_url` |
+| Optional difficulty and neutral setup | Manager / `questions.json` → `difficulty` and `context` |
+| Reveal explanation / debate | Manager / `questions.json` → `explanation`, `discussion`, `source_url` |
+| Online playback / clip times | Manager / `questions.json` → `media_url`, `media_start`, `media_end`; playback in `static/media.js` |
 | Point and streak rules | `main.py` → `BASE_POINTS`, `STREAK_STEP`, `MAX_STREAK_BONUS` |
 | Room lifetime / player cap | `main.py` → `ROOM_LIFETIME_HOURS`, `MAX_PLAYERS` |
 | Red/orange/white/gold palette | `static/style.css` → `:root` variables |
@@ -204,9 +207,9 @@ An incorrect or missed answer awards 0 and resets the streak. There is no speed 
 
 After changing scoring constants, also update the scoring note in both HTML files. Make changes between events: Python/JS changes need a restart/redeploy, and content changes need a **new room**. Managed decks are read on new room creation, so local JSON edits do not require a running game to restart. Text and code are rendered as text, never HTML or executable code. Only files in `static/` are public; do not put answer keys or credentials there. Asset filenames are neutral to avoid revealing answers in network requests.
 
-Audio playback is supported but no recordings are bundled. Interesting replacements for technical audiences: a real versus generated release note, a terse versus polished PR review, a synthetic voice versus a consenting colleague's reading, or a generated architecture explanation versus an old public specification excerpt. Use recordings you own or have permission to share. Keep the wording identical for voice comparisons to test the audio rather than the script. A typical audio round needs a longer timer and a presenter click on the audio control; browser autoplay is intentionally not used.
+The manager supports local audio/video uploads and HTTPS playback links, including YouTube videos. Use recordings you own or have permission to share. Playback needs a click; browser autoplay is intentionally not used. The app does not clone voices or infer authorship.
 
-This is a perception game, not an AI detector. Labels describe known origin, not quality, truth or “AI assistance” in general. The historical examples are intentionally verifiable and less recognizable than famous first commits or language aphorisms; use your own documented human originals if your colleagues recognize these sources. Preserve a source/prompt and label mixed-origin material explicitly rather than inventing a binary ground truth.
+This is a perception game. Labels describe known production origin, not quality or truth. Document mixed-origin material instead of inventing a binary answer; use unambiguous samples for the two-choice game.
 
 ## 7. Folder structure
 
@@ -216,12 +219,14 @@ Ice_Breaker_Game_App/
   QuestionManager.md
   HowToAddImages.md
   Content.py                       Bundled fallback starter deck
-  questions.json                   Created by the manager on first save
+  questions.json                   Bundled English deck; edited by manager
   question_content.py              Shared deck loader/validation
   question_manager.py              Separate local editor server
   manager_assets/index.html, app.js, style.css
   ContentSources.md
+  ContentSources_Technical.md
   ContentSources_Legacy.md
+  UpdateGuide.md
   main.py                          Public game entrypoint
   store.py
   supabase.sql
@@ -229,9 +234,10 @@ Ice_Breaker_Game_App/
   requirements-dev.txt
   vercel.json
   static/
-    index.html, presenter.html, app.js, style.css, imagestyle.css
+    index.html, presenter.html, app.js, media.js, style.css, imagestyle.css
     images/                        Bundled images and uploaded copies
-    audio/                         Uploaded recordings
+    audio/                         Bundled Hopper excerpt and uploads
+    videos/                        Uploaded videos (default videos are online)
   licenses/
   tests/test_game.py, test_question_manager.py
   Verification.md

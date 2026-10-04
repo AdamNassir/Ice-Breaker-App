@@ -14,9 +14,20 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from fastapi.testclient import TestClient
 import main
 from store import Store
+from question_content import parse_deck, validate_rounds
 
 
 class GameTests(unittest.TestCase):
+    def test_bundled_managed_deck_matches_fallback_and_assets(self):
+        root = Path(__file__).resolve().parents[1]
+        managed = parse_deck((root / 'questions.json').read_bytes(), root)
+        self.assertEqual(managed, validate_rounds(main.ROUNDS, root))
+        self.assertEqual(len(managed), 10)
+        self.assertEqual(sum(q['answer'] == 'AI' for q in managed), 5)
+        self.assertEqual([q['kind'] for q in managed].count('image'), 4)
+        self.assertEqual([q['kind'] for q in managed].count('audio'), 2)
+        self.assertEqual([q['kind'] for q in managed].count('video'), 2)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         # Verify the bundled game independently of any deck the presenter saved.
@@ -77,7 +88,7 @@ class GameTests(unittest.TestCase):
                 s = self.state(self.p1)
                 self.assertEqual(s['phase'], 'revealed')
                 self.assertEqual(s['reveal']['answer'], question['answer'])
-                self.assertEqual(s['reveal'].get('technical_note'), question.get('technical_note'))
+                self.assertEqual(s['reveal'].get('technical_note', ''), question.get('technical_note', ''))
                 self.assertEqual(s['reveal'].get('discussion'), question.get('discussion'))
                 score = s['me']['score']
                 self.assertEqual(self.state(self.p1)['me']['score'], score)
@@ -165,7 +176,7 @@ class GameTests(unittest.TestCase):
             self.assertEqual(self.client.get('/api/health').status_code, 503)
 
     def test_media_and_pages_exist(self):
-        for url in ['/', '/presenter', '/static/style.css', '/static/imagestyle.css', '/static/app.js']:
+        for url in ['/', '/presenter', '/static/style.css', '/static/imagestyle.css', '/static/app.js', '/static/media.js']:
             self.assertEqual(self.client.get(url).status_code, 200)
         for question in main.ROUNDS:
             if question.get('media'):

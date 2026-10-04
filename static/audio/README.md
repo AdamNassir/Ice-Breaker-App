@@ -1,2 +1,3 @@
-Optional MP3/WAV files go here. See HowToAddImages.md for audio round examples.
-No audio recordings are bundled; all ten default rounds are immediately playable.
+Audio assets uploaded through the local manager are saved here.
+The default deck also includes sample17.mp3; its credits and excerpt details are in the private root ContentSources.md.
+Commit referenced audio together with questions.json and redeploy.

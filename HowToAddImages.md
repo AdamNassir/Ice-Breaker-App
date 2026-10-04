@@ -1,6 +1,6 @@
-# Add and edit images (and audio)
+# Add and edit images, audio and video
 
-The easiest method is the **local question manager**: run `python question_manager.py` in your virtual environment, open http://127.0.0.1:8765, choose Image or Voice/audio, upload the file and save the deck. Windows/macOS/Linux commands and complete steps are in `QuestionManager.md`.
+The easiest method is the **local question manager**: run `python question_manager.py` in your virtual environment, open http://127.0.0.1:8765, click **+ Image**, **+ Audio** or **+ Video**, upload the file and save the deck. Windows/macOS/Linux commands and complete steps are in `QuestionManager.md`.
 
 The manager writes `questions.json` and copies media into the app. For Vercel, commit that JSON and new media, redeploy, then create a **new room**. Existing rooms keep their original questions.
 
@@ -34,7 +34,7 @@ The remaining instructions describe advanced manual file editing. If `questions.
 3. Save and restart/redeploy. Create a new room. The round count adjusts automatically. To keep exactly ten rounds, replace a round instead of appending one.
 4. Rehearse on the projector and a phone. Confirm the whole image loads and the title/alt text do not reveal its origin.
 
-The path begins with `/static/images/`, not a local path such as `C:\Pictures\photo.jpg`. Match filename case exactly: Vercel/Linux are case-sensitive. `sample11.JPG` and `sample11.jpg` differ. Keep filenames simple with no spaces. Assets are public, so avoid embedding an answer key, identifying metadata that gives away the classification, or confidential source material. Keep attribution in `source`, which the server exposes only at reveal. Preserve source licenses when editing or redistributing assets: the bundled `sample11.jpg` camera photo is by Jguarin under CC BY-SA 4.0; its resized derivative keeps the same license. The default technical image rounds are `sample11.jpg` and `sample12.jpg`; the four older assets remain optional.
+The path begins with `/static/images/`, not a local path such as `C:\Pictures\photo.jpg`. Match filename case exactly: Vercel/Linux are case-sensitive. `sample11.JPG` and `sample11.jpg` differ. Keep filenames simple with no spaces. Assets are public, so avoid embedding an answer key, identifying metadata that gives away the classification, or confidential source material. Keep attribution in `source`, which the server exposes only at reveal. Preserve source licenses when editing or redistributing assets: the bundled `sample11.jpg` camera photo is by Jguarin under CC BY-SA 4.0; its resized derivative keeps the same license. The current images are `sample13.jpg` (Napoleon cameo), `sample14.jpg` (mainframe cat), `sample15.jpg` (motorcycle football) and `sample16.jpg` (Tesla). Credits and exact transformations are in ContentSources.md; previous assets remain available. The motorcycle-football derivative keeps CC BY-SA 3.0 Germany.
 
 ## Change image appearance through code
 
@@ -106,4 +106,30 @@ Use MP3 or WAV for broad compatibility. Copy the file into `static/audio/` and r
 },
 ```
 
-For a human voice, use your own recording or a consenting colleague. Avoid impersonating someone without permission. In an audio round, classify the **voice production**, not who authored the script; explain that before play. Tap Play on the presenter screen after starting the round. Phone playback is optional; headphones prevent echoes. Polling does not replace a live audio element, so it will keep playing. No audio asset is included in the default ten rounds.
+For a human voice, use your own recording or a consenting colleague. Avoid impersonating someone without permission. In an audio round, classify the **voice production**, not who authored the script; explain that before play. Tap Play on the presenter screen after starting the round. Phone playback is optional; headphones prevent echoes. Polling does not replace a live audio element, so it will keep playing. The default deck includes a local Grace Hopper excerpt, sample17.mp3, and a linked synthesized voice example.
+
+## Video clips
+
+Use the manager’s **+ Video** button, select an MP4, WebM, OGV, MOV or M4V file up to 25 MB, fill in the title and known AI/HUMAN origin, preview it and save the deck. Uploads go to `static/videos/`. Commit the video and `questions.json`, redeploy and create a new room. MP4 with H.264 video and AAC audio is a useful choice for phones. Convert incompatible videos before uploading; the editor does not transcode them. Both presenter and player screens show manual playback controls.
+
+## Link an online recording instead of uploading
+
+The updated manager has **Media source → Online link** for audio/video. Paste a direct HTTPS audio file, direct video file or YouTube video URL and set optional start/end in seconds. See QuestionManager.md for playback and rehearsal details. Example Python dictionary (or corresponding fields in questions.json):
+
+```python
+{
+    "title": "The robots have better moves than us",
+    "kind": "video",
+    "media_url": "https://www.youtube.com/watch?v=fn3KWM1kuAw",  # CHANGE URL.
+    "media_start": 0,          # CHANGE absolute start in whole seconds.
+    "media_end": 18,           # CHANGE absolute end; omit for entire recording.
+    "seconds": 35,             # CHANGE voting timer, including playback time.
+    "answer": "HUMAN",         # CHANGE to documented footage/voice origin.
+    "explanation": "Explain the known origin after the timer ends.",
+    "source": "Credit the creator and identify the recording.",
+}
+```
+
+Do not set both `media` and `media_url`. Uploaded images use `media` only. URLs must be HTTPS; audio needs a direct supported audio file URL, while YouTube is supported as video. A regular article/TED webpage is not a file URL; use the talk's YouTube video link or a recording you may legally host. No download, conversion or voice cloning happens automatically.
+
+The bundled sources/English deck and exact install list are in ContentSources.md and UpdateGuide.md. Replace both Content.py and questions.json when adopting the new default; a saved JSON deck takes priority.

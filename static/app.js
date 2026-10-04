@@ -150,12 +150,11 @@
       } else if (q.kind === 'audio' || q.kind === 'video') {
         const isVideo = q.kind === 'video';
         stage.append(element('p', 'small', q.body || (isVideo ? 'Watch, then choose AI or Human.' : 'Listen, then choose AI or Human.')));
-        const player = element(q.kind, isVideo ? 'round-video' : 'round-audio');
-        player.src = q.media; player.controls = true; player.preload = 'metadata';
-        if (isVideo) player.setAttribute('playsinline', '');
-        player.setAttribute('aria-label', q.alt || (isVideo ? 'Round video' : 'Round audio'));
-        player.addEventListener('error', () => stage.append(element('p', 'image-error', `${isVideo ? 'Video' : 'Audio'} could not play. Tell the presenter and check the file format.`)));
+        const player = window.IcebreakerMedia.create(q, isVideo ? 'round-video' : 'round-audio', message => {
+          if (!stage.querySelector('.image-error')) stage.append(element('p', 'image-error', message));
+        });
         stage.append(player);
+        if (q.media_url) stage.append(element('p','small','Online clip. If playback is blocked, tell the presenter before voting.'));
       } else stage.append(element(q.kind === 'text' ? 'p' : 'pre', q.kind === 'text' ? 'text-content' : 'code-block', q.body));
     }
   }
@@ -272,10 +271,11 @@
     $('seconds').addEventListener('input', () => { $('seconds-output').textContent = `${$('seconds').value} sec`; });
     $('create-form').addEventListener('submit', async event => {
       event.preventDefault(); $('create-button').disabled = true;
+      $('notice').hidden = true;
       try {
         const room = await api('/api/rooms', {title:$('game-title').value, seconds:Number($('seconds').value), password:$('password').value}, false);
         $('password').value = ''; saveSession(room); await poll();
-      } catch (error) { notify(error.message); } finally { $('create-button').disabled = false; }
+      } catch (error) { notify(error.message, error.status === 503); } finally { $('create-button').disabled = false; }
     });
     $('control-button').addEventListener('click', async () => {
       if (!state || controlPending) return;

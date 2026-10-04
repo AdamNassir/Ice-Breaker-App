@@ -140,7 +140,7 @@ def view(state, role, player_id):
         question = state["rounds"][state["index"]]
         result["question"] = {k: question[k] for k in
                               ("title", "kind", "body", "media", "alt", "image_fit", "image_position",
-                               "difficulty", "context") if k in question}
+                               "media_url", "media_start", "media_end", "difficulty", "context") if k in question}
         if state["phase"] == "revealed":
             result["reveal"] = {k: question[k] for k in
                                 ("answer", "explanation", "source", "source_url", "technical_note",
@@ -202,7 +202,8 @@ def create_room(body: CreateRoom, request: Request):
     try:
         rounds = load_rounds(ROOT, fallback=ROUNDS)
     except DeckError as error:
-        raise HTTPException(503, "Question deck cannot load. Fix or save it in the local question manager.") from error
+        source = "questions.json" if (ROOT / "questions.json").exists() else "Content.py starter deck; questions.json is absent"
+        raise HTTPException(503, f"Question deck cannot load ({source}): {error} Save a valid deck in the manager and include its media files in the app or deployment.") from error
     if not rounds or any(r.get("answer") not in ("AI", "HUMAN") or r.get("kind") not in
                          ("code", "commit", "text", "image", "audio", "video") for r in rounds):
         raise HTTPException(503, "Fix the round definitions in Content.py.")

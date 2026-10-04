@@ -3,7 +3,7 @@
 The manager saves questions.json; that file takes priority over these ROUNDS.
 Advanced users can edit this fallback directly when questions.json is absent.
 
-kind: commit | code | text | image | audio; answer: AI | HUMAN (server-only).
+kind: commit | code | text | image | audio | video; answer: AI | HUMAN (server-only).
 difficulty: 1..5, an editorial reading/deception level, not a measured detection rate.
 context: neutral setup visible before voting; seconds: optional round timer (5..120).
 technical_note and discussion: visible only after the answer is revealed.
