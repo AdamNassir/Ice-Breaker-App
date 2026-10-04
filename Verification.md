@@ -1,19 +1,23 @@
-# Verification — October 4, 2026
+# Verification — October 5, 2026
 
-## Tweet replacement update
+## Pixelation update
 
-- **25 Python API tests pass**, covering the full ten-round game, streak scores, auth/vote guards, QR generation, timer boundaries, question-manager uploads and saves, deck snapshots, bundled JSON/fallback equivalence, and the unscored bonus route.
-- The timer test sets the room to 10 seconds while legacy questions contain conflicting 25/120-second values. Every round uses exactly 10 seconds; votes are accepted at 9.99 seconds and rejected at the deadline.
-- The real presenter form is exercised in JSDOM: submitting 10 seconds creates a QR-only lobby with no first question or ranking; QR failure stays visible, retry restores the code, Copy player link works, and clicking Start sends the correct control action, hides the QR and displays the first question with a 10-second timer.
-- Presenter/player DOM checks use an API playthrough of all ten bundled questions. Content-only questions and AI/HUMAN-only reveals render correctly. The presenter has one content column and no live leaderboard. The QR lobby is hidden during rounds and final results. Repeated polling preserves media elements rather than restarting playback.
-- Final-placement checks cover six API-ranked entrants, medals for 1/2/3, numeric ranks 4/4/6, exact names/scores, and tied gold medals. The bonus link opens `/bonus`; either choice reveals AI without a room or scoring request.
-- The local manager opens the actual ten-question JSON without missing-media warnings, previews the Teams image and both new tweet cards, and saves additional custom video/audio questions. Switching an online video to an uploaded MP3 preserves upload bytes and clears the former link. Audio/video capability remains for custom decks despite removing all default recording questions.
-- Python sources compile; public JavaScript passes syntax checks. The new tweet cards were visually inspected for text bounds and blurred identity fields; the earlier LinkedIn/Teams screenshot assets remain unchanged. The historical moth JPEG decodes. Both deck files contain the same ten questions and answer balance (five AI, five HUMAN).
-- The bundled deck contains exactly nine image questions and one text question, no audio/video rounds and no remote question media. The genuine tweet wording/date were verified against X's public oEmbed response; the second replacement is original AI-written parody.
-- The final ZIP is built from the current project, extracted into a fresh folder, compared byte for byte, and tested for complete deck/media loading. Runtime dependencies, databases, private `.env`, caches and authoring research files are excluded.
+Both Trump cards have been visually inspected at full resolution: profile pictures, names and handles use coarse pixelation and no longer show readable author text. Pixel comparison against the previous cards confirms all changes stay within the three identity rectangles; the post writing and interface outside them remain identical. LinkedIn and Teams PNGs remain byte-identical. Fresh extraction confirms all ten questions and media are present and JSON matches the Python fallback. The 25 Python tests still pass.
+
+## Checks completed
+
+- **25 Python API tests pass**: complete ten-round scores/streaks, authentication, vote guards, QR generation, timer boundaries, manager uploads/saves, room snapshots, JSON/fallback equivalence and bundled media.
+- A presenter-selected **10 seconds** applies to every round, despite conflicting legacy question timers. Votes are accepted at 9.99 seconds and rejected at the deadline.
+- API-to-DOM checks play all ten actual bundled questions. The presenter starts in the QR-only lobby, then gets centered questions without a live leaderboard. Questions contain only the content; reveals contain only AI or HUMAN.
+- Final-placement checks cover medals 1/2/3, numeric ranks 4/4/6, exact scores/names and tied gold medals. The presenter final screen has **no bonus question, link or further action**. Phones automatically get the bonus question below their placements. A choice reveals AI without changing scores; the reveal persists when updated rankings cause a rerender. The legacy standalone `/bonus` route remains available but is not linked from the presenter.
+- Real presenter form checks verify the timer, QR failure/retry, copy link and Start controls. No first question is shown before Start.
+- The actual local manager loads all ten questions without missing-media warnings, previews Teams and both Trump posts, and saves custom uploaded/online audio and video. The default deck has **eight images and two texts**, five AI and five HUMAN, no audio/video rounds or remote question media.
+- The LinkedIn writing and AI firewall post match the previous version exactly. All four social PNGs were rebuilt and inspected for text bounds. The Teams reply uses understandable but off-topic automation claims. The cat image is absent from the deck and package.
+- The genuine post's unchanged 15-word text and May 16, 2025 date were checked against the American Presidency Project archive, linked in ContentSources.md. Current Teams layout reference: Microsoft's combined Chat screenshot, accessed October 4, 2026.
+- Python compiles and public JavaScript passes syntax checks. The complete ZIP is freshly extracted, compared byte for byte with the project, checked for ten matching JSON/fallback rounds and decodable media, and tested again from that extracted folder. Runtime installations, private `.env`, caches and authoring research are excluded.
 
 ## Limits
 
-DOM/computed-style checks do not establish actual projector layout. Rehearse in the event browser. All current question media is bundled; no external media playback is required. No live Supabase/Vercel deployment was available for account-level checks, and no deployment or database migration was performed.
+JSDOM checks verify DOM behavior and selected computed styles, not actual browser/projector rendering. The social PNGs are UI reconstructions, with drawn anonymized avatars; they are not captures of real LinkedIn or Teams accounts. The real Trump post preserves original words; the firewall parody is fictional. All current media plays locally without external media hosts.
 
-This is a known-origin game, not an authorship detector or a measured difficulty benchmark. For the social screenshots, judge the post or reply text. The genuine tweet reproduces original words in a reconstructed interface; its displayed avatar is a blurred placeholder. Other social posts/conversations are fictional. The AI parody is not a real statement by Trump. Production capacity at the 200-player limit has not been load-tested.
+No live Supabase/Vercel account deployment or database migration was performed. Rehearse on the event browser and intended audience size. Production capacity at the 200-player limit has not been load-tested. This is a known-origin game, not an authorship detector.

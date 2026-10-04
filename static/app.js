@@ -133,10 +133,33 @@
     const rest = element('ol', 'final-list');
     s.leaderboard.filter(player => player.rank > 3).forEach(player => rest.append(placement(player, s.me?.id)));
     if (rest.children.length) wrap.append(rest);
-    const bonus = element('a', 'primary bonus-link', 'Was this game made with AI or not ?');
-    bonus.href = '/bonus';
-    wrap.append(bonus);
+    if (!host) wrap.append(playerBonus(s.code));
     return wrap;
+  }
+
+  function playerBonus(code) {
+    // Phone-only epilogue. No API request, timer, vote or score change.
+    const panel = element('section', 'player-bonus');
+    panel.setAttribute('aria-label', 'Bonus question');
+    panel.append(element('h2', '', 'Was this game made with AI or not ?'));
+    const choices = element('div', 'vote-controls');
+    const reveal = element('p', 'bonus-reveal', 'AI');
+    reveal.setAttribute('aria-live', 'polite');
+    const savedKey = `icebreaker:bonus:${code}`;
+    let answered = false;
+    try { answered = storage.getItem(savedKey) === 'answered'; } catch {}
+    choices.hidden = answered; reveal.hidden = !answered;
+    for (const answer of ['AI', 'HUMAN']) {
+      const button = element('button', `answer ${answer.toLowerCase()}`, answer);
+      button.type = 'button';
+      button.addEventListener('click', () => {
+        choices.hidden = true; reveal.hidden = false;
+        try { storage.setItem(savedKey, 'answered'); } catch {}
+      });
+      choices.append(button);
+    }
+    panel.append(choices, reveal);
+    return panel;
   }
 
   function renderStage(s) {

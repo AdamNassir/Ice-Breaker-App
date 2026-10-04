@@ -1,6 +1,6 @@
 # English fun deck: private answer key and credits
 
-Rebuilt October 4, 2026. Ten rounds: five AI and five HUMAN; nine images and one text; no audio or video rounds. All prompts, questions and reveals are in English. These are known-origin examples, not detector verdicts. The previous technical deck's sources remain in `ContentSources_Technical.md`; older credits remain in `ContentSources_Legacy.md`.
+Rebuilt October 4, 2026. Ten rounds: five AI and five HUMAN; eight images and two texts; no audio or video rounds. All prompts, questions and reveals are in English. These are known-origin examples, not detector verdicts. The previous technical deck's sources remain in `ContentSources_Technical.md`; older credits remain in `ContentSources_Legacy.md`.
 
 ## Explain the rule before play
 
@@ -14,13 +14,13 @@ The public game reveals only AI or HUMAN. Sources and discussion notes are retai
 | --- | --- | --- | --- |
 | 1 | My AI agent deleted the roadmap | AI | Original AI-written post inside a fictional LinkedIn-style screenshot (`sample18.png`). All identities are fictional and blurred. Classification concerns the post text, not the interface renderer. |
 | 2 | The football upgrade nobody asked for | HUMAN | German Federal Archives photograph, August 1931; motorbike football. `sample15.jpg`: current Commons crop, re-encoded as JPEG without generative editing. |
-| 3 | A very scientific beverage observation | HUMAN | Verified Donald Trump tweet, October 14, 2012. Original wording displayed in an anonymized reconstructed tweet card (`sample21.png`). Profile picture, name and handle are blurred. |
+| 3 | A very scientific pop-culture observation | HUMAN | Genuine Donald Trump Truth Social post, May 16, 2025. Complete unchanged 15-word text inside a reconstructed post (`sample21.png`); profile and identity coarsely pixelated. |
 | 4 | Perfectly normal office lighting | HUMAN | Dickenson V. Alley's Tesla laboratory photograph, December 1899. Historical double exposure; resized/re-encoded, no generative editing. `sample16.jpg`. |
 | 5 | The protocol committee got creative | HUMAN | Exact English excerpts from RFCs 1149, 2549, 6214 and 2324, all published April 1. Visible omission markers separate nonadjacent selections and documents. No paraphrasing or translation. |
 | 6 | An unexpected guest at the coronation | AI | Original generated imperial ceremony with an Inspector Gadget cameo, October 4, 2026. Historical pastiche, not an altered museum original. `sample13.jpg`. |
-| 7 | The firewall procurement plan | AI | Original AI-written parody about a huge firewall and CAPS LOCK (`sample22.png`). This is fictional, not a real Trump post. Its layout matches the genuine-post card; profile picture, name and handle are blurred. |
-| 8 | The new hire seems qualified | AI | Original generated fictional 1960s mainframe team photograph with a cat in a tie, October 4, 2026. `sample14.jpg`. |
-| 9 | The quarterly technical validation | AI | Fictional Teams-style screenshot (`sample19.png`). AI wrote the response, whose advanced technical claims do not describe the simple coffee-rota PDF shown beside it. Both messages, document, profiles and interface are fictional; identities are blurred. |
+| 7 | The firewall procurement plan | AI | Original AI-written parody about a huge firewall and CAPS LOCK (`sample22.png`). This is fictional, not a real Trump post. It uses a compact X-style post layout; profile picture, name and handle are coarsely pixelated. |
+| 8 | The printer has been promoted | AI | Original AI-written comic incident report about promoting the office printer to primary database server. No quotation or real incident claimed. Text replaces the removed cat photo. |
+| 9 | The quarterly technical validation | AI | Fictional Teams-style screenshot (`sample19.png`). AI wrote the response, whose understandable claims about company-wide automated purchasing do not describe the simple coffee-rota PDF shown beside it. Both messages, document, profiles and interface are fictional; identities are blurred. |
 | 10 | A bug report with physical evidence | HUMAN | U.S. Navy photograph of the Harvard Mark II logbook, September 9, 1947 (`sample20.jpg`). Public-domain federal-government image; resized/re-encoded without generative editing. The moth is real. |
 
 ### Historical photos: credit and licenses
@@ -58,32 +58,30 @@ Courtesy Naval Surface Warfare Center, Dahlgren; U.S. Navy photograph of the log
 
 ### Fictional social screenshots — sample18.png and sample19.png
 
-These are original UI reconstructions produced by `build_question_images.py`, not captures of real accounts. Text was generated for this game. The LinkedIn post and Teams reply are the objects of classification. Blur hides invented identity fields and drawn avatars; it does not anonymize a real person. No claim about a real founder's or employee's use of AI is made. The Teams PDF preview explicitly describes a manual shared spreadsheet, contradicting the invented advanced architecture in the reply. No real PDF or uploaded document is used.
+These are native editable UI reconstructions produced by `build_question_images.py`, not captures of real accounts. The LinkedIn writing is unchanged from the previous deck. Its compact post layout follows the user-supplied reference: profile header, body, reactions and four actions. Engagement numbers are fictional interface decoration. The Teams view follows [Microsoft's current combined Chat interface](https://support.microsoft.com/en-us/teams/teams-channels/explore-the-new-chat-and-channels-experience-in-microsoft-teams), accessed October 4, 2026; [official reference screenshot](https://support.microsoft.com/en-us/teams/media/simple-collab-combined-view.png). The layout has the light app bar, app rail, Chat filters/list, message bubbles and document panel. No reference screenshot pixels or original employee messages are redistributed.
 
-### Anonymized tweet cards — sample21.png and sample22.png
+LinkedIn post and Teams reply text are the objects of classification. Blur hides invented identities and drawn avatars. The revised Teams response is readable ordinary English about automated inventory, supplier orders, access controls, backups and an international rollout. None describes the manual coffee-rota spreadsheet visible in the PDF. Both messages and the document are fictional. No real founder's or employee's use of AI is claimed.
 
-**sample21.png: genuine human-written post.** [Original public post](https://x.com/realDonaldTrump/status/257552283850653696), Donald J. Trump, October 14, 2012, status 257552283850653696. Its wording and date were verified using X's public [oEmbed response](https://publish.twitter.com/oembed?url=https%3A%2F%2Ftwitter.com%2FrealDonaldTrump%2Fstatus%2F257552283850653696&omit_script=true). The complete post is ten words. The card preserves the words, normalizes whitespace and reconstructs the interface. The avatar is a blurred placeholder; author name and handle are blurred. The card omits date and engagement counts so they do not give away provenance. HUMAN refers to the original writing, not whether the underlying claim is true.
+### Anonymized social posts — sample21.png and sample22.png
 
-**sample22.png: AI-written fictional parody.** Original English satire created for this game on October 4, 2026, using exaggerated social-media phrasing about cybersecurity. These words were never attributed to a real person as a genuine statement. The card uses the same reconstructed interface and blurred identity treatment, with no date or engagement counts. AI refers to the post text. This is not an edited quotation from a real tweet.
+**sample21.png: genuine human-written post.** Donald J. Trump, May 16, 2025. [Original Truth Social post](https://truthsocial.com/@realDonaldTrump/posts/114517718765768352), ID 114517718765768352. The [American Presidency Project archive](https://www.presidency.ucsb.edu/documents/truth-social-posts-may-16-2025) preserves its complete 15-word text and posting time. The words are unchanged. This replaces the October 2012 Diet Coke tweet. The card reconstructs a Truth Social post with a drawn placeholder avatar and coarse name/handle pixelation. It omits date and engagement counts. HUMAN refers to original writing, not whether the claim is true.
 
-Both cards are generated by the local Python/Pillow `tweet()` function in `build_question_images.py`; no paid API, screenshot service or live social-media embed is used to play. The authentic post is fixed in `GENUINE_TWEET`; the original parody can be edited in `AI_TWEET`. Keep source/classification notes in sync if replacing either sample.
+**sample22.png: AI-written fictional parody.** Original English cybersecurity satire created for this game on October 4, 2026. The firewall/CAPS LOCK text is unchanged. It uses a compact X-style post with the same coarse identity pixelation and no date or engagement counts. These words are fictional and are not a genuine statement by Trump. AI refers to the post text.
+
+The local Python/Pillow `tweet()` function renders both cards. `GENUINE_TWEET` is the fixed verified text; `AI_TWEET` is the editable parody. `SOCIAL_NAME_PIXEL_SIZE = 24` and `SOCIAL_AVATAR_PIXEL_SIZE = 20` render coarse, solid pixels so neither name nor handle is legible. The avatars remain drawn placeholders. Neither card uses live embeds or paid APIs during play. Keep sources and classifications synchronized when replacing posts.
 
 ## Generated images: full prompts
 
-Both images were made with OpenAI's built-in image generation tool on October 4, 2026. No external CLI or paid API setup is required to play. Original PNG outputs were 1536 × 1024; the app uses JPEG copies at that size, quality 91, without added generative edits. The originals are fictional scenes. Do not describe either as a recovered historical photograph or authentic painting.
+The remaining generated image was made with OpenAI's built-in image generation tool on October 4, 2026. No external CLI or paid API setup is required to play. The original PNG output was 1536 × 1024; the app uses a JPEG copy at that size, quality 91, without added generative edits. It is a fictional scene, not an authentic painting.
 
 **sample13.jpg — Napoleon's unexpected guest**
 
 > Use case: historical-scene. Asset type: one landscape image for an AI-or-HUMAN party quiz. Create an original oil painting evocative of a large early nineteenth-century French imperial ceremony: Napoleon in ornate coronation clothes, gathered clergy and aristocrats, rich crimson robes, elaborate gold architecture, huge painted canvas texture and aged varnish. Sneak Inspector Gadget into the middle-distance guests: recognizable grey trench coat, grey hat, long nose, one subtly extended mechanical arm, but render him in the same realistic oil-painted style. His figure should be findable on close inspection on a projector, about 8% of image height, not a giant cartoon foreground subject. Make the rest of the painting convincingly historical and spatially coherent. This is a humorous fictional scene, not a claim of an authentic painting. No captions, no logos, no watermark, no text. Landscape aspect ratio.
 
-**sample14.jpg — The cat at the mainframe**
-
-> Use case: photorealistic-natural. Asset type: one landscape image for an AI-or-HUMAN party quiz. Create a convincingly old 1960s black-and-white press photograph of a computer training room: six serious office workers in suits, big mainframe cabinets, neatly routed cables, paper tape reels, desk terminals. One deadpan tabby cat sits upright in a little chair at the central terminal with its forepaws naturally resting on the keyboard, wearing a very small dark tie, as though it belongs in the team photograph. The workers look studiously unimpressed. Candid archival photograph, subtle film grain, mild flash, ordinary messy room, imperfect framing. Make the absurdity funny yet the physical details plausible. One cat only. No readable signs, no invented gibberish lettering, no captions, no watermark. Landscape aspect ratio.
-
 ## Game inspiration and event notes
 
 [Sightengine's AI or Not](https://www.sightengine.com/ai-or-not) uses a simple real/generated choice across images, voices and videos. [Realdle](https://www.realdle.com/) encourages comparing plausible real and generated images. This deck borrows the quick choice and visual surprise; it adds a presenter-controlled reveal, humorous sources and discussion. It does not copy those games' assets or code.
 
-All nine current question images are bundled locally. The current deck contains no audio/video questions and no externally hosted media. Manager media support and the legacy Hopper clip remain available for custom decks and older room snapshots. Both new replacements are tweet-style images; no extra April Fools RFC questions were added.
+All eight current question images are bundled locally. The current deck contains no audio/video questions and no externally hosted media. Manager media support and the legacy Hopper clip remain available for custom decks and older room snapshots. The cat photo has been removed from both the deck and ZIP. Its replacement is original tech satire; no additional April Fools RFC round was added.
 
 Keep this answer-key file outside `static/` and your source repository private if participants should not inspect it.

@@ -27,11 +27,13 @@ TEAMS_REQUEST = (
     "the beans each week. Can you read it and validate before I close the project?"
 )
 TEAMS_REPLY = (
-    "Validated. The document establishes a fault-tolerant "
-    "distributed consensus architecture with Raft leader election and "
-    "Byzantine resilience. I particularly appreciated the homomorphic "
-    "encryption layer, the quantum-safe key exchange and the Kubernetes "
-    "service mesh. Ready for planetary-scale deployment. No changes needed."
+    "Validated. This is a strong plan for automating coffee supply across all our "
+    "offices. The live inventory dashboard should predict demand, place orders "
+    "with suppliers and reroute deliveries when a site runs low. I also like "
+    "the access controls that stop unauthorized purchases and the backup "
+    "system that keeps everything running during an outage. My only "
+    "recommendation is to add a rollout plan for international offices. "
+    "Otherwise, ready to launch."
 )
 PDF_LINES = [
     "Q3 PROJECT WRAP-UP", "Office coffee rota", "Final technical document",
@@ -39,8 +41,8 @@ PDF_LINES = [
     "Everyone edits their own row manually.", "Friday: check next week's volunteer.",
     "Success: no empty coffee machine.", "No servers. No API. No automation.",
 ]
-GENUINE_TWEET = "I have never seen a thin person drinking Diet Coke."
-GENUINE_TWEET_SOURCE = "https://x.com/realDonaldTrump/status/257552283850653696"
+GENUINE_TWEET = 'Has anyone noticed that, since I said "I HATE TAYLOR SWIFT," she\'s no longer "HOT?"'
+GENUINE_TWEET_SOURCE = "https://truthsocial.com/@realDonaldTrump/posts/114517718765768352"
 AI_TWEET = (
     "We will build the biggest FIREWALL anyone has ever seen. Beautiful firewall. "
     "And the hackers are going to pay for it. They said nobody could secure a "
@@ -49,7 +51,9 @@ AI_TWEET = (
 
 
 def font(size, bold=False):
-    names = ["DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf",
+    names = ["/usr/share/fonts/opentype/urw-base35/NimbusSans-Bold.otf" if bold else
+             "/usr/share/fonts/opentype/urw-base35/NimbusSans-Regular.otf",
+             "DejaVuSans-Bold.ttf" if bold else "DejaVuSans.ttf",
              str(Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts" /
                  ("arialbd.ttf" if bold else "arial.ttf")),
              "/System/Library/Fonts/Supplemental/Arial Bold.ttf" if bold else
@@ -84,142 +88,236 @@ def paragraph(draw, xy, value, width, size=26, line=38, fill="#242424"):
     return y
 
 
-def identity(image, xy, color="#88a4b0", name_width=215, size=58):
+# CHANGE these block sizes for the two Trump cards. Larger blocks hide more.
+SOCIAL_NAME_PIXEL_SIZE = 24
+SOCIAL_AVATAR_PIXEL_SIZE = 20
+
+
+def pixelate(tile, block_size):
+    """Destructively average identity details, then draw solid square pixels."""
+    width, height = tile.size
+    reduced = tile.resize((max(1, width // block_size), max(1, height // block_size)),
+                          Image.Resampling.BOX)
+    return reduced.resize(tile.size, Image.Resampling.NEAREST)
+
+
+def avatar(image, xy, size=88, color="#d5dfeb", blur=5, pixel_size=None):
     x, y = xy
-    avatar = Image.new("RGB", (size, size), color)
-    ad = ImageDraw.Draw(avatar)
-    ad.ellipse((size*.31, size*.13, size*.7, size*.54), fill="#dcc3ab")
-    ad.ellipse((size*.12, size*.48, size*.91, size*1.2), fill="#334858")
-    mask = Image.new("L", (size, size), 0)
-    ImageDraw.Draw(mask).ellipse((0, 0, size - 1, size - 1), fill=255)
-    image.paste(avatar.filter(ImageFilter.GaussianBlur(9)), (x, y), mask)
-    label = Image.new("RGB", (name_width, 52), "white")
-    ld = ImageDraw.Draw(label)
-    text(ld, (0, -2), "Alexandre Martin", 23, bold=True)
-    text(ld, (0, 28), "Product & Operations", 18, "#666666")
-    image.paste(label.filter(ImageFilter.GaussianBlur(7)), (x + size + 14, y + 2))
+    tile = Image.new("RGB", (size, size), color)
+    d = ImageDraw.Draw(tile)
+    d.ellipse((size*.30, size*.12, size*.72, size*.62), fill="#ecc4a3")
+    d.ellipse((size*.29, size*.06, size*.73, size*.32), fill="#c9b28b")
+    d.polygon([(size*.12,size),(size*.30,size*.58),(size*.51,size*.72),
+               (size*.73,size*.58),(size*.95,size)], fill="#23354d")
+    d.polygon([(size*.43,size*.65),(size*.55,size*.65),(size*.58,size),
+               (size*.45,size)],fill="#bc3036")
+    mask=Image.new("L",(size,size),0)
+    ImageDraw.Draw(mask).ellipse((0,0,size-1,size-1),fill=255)
+    hidden = pixelate(tile, pixel_size) if pixel_size else tile.filter(ImageFilter.GaussianBlur(blur))
+    image.paste(hidden,(x,y),mask)
+
+
+def blurred_label(image, xy, value, size=30, width=350, height=46, bold=False,
+                  bg="white", fill="#161616", radius=5, pixel_size=None):
+    tile=Image.new("RGB",(width,height),bg)
+    text(ImageDraw.Draw(tile),(0,0),value,size,fill,bold)
+    hidden = pixelate(tile, pixel_size) if pixel_size else tile.filter(ImageFilter.GaussianBlur(radius))
+    image.paste(hidden,xy)
+
+
+def icon(d, xy, kind, scale=1, color="#656565"):
+    x,y=xy; w=max(2,round(2*scale))
+    def line(points):d.line([(x+a*scale,y+b*scale) for a,b in points],fill=color,width=w)
+    if kind=="comment":
+        d.rounded_rectangle((x,y,x+26*scale,y+20*scale),radius=5*scale,outline=color,width=w)
+        line([(6,20),(3,27),(14,20)])
+    elif kind=="repost":
+        line([(2,11),(2,4),(25,4),(20,0)]);line([(25,4),(20,8)])
+        line([(25,15),(25,24),(2,24),(7,28)]);line([(2,24),(7,20)])
+    elif kind=="send":
+        line([(0,10),(28,0),(18,28),(12,16),(0,10)]);line([(12,16),(28,0)])
+    elif kind=="like":
+        line([(4,12),(10,12),(15,0),(20,0),(20,10),(29,10),(26,28),(10,28),(10,12)])
+        d.rectangle((x,y+12*scale,x+6*scale,y+28*scale),outline=color,width=w)
+    elif kind=="heart":
+        d.arc((x,y,x+15*scale,y+16*scale),180,340,fill=color,width=w)
+        d.arc((x+13*scale,y,x+28*scale,y+16*scale),200,360,fill=color,width=w)
+        line([(0,9),(14,27),(28,9)])
+    elif kind=="share":
+        line([(0,14),(0,28),(26,28),(26,14)]);line([(13,22),(13,0),(5,8)])
+        line([(13,0),(21,8)])
+    elif kind=="calendar":
+        d.rounded_rectangle((x,y+3*scale,x+26*scale,y+27*scale),3*scale,outline=color,width=w)
+        line([(0,10),(26,10)]);line([(7,0),(7,6)]);line([(19,0),(19,6)])
+        for a,b in [(7,16),(18,16),(7,22),(18,22)]:
+            d.rectangle((x+a*scale,y+b*scale,x+(a+2)*scale,y+(b+2)*scale),fill=color)
+    elif kind=="phone":
+        line([(6,0),(1,3),(0,10),(4,20),(13,28),(22,31),(28,28),
+              (28,24),(20,19),(17,23),(10,17),(7,11),(11,8),(6,0)])
+    elif kind=="cloud":
+        d.arc((x,y+11*scale,x+15*scale,y+28*scale),90,270,fill=color,width=w)
+        d.arc((x+7*scale,y+2*scale,x+26*scale,y+24*scale),170,355,fill=color,width=w)
+        d.arc((x+20*scale,y+13*scale,x+33*scale,y+28*scale),270,90,fill=color,width=w)
+        line([(7,28),(27,28)])
+    elif kind=="apps":
+        d.rounded_rectangle((x,y,x+26*scale,y+26*scale),3*scale,outline=color,width=w)
+        line([(13,6),(13,20)]);line([(6,13),(20,13)])
+    elif kind=="bell":
+        d.arc((x+5*scale,y,x+23*scale,y+20*scale),180,360,fill=color,width=w)
+        line([(5,9),(5,19),(1,24),(27,24),(23,19),(23,9)])
+        d.arc((x+9*scale,y+22*scale,x+18*scale,y+29*scale),0,180,fill=color,width=w)
 
 
 def linkedin():
-    im = Image.new("RGB", (1100, 1110), "#f3f2ef")
-    d = ImageDraw.Draw(im)
-    d.rectangle((0, 0, 1100, 82), fill="white")
-    d.rounded_rectangle((36, 17, 82, 63), radius=4, fill="#0a66c2")
-    text(d, (43, 15), "in", 36, "white", True)
-    d.rounded_rectangle((100, 17, 405, 63), radius=4, fill="#edf3f8")
-    text(d, (120, 26), "Search", 22, "#5d666c")
-    for x, icon, label in [(466, "⌂", "Home"), (585, "♙", "My Network"),
-                            (715, "▣", "Jobs"), (820, "□", "Messaging"), (970, "●", "Notifications")]:
-        text(d, (x, 3), icon, 29, "#666666")
-        text(d, (x-20, 49), label, 15, "#666666")
-    d.rounded_rectangle((85, 108, 1015, 1068), radius=12, fill="white", outline="#d7d7d7", width=2)
-    identity(im, (115, 137), size=76, name_width=275)
-    d = ImageDraw.Draw(im)
-    text(d, (205, 202), "1d · ◉", 19, "#777777")
-    text(d, (927, 131), "···", 35, "#666666")
-    y = paragraph(d, (120, 257), LINKEDIN_POST, 850, 29, 43)
-    footer_y = max(895, y + 22)
-    for cx, c, s in [(137, "#378fe9", "+"), (159, "#df704d", "♥"), (181, "#6d9e80", "★")]:
-        d.ellipse((cx-16, footer_y, cx+16, footer_y+32), fill=c, outline="white", width=2)
-        text(d, (cx-8, footer_y+4), s, 16, "white")
-    text(d, (208, footer_y+4), "1,284", 19, "#666666")
-    text(d, (647, footer_y+4), "86 comments · 24 reposts", 19, "#666666")
-    d.line((116, footer_y+52, 983, footer_y+52), fill="#dddddd", width=2)
-    for x, label in [(145, "♡  Like"), (353, "□  Comment"), (591, "⇄  Repost"), (815, "➤  Send")]:
-        text(d, (x, footer_y+75), label, 22, "#666666", True)
-    im.save(ROOT / "sample18.png", optimize=True)
+    # Cropped post, like the supplied reference: no invented whole-site header.
+    im=Image.new("RGB",(1100,1800),"white");d=ImageDraw.Draw(im)
+    avatar(im,(25,25),96,color="#bdc8d4",blur=8)
+    blurred_label(im,(139,29),"Alexandre Martin",32,330,42,True,radius=5)
+    blurred_label(im,(139,75),"Product & Operations",26,470,38,fill="#666666",radius=5)
+    d=ImageDraw.Draw(im)
+    text(d,(484,29),"· 2nd",29,"#666666")
+    text(d,(139,111),"1d ·",25,"#666666")
+    d.ellipse((196,115,217,136),outline="#666666",width=2)
+    d.arc((201,115,212,136),0,360,fill="#666666",width=1)
+    d.line((196,125,217,125),fill="#666666",width=1)
+    text(d,(902,33),"+ Follow",32,"#0a66c2",True)
+    y=paragraph(d,(24,175),LINKEDIN_POST,1052,31,44)
+    footer=y+30
+    for x,c in [(39,"#378fe9"),(65,"#df704d"),(91,"#6d9e80")]:
+        d.ellipse((x-19,footer,x+19,footer+38),fill=c,outline="white",width=2)
+    icon(d,(26,footer+9),"like",.65,"white")
+    text(d,(53,footer+5),"♥",24,"white")
+    text(d,(82,footer+7),"✦",21,"white")
+    text(d,(121,footer+8),"701",25,"#666666")
+    text(d,(697,footer+8),"77 comments · 40 reposts",25,"#666666")
+    d.line((24,footer+62,1076,footer+62),fill="#dedede",width=2)
+    for cx,label,kind in [(143,"Like","like"),(414,"Comment","comment"),
+                           (686,"Repost","repost"),(957,"Send","send")]:
+        icon(d,(cx-19,footer+87),kind,1.3)
+        width=d.textlength(label,font=font(27,True))
+        text(d,(cx-width/2,footer+134),label,27,"#666666",True)
+    height=footer+185
+    im=im.crop((0,0,1100,height));ImageDraw.Draw(im).rounded_rectangle((1,1,1098,height-2),8,outline="#dedede",width=2)
+    im.save(ROOT/"sample18.png",optimize=True)
 
 
 def teams():
-    im = Image.new("RGB", (1560, 1070), "#f5f5f5")
-    d = ImageDraw.Draw(im)
-    d.rectangle((0, 0, 1560, 66), fill="#48466d")
-    text(d, (24, 16), "···    Microsoft Teams", 24, "white", True)
-    d.rounded_rectangle((444, 12, 1115, 53), radius=6, fill="#e8e8ef")
-    text(d, (466, 20), "Search (Ctrl+E)", 21, "#6b6b78")
-    d.rectangle((0, 66, 86, 1070), fill="#eeeeF4")
-    for y, icon, label in [(105, "●", "Activity"), (204, "□", "Chat"), (303, "▣", "Teams"), (402, "▦", "Calendar"), (501, "☎", "Calls")]:
-        text(d, (30, y), icon, 26, "#6264a7")
-        text(d, (9, y+38), label, 14, "#555561")
-    d.rectangle((86, 66, 1560, 149), fill="white")
-    identity(im, (114, 83), "#bea7c8", size=46, name_width=236)
-    d = ImageDraw.Draw(im)
-    text(d, (477, 98), "Chat     Shared     +", 24, "#5b5fc7")
-    text(d, (1364, 98), "◉    ☎    ···", 25, "#666666")
-    text(d, (698, 174), "Thursday, 3 October", 18, "#787884")
-    # Left: actual conversation. Right: the opened, extremely simple PDF.
-    identity(im, (114, 215), "#90aab2", size=46, name_width=210)
-    d = ImageDraw.Draw(im)
-    text(d, (393, 223), "09:41", 18, "#787884")
-    d.rounded_rectangle((176, 279, 905, 511), radius=8, fill="white")
-    paragraph(d, (197, 297), TEAMS_REQUEST, 687, 25, 36)
-    d.rounded_rectangle((176, 527, 842, 609), radius=8, fill="white", outline="#d6d6dd", width=2)
-    d.rounded_rectangle((195, 545, 242, 592), radius=5, fill="#ca3838")
-    text(d, (201, 558), "PDF", 15, "white", True)
-    text(d, (260, 541), "Q3_Final_Technical_Document.pdf", 22, bold=True)
-    text(d, (260, 575), "1 page · 84 KB", 17, "#777777")
-    identity(im, (114, 641), "#b6a183", size=46, name_width=210)
-    d = ImageDraw.Draw(im)
-    text(d, (393, 650), "09:42", 18, "#787884")
-    d.rounded_rectangle((176, 707, 905, 978), radius=8, fill="white")
-    paragraph(d, (197, 725), TEAMS_REPLY, 687, 25, 36)
-    # Shared document preview. Labels are part of the fictional Teams chrome.
-    d.rounded_rectangle((937, 213, 1532, 979), radius=8, fill="#e7e7ec", outline="#d0d0d6")
-    text(d, (954, 231), "Q3_Final_Technical_Document.pdf", 19, bold=True)
-    text(d, (978, 279), "‹    1 / 1          100%                ×", 21, "#666666")
-    d.rectangle((960, 322, 1509, 952), fill="white")
-    text(d, (988, 356), PDF_LINES[0], 25, bold=True)
-    text(d, (988, 405), PDF_LINES[1], 28, bold=True)
-    text(d, (988, 454), PDF_LINES[2], 21, "#666666")
-    d.line((988, 496, 1480, 496), fill="#cccccc", width=2)
-    yy = 526
-    for part in PDF_LINES[3:]:
-        yy = paragraph(d, (988, yy), part, 488, 23, 34) + 20
-    d.rounded_rectangle((176, 1005, 1532, 1054), radius=5, fill="white", outline="#b8b8c4")
-    text(d, (194, 1018), "Type a message", 20, "#8b8b91")
-    im.save(ROOT / "sample19.png", optimize=True)
+    # Reference: Microsoft's current combined Chat view, accessed October 2026.
+    # Native editable UI reconstruction; every account and message is fictional.
+    im=Image.new("RGB",(1800,1120),"#f5f5f5");d=ImageDraw.Draw(im)
+    text(d,(24,17),"···",27,"#525252")
+    text(d,(99,18),"Microsoft Teams",22,"#424242",True)
+    d.rounded_rectangle((560,10,1230,54),8,fill="#e8e8ee")
+    text(d,(584,20),"Search (Ctrl+E)",22,"#616161")
+    text(d,(1650,17),"···   −   ×",24,"#616161")
+    d.line((0,65,1800,65),fill="#dedede",width=1)
+    d.rectangle((0,66,84,1120),fill="#ebebeb")
+    for y,label,kind in [(110,"Activity","bell"),(209,"Chat","comment"),
+                         (308,"Calendar","calendar"),(407,"Calls","phone"),
+                         (506,"OneDrive","cloud"),(605,"Apps","apps")]:
+        if label=="Chat":
+            d.rectangle((0,y-15,4,y+68),fill="#5b5fc7")
+            d.rounded_rectangle((11,y-10,74,y+62),7,fill="#e3e3f0")
+        icon(d,(28,y),kind,1,color="#5b5fc7" if label=="Chat" else "#616161")
+        fw=d.textlength(label,font=font(15));text(d,(42-fw/2,y+38),label,15,"#5b5fc7" if label=="Chat" else "#616161")
+    # Combined Chat list with filters, Quick views and Favorites.
+    d.rectangle((84,66,415,1120),fill="#f5f5f5")
+    d.line((415,66,415,1120),fill="#dedede",width=1)
+    text(d,(110,88),"Chat",30,bold=True);text(d,(281,90),"···   ⌕",26,"#616161")
+    for x,label,width in [(108,"Unread",94),(213,"Chats",82),(306,"Channels",96)]:
+        d.rounded_rectangle((x,148,x+width,187),20,outline="#c7c7c7",width=1)
+        text(d,(x+12,157),label,20,"#484848")
+    text(d,(109,215),"Quick views",20,"#616161")
+    text(d,(123,256),"@  Mentions",22);text(d,(123,298),"Followed threads",22)
+    text(d,(109,360),"Favorites",20,"#616161")
+    text(d,(124,402),"General",22);text(d,(109,464),"Chats",20,"#616161")
+    for i,name in enumerate(["Alexandre Martin","Camille Bernard","Morgan Lee"]):
+        y=506+i*69
+        if i==0:d.rounded_rectangle((101,y-9,399,y+49),6,fill="white",outline="#dfdfdf")
+        avatar(im,(115,y),40,color="#c4ceda",blur=4)
+        blurred_label(im,(168,y+5),name,22,218,35,bg="white" if i==0 else "#f5f5f5",radius=4)
+    d=ImageDraw.Draw(im)
+    text(d,(110,774),"Teams and channels",20,"#616161")
+    text(d,(124,820),"Project office",22);text(d,(144,865),"General",21,"#616161")
+    # Chat toolbar matches modern light Teams chrome, not the old purple bar.
+    d.rectangle((416,66,1800,155),fill="white")
+    avatar(im,(444,86),48,color="#c4ceda",blur=5)
+    blurred_label(im,(506,94),"Alexandre Martin",27,280,40,True,radius=5)
+    d=ImageDraw.Draw(im)
+    text(d,(834,95),"Chat",23,"#242424",True);text(d,(910,95),"Shared",23,"#616161")
+    text(d,(1010,95),"+",28,"#616161")
+    d.line((834,151,881,151),fill="#5b5fc7",width=4)
+    text(d,(1624,95),"Call  ∨   ···",23,"#616161")
+    d.line((416,155,1800,155),fill="#dedede",width=1)
+    text(d,(732,179),"Today",19,"#616161")
+    # Incoming request + attached PDF. Outgoing validation is the purple bubble.
+    avatar(im,(443,230),44,color="#c4ceda",blur=5)
+    blurred_label(im,(503,222),"Alexandre Martin",21,226,34,bg="#f5f5f5",radius=4)
+    d=ImageDraw.Draw(im);text(d,(741,223),"09:41",19,"#616161")
+    d.rounded_rectangle((500,266,1145,483),8,fill="white")
+    end=paragraph(d,(521,283),TEAMS_REQUEST,603,24,34)
+    if end>467:raise ValueError("Teams request overflows; increase its bubble height.")
+    d.rounded_rectangle((500,499,1075,579),7,fill="white",outline="#d8d8d8")
+    d.rounded_rectangle((519,518,562,560),4,fill="#bd302f")
+    text(d,(523,532),"PDF",15,"white",True)
+    text(d,(578,513),"Q3_Final_Technical_Document.pdf",22,bold=True)
+    text(d,(578,548),"84 KB",18,"#616161")
+    blurred_label(im,(802,635),"Camille Bernard",21,245,33,bg="#f5f5f5",radius=4)
+    d=ImageDraw.Draw(im);text(d,(1060,638),"09:42",19,"#616161")
+    d.rounded_rectangle((518,680,1150,1022),8,fill="#e8ebfa")
+    end=paragraph(d,(540,699),TEAMS_REPLY,588,24,34)
+    if end>1007:raise ValueError("Teams reply overflows; increase its bubble height.")
+    # Open document side panel. Its simple contents make the mismatch obvious.
+    d.rectangle((1180,156,1800,1120),fill="white",outline="#dedede")
+    text(d,(1202,177),"Q3_Final_Technical_Document.pdf",22,bold=True)
+    text(d,(1750,176),"×",27,"#616161")
+    d.line((1180,224,1800,224),fill="#dedede")
+    text(d,(1251,245),"‹      1 / 1      ›         −    100%    +",23,"#616161")
+    d.rectangle((1201,304,1778,1040),fill="#fafafa",outline="#d6d6d6")
+    text(d,(1232,340),PDF_LINES[0],25,bold=True)
+    text(d,(1232,392),PDF_LINES[1],31,bold=True)
+    text(d,(1232,447),PDF_LINES[2],23,"#616161")
+    d.line((1232,493,1747,493),fill="#dedede",width=2)
+    yy=525
+    for part in PDF_LINES[3:]:yy=paragraph(d,(1232,yy),part,512,24,35)+23
+    if yy>1020:raise ValueError("PDF overflows; shorten PDF_LINES or adjust panel.")
+    d.rounded_rectangle((467,1046,1150,1102),7,fill="white",outline="#b9b9b9")
+    text(d,(485,1063),"Type a message",22,"#757575")
+    icon(d,(1094,1061),"send",1,"#616161")
+    im.save(ROOT/"sample19.png",optimize=True)
 
 
-def tweet(value, filename):
-    """Identical anonymized layouts: no date, counts or account clue to the answer."""
-    im = Image.new("RGB", (1200, 720), "#f5f8fa")
-    d = ImageDraw.Draw(im)
-    d.rounded_rectangle((40, 36, 1160, 684), radius=16, fill="white", outline="#dfe6eb", width=2)
-    text(d, (86, 61), "Tweet", 27, "#657786", True)
-    d.line((68, 112, 1132, 112), fill="#e8eef2", width=2)
-    identity(im, (86, 143), color="#aec4d1", name_width=335, size=82)
-    # Blur the author's name and handle; no readable profile identifiers survive.
-    identity_strip = Image.new("RGB", (360, 76), "white")
-    sd = ImageDraw.Draw(identity_strip)
-    text(sd, (4, 0), "Donald J. Trump", 29, bold=True)
-    text(sd, (4, 42), "@realDonaldTrump", 25, "#657786")
-    im.paste(identity_strip.filter(ImageFilter.GaussianBlur(11)), (182, 146))
-    d = ImageDraw.Draw(im)
-    text(d, (1082, 139), "···", 35, "#657786")
-    end = paragraph(d, (86, 285), value, 1028, size=42, line=62, fill="#14171a")
-    if end > 573:
-        raise ValueError(f"Tweet text overflows {filename}; shorten it or adjust the template.")
-    d.line((86, 586, 1114, 586), fill="#e8eef2", width=2)
-    for x in (125, 422, 715, 1034):
-        # Reply, retweet, like, share icons; no invented engagement numbers.
-        if x == 125:
-            d.rounded_rectangle((x, 613, x+34, 641), radius=7, outline="#657786", width=3)
-            d.line((x+7, 641, x+3, 650, x+17, 641), fill="#657786", width=3)
-        elif x == 422:
-            text(d, (x-2, 605), "⇄", 39, "#657786")
-        elif x == 715:
-            text(d, (x-2, 607), "♡", 36, "#657786")
-        else:
-            d.line((x, 626, x, 648, x+30, 648, x+30, 626), fill="#657786", width=3)
-            d.line((x+15, 639, x+15, 610), fill="#657786", width=3)
-            d.line((x+6, 620, x+15, 610, x+24, 620), fill="#657786", width=3)
-    im.save(ROOT / filename, optimize=True)
+def tweet(value, filename, platform="X"):
+    # Cropped post detail, native proportions and outline action icons.
+    im=Image.new("RGB",(1200,1200),"white");d=ImageDraw.Draw(im)
+    text(d,(30,20),"←",36);text(d,(123,23),"Post" if platform=="X" else "Truth",34,bold=True)
+    if platform=="X":
+        d.line((1107,25,1138,59),fill="#0f1419",width=5)
+        d.line((1138,25,1107,59),fill="#0f1419",width=3)
+    else:
+        text(d,(1030,29),"TRUTH",25,"#4265e8",True)
+    d.line((0,90,1200,90),fill="#eff3f4",width=2)
+    avatar(im,(35,123),100,pixel_size=SOCIAL_AVATAR_PIXEL_SIZE)
+    blurred_label(im,(155,126),"Donald J. Trump",35,410,48,True,
+                  pixel_size=SOCIAL_NAME_PIXEL_SIZE)
+    blurred_label(im,(155,179),"@realDonaldTrump",30,410,43,fill="#536471",
+                  pixel_size=SOCIAL_NAME_PIXEL_SIZE)
+    d=ImageDraw.Draw(im);text(d,(1112,126),"···",35,"#536471")
+    end=paragraph(d,(35,269),value,1128,37,52,fill="#0f1419")
+    footer=end+32
+    d.line((35,footer,1165,footer),fill="#eff3f4",width=2)
+    for x,kind in [(72,"comment"),(384,"repost"),(700,"heart"),(1100,"share")]:
+        icon(d,(x,footer+25),kind,1.4,"#536471")
+    height=footer+100
+    im=im.crop((0,0,1200,height))
+    ImageDraw.Draw(im).rectangle((0,0,1199,height-1),outline="#eff3f4",width=2)
+    im.save(ROOT/filename,optimize=True)
 
 
 if __name__ == "__main__":
     ROOT.mkdir(parents=True, exist_ok=True)
     linkedin()
     teams()
-    tweet(GENUINE_TWEET, "sample21.png")
+    tweet(GENUINE_TWEET, "sample21.png", platform="Truth Social")
     tweet(AI_TWEET, "sample22.png")
     print("Created static/images/sample18.png, sample19.png, sample21.png and sample22.png")

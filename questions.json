@@ -29,17 +29,17 @@
       "source_url": "https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_102-12210,_Fussballspiel_mit_dem_Motorrad.jpg"
     },
     {
-      "title": "A very scientific beverage observation",
+      "title": "A very scientific pop-culture observation",
       "kind": "image",
       "media": "/static/images/sample21.png",
       "image_fit": "contain",
-      "alt": "A short social-network post with the profile picture, name and handle blurred.",
+      "alt": "A short social-network post with the profile picture, name and handle pixelated.",
       "seconds": 25,
       "answer": "HUMAN",
       "context": "Judge the writing in the post.",
-      "explanation": "This is the unchanged text of a genuine Donald Trump tweet from October 14, 2012. The interface is reconstructed and identities are blurred; the words are not AI-generated.",
-      "source": "Donald J. Trump, public Twitter post, October 14, 2012, status 257552283850653696. Complete original wording: 10 words; whitespace normalized. Original post indexed by X; also reproduced in contemporary reporting. App image is an anonymized Python/Pillow reconstruction: no fabricated date or engagement counts, blurred placeholder avatar and blurred author name/handle.",
-      "source_url": "https://x.com/realDonaldTrump/status/257552283850653696",
+      "explanation": "Unchanged wording of a genuine Donald Trump Truth Social post from May 16, 2025. The interface is reconstructed and coarsely pixelated. HUMAN refers to the original writing, not the truth of the claim.",
+      "source": "Donald J. Trump, Truth Social, May 16, 2025, post 114517718765768352. Exact complete wording (15 words), preserved in The American Presidency Project: https://www.presidency.ucsb.edu/documents/truth-social-posts-may-16-2025 . Reconstructed native interface; drawn placeholder avatar and coarsely pixelated name/handle. No fabricated date or engagement counts.",
+      "source_url": "https://truthsocial.com/@realDonaldTrump/posts/114517718765768352",
       "discussion": ""
     },
     {
@@ -86,26 +86,24 @@
       "kind": "image",
       "media": "/static/images/sample22.png",
       "image_fit": "contain",
-      "alt": "A social-network post with the profile picture, name and handle blurred.",
+      "alt": "A social-network post with the profile picture, name and handle pixelated.",
       "seconds": 25,
       "answer": "AI",
       "context": "Judge the writing in the post.",
       "explanation": "AI wrote this original parody about a giant firewall and CAPS LOCK security. It imitates a bombastic social-media style, but it is not a real Trump statement. Both the post and interface were created for the game.",
-      "source": "Original AI-written fictional tweet-style satire, October 4, 2026. No real person said or posted these words. Python/Pillow interface reconstruction with blurred placeholder avatar and blurred author fields; no fabricated date or engagement counts.",
+      "source": "Original AI-written fictional tweet-style satire, October 4, 2026. No real person said or posted these words. Native Python/Pillow interface reconstruction, coarsely pixelated drawn placeholder avatar and author fields; no fabricated date or engagement counts.",
       "discussion": ""
     },
     {
-      "title": "The new hire seems qualified",
-      "kind": "image",
+      "title": "The printer has been promoted",
+      "kind": "text",
       "seconds": 25,
-      "context": "A mainframe team photo. Look beyond the serious faces.",
-      "media": "/static/images/sample14.jpg",
-      "alt": "A black-and-white mainframe room with formally dressed workers and a cat at the central terminal.",
-      "image_fit": "contain",
+      "context": "Judge the writing.",
+      "body": "At 09:14, the office printer was elected primary database server after reporting the best uptime in the building.\n\nThe migration initially went well. Every transaction was acknowledged, stapled and placed in the output tray. Unfortunately, our backup strategy depended on someone remembering to buy paper.\n\nAt 10:02, a jam caused the entire finance department to become read-only. The on-call engineer resolved the incident by opening Tray 2 and gently reassuring the printer.\n\nAction items: purchase toner, add a second printer for redundancy, and stop describing the shredder as our data-retention policy.",
       "answer": "AI",
-      "explanation": "AI generated this fictional archival team photograph, including the cat in a tie operating the terminal. Film grain, dated equipment and a deadpan cast were requested deliberately.",
+      "explanation": "Original AI-written comic incident report. It turns ordinary printer problems into a database outage; it is not a real company postmortem.",
       "discussion": "",
-      "source": "OpenAI built-in image generation, October 4, 2026. Original fictional 1960s computer-room photograph. Resized/re-encoded; full prompt in ContentSources.md."
+      "source": "Original AI-written English tech satire created for this game, October 4, 2026. No external quotation or real incident claimed."
     },
     {
       "title": "The quarterly technical validation",
@@ -115,8 +113,8 @@
       "alt": "A work chat with blurred identities, a PDF attachment, a visible document preview, and a reply.",
       "context": "Judge the second message in the conversation.",
       "answer": "AI",
-      "explanation": "AI wrote this fictional reply. Its claims about consensus, encryption and Kubernetes are invented: the visible PDF describes a manual coffee rota spreadsheet. The first message and interface are fictional setup.",
-      "source": "Original AI-written Teams-style conversation and PDF preview, October 4, 2026. Python/Pillow interface reconstruction. Names and avatars are fictional and blurred; no real conversation or document is reproduced.",
+      "explanation": "AI wrote the off-topic validation: a company-wide automated purchasing platform and international rollout are absent from the simple manual coffee-rota document. The people, messages, document and interface are fictional.",
+      "source": "Original AI-written fictional Teams reply and coffee-rota PDF. Native editable UI reconstruction based on Microsoft Support's current combined Chat view, accessed October 4, 2026: https://support.microsoft.com/en-us/teams/teams-channels/explore-the-new-chat-and-channels-experience-in-microsoft-teams . No real account, employee or PDF; drawn profiles and names blurred.",
       "discussion": "",
       "seconds": 25
     },

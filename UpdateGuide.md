@@ -1,44 +1,26 @@
-# Install the tweet replacements
+# Install the Trump identity pixelation update
 
-This complete ZIP removes the two voice questions from the starter deck and replaces them with anonymized tweet-style images. There are still ten scored rounds: nine images and one text, five AI and five HUMAN. No audio/video round or remote question-media link remains in the default deck.
+Both Trump cards now use coarse pixelation on the profile picture, name and handle. Names and handles are no longer readable. Their writing and layouts are unchanged; the previous ten-round deck and phone-only bonus remain included.
 
 ## Install
 
-1. Stop the local game and manager; back up your folder and custom questions.
-2. Extract the ZIP. `main.py`, `Content.py` and `questions.json` must be together in the enclosed `Ice_Breaker_Game_App` project root.
-3. Replace the modified files and add the new PNGs listed below. Replace **both `questions.json` and `Content.py`** to install the new questions; JSON takes priority over the fallback.
-4. Keep your `.env`, database and deployment environment variables. No package installation or Supabase migration is required.
-5. Restart locally and click **Reload saved** in the manager. Check ten questions, with images in positions 3 and 7 and no missing-media warnings.
-6. Commit the changed files and both new PNGs, redeploy, refresh presenter/player pages, and create a **new room**. Existing rooms retain their previous questions.
-
-## New questions
-
-Round 3 reproduces the wording of a verified Donald Trump tweet, displayed in a reconstructed interface with blurred profile picture, name and handle. Round 7 is an original AI-written parody in a similar exaggerated style, about building a huge firewall. The cards use the same layout and omit date and engagement counts. The genuine source and parody origin are recorded privately in `ContentSources.md` and the manager. Before opening the room, explain that social-post rounds classify the writing.
-
-The existing longer April Fools text remains one question. No new April Fools questions were added. The QR-first lobby, centered presenter questions, final-only presenter rankings, podium and unscored bonus question remain available.
+Replace the modified files below, commit and redeploy, then hard-refresh presenter and phone pages to load the updated images. Keep your `.env` and deployment settings. No new dependencies or database migration are needed. `questions.json` and its matching `Content.py` fallback are both included.
 
 ## Modified files relative to the previous ZIP
 
-- `Content.py`
-- `questions.json`
 - `build_question_images.py`
-- `static/index.html`
-- `static/presenter.html`
-- `static/audio/README.md`
-- `tests/test_game.py`
+- `static/images/sample21.png`
+- `static/images/sample22.png`
+- `questions.json`
+- `Content.py`
 - `ReadMe.md`
 - `HowToAddImages.md`
 - `ContentSources.md`
 - `Verification.md`
 - `UpdateGuide.md`
 
-## New files
+No files were added or removed in this update. The cat image remains excluded, as in the previous ZIP.
 
-- `static/images/sample21.png` — anonymized genuine post.
-- `static/images/sample22.png` — anonymized original AI parody.
+## Customize pixelation
 
-All other game code, requirements, SQL and deployment configuration are unchanged. Legacy audio is retained for older room snapshots and custom decks; it is not a question in the new starter deck. The local manager still supports custom audio/video uploads.
-
-## Check before presenting
-
-Create a fresh room, scan the QR on a phone, start the first round and check that the QR disappears. Confirm rounds 3 and 7 show the new images. Choose ten seconds and verify the timer, then complete the game and open the bonus question. The default questions require no access to external media hosts.
+In `build_question_images.py`, change `SOCIAL_NAME_PIXEL_SIZE` (currently 24) and `SOCIAL_AVATAR_PIXEL_SIZE` (currently 20). Larger values hide more detail. Rebuild with `python build_question_images.py` and inspect both Trump cards before deploying. The current sizes replace letter shapes with coarse solid blocks. LinkedIn and Teams retain their previous appearance.

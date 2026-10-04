@@ -1,6 +1,6 @@
 # AI or Human? — Ice Breaker Game
 
-A complete browser game for an AI presentation: a presenter opens a room, players join on their phones with pseudonyms, and everyone decides **AI OR HUMAN**. The bundled **English** deck has **10 rounds**: nine images (including four social screenshots) and one longer tech text; no audio or video rounds, split evenly between AI and human origins. See `UpdateGuide.md` to install this deck in an existing deployment.
+A complete browser game for an AI presentation: a presenter opens a room, players join on their phones with pseudonyms, and everyone decides **AI OR HUMAN**. The bundled **English** deck has **10 rounds**: eight images (including four social screenshots) and two tech texts; no audio or video rounds, split evenly between AI and human origins. See `UpdateGuide.md` to install this deck in an existing deployment.
 
 ## Edit questions with the local manager
 
@@ -14,15 +14,15 @@ For Vercel, commit the saved `questions.json` and uploaded media, redeploy and c
 
 ## Bundled starter deck
 
-The deck includes a fictional LinkedIn screenshot, motorcycle football, a historical Tesla double exposure, longer excerpts from April Fools networking RFCs, Napoleon with a hidden Inspector Gadget, a mainframe cat, an anonymized genuine tweet and an original AI-written tech parody, a fictional Teams conversation with a mismatched PDF summary, and the historical moth-in-a-computer logbook. Each default round shows only its text or image. Each reveal shows only AI or HUMAN; explanations and credits remain in the local manager and ContentSources.md. Questions stay AI OR HUMAN; difficult code parsing is no longer the focus.
+The deck includes a fictional LinkedIn screenshot, motorcycle football, a historical Tesla double exposure, longer excerpts from April Fools networking RFCs, Napoleon with a hidden Inspector Gadget, a comic printer/database incident report, an anonymized genuine May 2025 Truth Social post and an original AI-written tech parody, a fictional Teams conversation with a mismatched PDF summary, and the historical moth-in-a-computer logbook. Each default round shows only its text or image. Each reveal shows only AI or HUMAN; explanations and credits remain in the local manager and ContentSources.md. Questions stay AI OR HUMAN; difficult code parsing is no longer the focus.
 
 **Explain the rule:** AI means generated writing/image/voice/footage. HUMAN includes human-written jokes and human camera tricks. For all social screenshots, judge the post or reply text. Say this rule before opening the room; the question screens contain no extra hints. The labels come from documented origins, not a style detector. The founder is fictional; no real public figure is accused of using AI.
 
 `ContentSources.md` has the private answer key, credits, source links, changes and full image-generation prompts. `ContentSources_Technical.md` retains credits for the previous deck.
 
-The ready-to-play `questions.json`, matching `Content.py` fallback and all nine current images are included. **The starter deck has no audio/video questions and no externally hosted question media.** The local manager still supports recordings and videos for custom decks. Older media remains bundled for existing rooms and backups.
+The ready-to-play `questions.json`, matching `Content.py` fallback and all eight current images are included. **The starter deck has no audio/video questions and no externally hosted question media.** The local manager still supports recordings and videos for custom decks. Most older media remains bundled for existing rooms and backups; the removed cat image is no longer included.
 
-The two former voice rounds are now tweet-style images with blurred profile pictures, names and handles. One reproduces a verified public post; the other is original AI-written satire. No extra April Fools questions were added. Credits and the private answer key identify the real source and the fictional parody.
+The two former voice rounds are now tweet-style images with coarsely pixelated profile pictures, names and handles. One reproduces a verified public post; the other is original AI-written satire. No extra April Fools questions were added. Credits and the private answer key identify the real source and the fictional parody.
 
 The presenter’s timer applies to **every round**. Choose 10 seconds and all ten rounds last 10 seconds; stored question-level `seconds` fields are ignored, including older decks.
 
@@ -166,7 +166,7 @@ Each `env add` prompts for the secret rather than putting it into command histor
 4. The first accepted vote is final. The presenter sees the count of answers; individual choices and the correct answer stay hidden during voting.
 5. When the timer reaches zero, the server rejects late answers and shows only **AI** or **HUMAN**. Scores update on phones; the presenter sees rankings only at the end.
 6. Click **Next round** when ready. The new round remains hidden in the “ready” phase until you click **Start round N**. There is no automatic advance or early reveal.
-7. After round 10's reveal, click **Show final results**. Both screens show a tournament podium and the remaining placements. Only names, ranks and numeric scores appear; ranks 1–3 have medals. Ties share ranks. Below the podium, click **Was this game made with AI or not ?** to open the single bonus question. Choosing either answer reveals **AI**; this question is unscored and does not change the room. To host another game, open `/presenter` in a new browser tab.
+7. After round 10's reveal, click **Show final results**. Both screens show a tournament podium and the remaining placements. Only names, ranks and numeric scores appear; ranks 1–3 have medals. Ties share ranks. The presenter stays on these placements. On phones only, **Was this game made with AI or not ?** appears automatically below the placements. Choosing either answer reveals **AI**; it is unscored, has no timer, and makes no game API request. The answer stays revealed when the page polls or reloads. To host another game, open `/presenter` in a new browser tab.
 
 Reconnect by refreshing the same tab/browser. A player's random token lives in local browser storage; the presenter's token lives in session storage and survives a refresh in that tab. Tokens never appear in the shared link. Keep the presenter tab open and do not share its stored credentials. Clearing storage, using another browser or an incognito window creates a new identity; scores cannot be recovered by pseudonym alone. Players may join an ongoing game and begin scoring in the active round if its deadline has not passed. Tied scores share a rank; names determine display order within a tie.
 
