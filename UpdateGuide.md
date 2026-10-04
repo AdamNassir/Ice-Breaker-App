@@ -1,48 +1,44 @@
-# Install the English fun deck
+# Install the tweet replacements
 
-This update replaces the default questions and adds online audio/video playback. No Python package change, Supabase SQL migration or environment-variable change is needed.
+This complete ZIP removes the two voice questions from the starter deck and replaces them with anonymized tweet-style images. There are still ten scored rounds: nine images and one text, five AI and five HUMAN. No audio/video round or remote question-media link remains in the default deck.
 
-## Replace the working app files
+## Install
 
-1. Stop the local game and question manager. Make a backup of your existing app folder, especially `questions.json` and any uploaded media.
-2. Extract this archive to a separate folder. Use the enclosed `Ice_Breaker_Game_App` as the project root: `main.py`, `Content.py` and `questions.json` must be together. Do not accidentally create another nested project root.
-3. Copy the files below into the same app folder you actually run/deploy. To use the rebuilt ten-round deck, **replace `questions.json` as well as `Content.py`**. An older `questions.json` takes priority over a newer `Content.py`.
-4. Keep your own `.env`, Vercel environment variables, database and uploaded media. Do not rerun `supabase.sql`.
-5. Restart locally; reload the manager/presenter with Ctrl+F5 (Windows/Linux) or Cmd+Shift+R (Mac). In the manager, use **Reload saved** to see the ten new questions. **Load starter → Save deck to game** also installs the matching English fallback.
-6. Commit the changed files and all new media to your Vercel source repository, push/redeploy, wait for deployment to finish, and open `/presenter`. Create a **new room**: old rooms retain their original deck.
+1. Stop the local game and manager; back up your folder and custom questions.
+2. Extract the ZIP. `main.py`, `Content.py` and `questions.json` must be together in the enclosed `Ice_Breaker_Game_App` project root.
+3. Replace the modified files and add the new PNGs listed below. Replace **both `questions.json` and `Content.py`** to install the new questions; JSON takes priority over the fallback.
+4. Keep your `.env`, database and deployment environment variables. No package installation or Supabase migration is required.
+5. Restart locally and click **Reload saved** in the manager. Check ten questions, with images in positions 3 and 7 and no missing-media warnings.
+6. Commit the changed files and both new PNGs, redeploy, refresh presenter/player pages, and create a **new room**. Existing rooms retain their previous questions.
 
-## Exact changed files
+## New questions
 
-| Files | Change |
-| --- | --- |
-| `Content.py` | New English ten-round fallback deck |
-| `main.py` | Exposes playback URLs and clip boundaries in public question state |
-| `question_content.py` | Validates HTTPS audio/video links, YouTube IDs and clip times |
-| `static/app.js` | Shared audio/video/YouTube rendering on presenter and player screens |
-| `static/index.html`, `static/presenter.html` | Loads shared playback script and explains classification |
-| `static/imagestyle.css` | Responsive embedded video |
-| `manager_assets/index.html`, `manager_assets/app.js`, `manager_assets/style.css` | Local/uploaded or online-link modes, clip times and previews |
-| `tests/test_question_manager.py`, `tests/test_game.py` | URL/clip validation, live-state secrecy and bundled-deck checks |
-| `ReadMe.md`, `QuestionManager.md`, `HowToAddImages.md`, `ContentSources.md`, `Verification.md`, `static/audio/README.md`, `static/videos/README.md` | Updated instructions, sources and verification |
+Round 3 reproduces the wording of a verified Donald Trump tweet, displayed in a reconstructed interface with blurred profile picture, name and handle. Round 7 is an original AI-written parody in a similar exaggerated style, about building a huge firewall. The cards use the same layout and omit date and engagement counts. The genuine source and parody origin are recorded privately in `ContentSources.md` and the manager. Before opening the room, explain that social-post rounds classify the writing.
 
-## New files to include
+The existing longer April Fools text remains one question. No new April Fools questions were added. The QR-first lobby, centered presenter questions, final-only presenter rankings, podium and unscored bonus question remain available.
 
-| Files | Purpose |
-| --- | --- |
-| `questions.json` | Complete ready-to-play English deck; replaces your old managed deck when copied |
-| `static/media.js` | Shared playback code; required by both game and manager |
-| `static/images/sample13.jpg` | Napoleon ceremony with hidden guest |
-| `static/images/sample14.jpg` | Cat at a mainframe |
-| `static/images/sample15.jpg` | Historical motorcycle football |
-| `static/images/sample16.jpg` | Historical Tesla double exposure |
-| `static/audio/sample17.mp3` | Authentic English Grace Hopper excerpt |
-| `ContentSources_Technical.md` | Archived credits for the previous deck |
-| `UpdateGuide.md` | These update instructions |
+## Modified files relative to the previous ZIP
 
-`question_manager.py`, `store.py`, `static/style.css`, `requirements.txt`, `supabase.sql`, and `vercel.json` are unchanged. Previous media/credits remain included so old rooms or backups can still reference them.
+- `Content.py`
+- `questions.json`
+- `build_question_images.py`
+- `static/index.html`
+- `static/presenter.html`
+- `static/audio/README.md`
+- `tests/test_game.py`
+- `ReadMe.md`
+- `HowToAddImages.md`
+- `ContentSources.md`
+- `Verification.md`
+- `UpdateGuide.md`
 
-## Before projecting
+## New files
 
-Play both voice clips and both videos using the event laptop's browser and speakers. Three rounds use online sources; they need internet and may be blocked by a venue network, YouTube restrictions or changed source links. Embedded branding can be a clue. If needed, replace those questions with recordings you have permission to host, using the manager.
+- `static/images/sample21.png` — anonymized genuine post.
+- `static/images/sample22.png` — anonymized original AI parody.
 
-If a deck error mentions a missing local file, compare its exact path with the new-file table. Copying only the Python or JSON files does not include images/audio. A functioning room, QR code or database does not establish that every media file was deployed.
+All other game code, requirements, SQL and deployment configuration are unchanged. Legacy audio is retained for older room snapshots and custom decks; it is not a question in the new starter deck. The local manager still supports custom audio/video uploads.
+
+## Check before presenting
+
+Create a fresh room, scan the QR on a phone, start the first round and check that the QR disappears. Confirm rounds 3 and 7 show the new images. Choose ten seconds and verify the timer, then complete the game and open the bonus question. The default questions require no access to external media hosts.

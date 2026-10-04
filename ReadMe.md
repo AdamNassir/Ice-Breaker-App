@@ -1,6 +1,6 @@
 # AI or Human? — Ice Breaker Game
 
-A complete browser game for an AI presentation: a presenter opens a room, players join on their phones with pseudonyms, and everyone decides **AI OR HUMAN**. The bundled **English** deck has **10 rounds**: four strange images, two funny tech texts, two voices and two videos, split evenly between AI and human origins. See `UpdateGuide.md` to install this deck in an existing deployment.
+A complete browser game for an AI presentation: a presenter opens a room, players join on their phones with pseudonyms, and everyone decides **AI OR HUMAN**. The bundled **English** deck has **10 rounds**: nine images (including four social screenshots) and one longer tech text; no audio or video rounds, split evenly between AI and human origins. See `UpdateGuide.md` to install this deck in an existing deployment.
 
 ## Edit questions with the local manager
 
@@ -14,15 +14,17 @@ For Vercel, commit the saved `questions.json` and uploaded media, redeploy and c
 
 ## Bundled starter deck
 
-The deck includes a fictional founder's professional-network post, motorcycle football, a historical Tesla double exposure, a bird-powered networking RFC, Napoleon with a hidden Inspector Gadget, a mainframe cat, English synthesized speech, authentic Grace Hopper audio, dancing robots and a generated astronaut clip. Each reveal includes a source, explanation and discussion prompt. Questions stay AI OR HUMAN; difficult code parsing is no longer the focus.
+The deck includes a fictional LinkedIn screenshot, motorcycle football, a historical Tesla double exposure, longer excerpts from April Fools networking RFCs, Napoleon with a hidden Inspector Gadget, a mainframe cat, an anonymized genuine tweet and an original AI-written tech parody, a fictional Teams conversation with a mismatched PDF summary, and the historical moth-in-a-computer logbook. Each default round shows only its text or image. Each reveal shows only AI or HUMAN; explanations and credits remain in the local manager and ContentSources.md. Questions stay AI OR HUMAN; difficult code parsing is no longer the focus.
 
-**Explain the rule:** AI means generated writing/image/voice/footage. HUMAN includes human-written jokes and human camera tricks. For audio judge the voice; for video judge the footage, even when it depicts robots. The labels come from documented origins, not a style detector. The founder is fictional; no real public figure is accused of using AI.
+**Explain the rule:** AI means generated writing/image/voice/footage. HUMAN includes human-written jokes and human camera tricks. For all social screenshots, judge the post or reply text. Say this rule before opening the room; the question screens contain no extra hints. The labels come from documented origins, not a style detector. The founder is fictional; no real public figure is accused of using AI.
 
 `ContentSources.md` has the private answer key, credits, source links, changes and full image-generation prompts. `ContentSources_Technical.md` retains credits for the previous deck.
 
-The ready-to-play `questions.json`, matching `Content.py` fallback, four image files and one human voice excerpt are included. **Three rounds need internet:** the linked synthetic voice, YouTube robots and linked generated video. No paid API key is required. Remote sites may show branding or become unavailable; rehearse and replace a blocked clip in the manager.
+The ready-to-play `questions.json`, matching `Content.py` fallback and all nine current images are included. **The starter deck has no audio/video questions and no externally hosted question media.** The local manager still supports recordings and videos for custom decks. Older media remains bundled for existing rooms and backups.
 
-Timers range from 25 to 35 seconds, totaling **4 minutes 35 seconds** of voting. Allow about 10–15 minutes with introductions/discussion. Timers override the initial room slider; clear per-question timers in the manager for a uniform timer. Start each recording manually after starting its round; the countdown does not wait for playback. Use the projector's speakers and invite phones to stay silent unless headphones are available.
+The two former voice rounds are now tweet-style images with blurred profile pictures, names and handles. One reproduces a verified public post; the other is original AI-written satire. No extra April Fools questions were added. Credits and the private answer key identify the real source and the fictional parody.
+
+The presenter’s timer applies to **every round**. Choose 10 seconds and all ten rounds last 10 seconds; stored question-level `seconds` fields are ignored, including older decks.
 
 ## 1. Necessary downloads and installs
 
@@ -37,7 +39,7 @@ Timers range from 25 to 35 seconds, totaling **4 minutes 35 seconds** of voting.
 | Node.js LTS + Vercel CLI | Not required | Only for the alternative CLI route | https://nodejs.org/ then `npm install -g vercel` |
 | Editor | Recommended | Recommended | VS Code or any text editor |
 
-No Supabase CLI, Docker, local PostgreSQL, Node build system, paid AI API key, or frontend framework is needed. The current local image/audio files are bundled; previous assets remain available for old rooms and backups. Supabase is used as PostgreSQL storage through **server-side psycopg**, so there is no Supabase browser SDK or exposed database key. This project does not use Supabase Auth: pseudonyms and random game tokens are sufficient for an ice breaker.
+No Supabase CLI, Docker, local PostgreSQL, Node build system, paid AI API key, or frontend framework is needed. The current question images and legacy audio files are bundled; previous assets remain available for old rooms and backups. Supabase is used as PostgreSQL storage through **server-side psycopg**, so there is no Supabase browser SDK or exposed database key. This project does not use Supabase Auth: pseudonyms and random game tokens are sufficient for an ice breaker.
 
 The delivered folder is the project root. Commands below run **inside `Ice_Breaker_Game_App`**. The app works immediately with a local SQLite file; cloud deployment requires your own Supabase and Vercel setup. Credentials are intentionally absent.
 
@@ -159,12 +161,12 @@ Each `env add` prompts for the secret rather than putting it into command histor
 ## 5. How to run the ice breaker
 
 1. Open `/presenter` on the screen you will project. Create a room, choose a title and a default timer (5–120 seconds; 25 by default). Enter the presenter password if configured.
-2. The presenter screen automatically generates and displays a QR code for the room. Players scan it with their phone camera, open the link, and choose a unique pseudonym; the room code is already filled in. You can also share the room code or copy the player link. No account or email is required.
-3. Click **Start round 1**. Content appears on both the projector and every phone, and the server deadline begins. The player has exactly two choices: **AI** or **HUMAN**.
+2. The presenter opens on a large, centered QR lobby, with no question or leaderboard. The app generates the QR code automatically. Players scan it with their phone camera, open the link, and choose a unique pseudonym; the room code is already filled in. You can also share the room code or copy the player link. No account or email is required.
+3. Click **Start round 1**. Content appears on both the projector and every phone, and the server deadline begins. The QR disappears, and the projector shows a large centered question without a ranking sidebar. The player has exactly two choices: **AI** or **HUMAN**.
 4. The first accepted vote is final. The presenter sees the count of answers; individual choices and the correct answer stay hidden during voting.
-5. When the timer reaches zero, the server rejects late answers and reveals the origin, source note and explanation. Scores update on both views.
-6. Discuss briefly, then click **Next round**. The new round remains hidden in the “ready” phase until you click **Start round N**. There is no automatic advance or early reveal.
-7. After round 10's reveal, click **Show final results**. Both screens show final standings; each phone also shows its own score, rank and accuracy.
+5. When the timer reaches zero, the server rejects late answers and shows only **AI** or **HUMAN**. Scores update on phones; the presenter sees rankings only at the end.
+6. Click **Next round** when ready. The new round remains hidden in the “ready” phase until you click **Start round N**. There is no automatic advance or early reveal.
+7. After round 10's reveal, click **Show final results**. Both screens show a tournament podium and the remaining placements. Only names, ranks and numeric scores appear; ranks 1–3 have medals. Ties share ranks. Below the podium, click **Was this game made with AI or not ?** to open the single bonus question. Choosing either answer reveals **AI**; this question is unscored and does not change the room. To host another game, open `/presenter` in a new browser tab.
 
 Reconnect by refreshing the same tab/browser. A player's random token lives in local browser storage; the presenter's token lives in session storage and survives a refresh in that tab. Tokens never appear in the shared link. Keep the presenter tab open and do not share its stored credentials. Clearing storage, using another browser or an incognito window creates a new identity; scores cannot be recovered by pseudonym alone. Players may join an ongoing game and begin scoring in the active round if its deadline has not passed. Tied scores share a rank; names determine display order within a tie.
 
@@ -192,9 +194,9 @@ An incorrect or missed answer awards 0 and resets the streak. There is no speed 
 | --- | --- |
 | Round text, origin, source, image, audio or video | Local question manager → `questions.json`; `Content.py` is the fallback starter |
 | Add/remove/reorder rounds | Add/remove/reorder dictionary entries in `ROUNDS`; UI count updates automatically |
-| Override one round's timer | Edit `"seconds": 40`; remove per-round seconds to use the room slider |
-| Optional difficulty and neutral setup | Manager / `questions.json` → `difficulty` and `context` |
-| Reveal explanation / debate | Manager / `questions.json` → `explanation`, `discussion`, `source_url` |
+| Timer for every round | Presenter setup → Seconds per round; question-level seconds are ignored |
+| Editor-only difficulty and neutral setup | Manager / `questions.json` → `difficulty` and `context` |
+| Private explanation / debate notes | Manager / `questions.json` → `explanation`, `discussion`, `source_url` |
 | Online playback / clip times | Manager / `questions.json` → `media_url`, `media_start`, `media_end`; playback in `static/media.js` |
 | Point and streak rules | `main.py` → `BASE_POINTS`, `STREAK_STEP`, `MAX_STREAK_BONUS` |
 | Room lifetime / player cap | `main.py` → `ROOM_LIFETIME_HOURS`, `MAX_PLAYERS` |
@@ -205,7 +207,7 @@ An incorrect or missed answer awards 0 and resets the streak. There is no speed 
 | Shared browser behavior / polling | `static/app.js` |
 | Database transactions | `store.py` |
 
-After changing scoring constants, also update the scoring note in both HTML files. Make changes between events: Python/JS changes need a restart/redeploy, and content changes need a **new room**. Managed decks are read on new room creation, so local JSON edits do not require a running game to restart. Text and code are rendered as text, never HTML or executable code. Only files in `static/` are public; do not put answer keys or credentials there. Asset filenames are neutral to avoid revealing answers in network requests.
+Make changes between events: Python/JS changes need a restart/redeploy, and content changes need a **new room**. Managed decks are read on new room creation, so local JSON edits do not require a running game to restart. Text and code are rendered as text, never HTML or executable code. Only files in `static/` are public; do not put answer keys or credentials there. Asset filenames are neutral to avoid revealing answers in network requests.
 
 The manager supports local audio/video uploads and HTTPS playback links, including YouTube videos. Use recordings you own or have permission to share. Playback needs a click; browser autoplay is intentionally not used. The app does not clone voices or infer authorship.
 
@@ -218,6 +220,7 @@ Ice_Breaker_Game_App/
   ReadMe.md
   QuestionManager.md
   HowToAddImages.md
+  build_question_images.py         Optional social screenshot authoring tool
   Content.py                       Bundled fallback starter deck
   questions.json                   Bundled English deck; edited by manager
   question_content.py              Shared deck loader/validation
@@ -234,10 +237,10 @@ Ice_Breaker_Game_App/
   requirements-dev.txt
   vercel.json
   static/
-    index.html, presenter.html, app.js, media.js, style.css, imagestyle.css
+    index.html, presenter.html, bonus.html, bonus.js, app.js, media.js, style.css, imagestyle.css
     images/                        Bundled images and uploaded copies
-    audio/                         Bundled Hopper excerpt and uploads
-    videos/                        Uploaded videos (default videos are online)
+    audio/                         Legacy excerpt and custom uploads; no default audio rounds
+    videos/                        Custom uploaded videos; no default video questions
   licenses/
   tests/test_game.py, test_question_manager.py
   Verification.md

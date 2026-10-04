@@ -182,6 +182,12 @@ def presenter_page():
     return FileResponse(ROOT / "static/presenter.html")
 
 
+@app.get("/bonus")
+def bonus_page():
+    """Standalone, unscored question after the final podium."""
+    return FileResponse(ROOT / "static/bonus.html")
+
+
 @app.get("/api/health")
 def health():
     with closing(store.connect()) as connection:
@@ -295,7 +301,9 @@ def control(code: str, body: Control, authorization: str | None = Header(default
             if not state["players"]:
                 error = (409, "Wait for at least one player to join.")
             else:
-                state["duration"] = max(5, min(120, int(state["rounds"][state["index"]].get("seconds", state["default_seconds"]))))
+                # The presenter chooses one timer for the entire room. Legacy
+                # question-level seconds must never override that choice.
+                state["duration"] = state["default_seconds"]
                 state["deadline"] = time.time() + state["duration"]
                 state["phase"] = "live"
                 state["revision"] += 1

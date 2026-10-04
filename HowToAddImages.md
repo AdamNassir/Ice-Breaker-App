@@ -21,7 +21,6 @@ The remaining instructions describe advanced manual file editing. If `questions.
     "alt": "A bicycle leaning against a wall.",  # CHANGE accessible description.
     "image_fit": "contain",                      # CHANGE to "cover" to crop.
     "image_position": "center",                  # CHANGE e.g. "50% 30%".
-    "seconds": 30,                               # Optional per-round timer.
     "answer": "HUMAN",                           # CHANGE to the known origin.
     "explanation": "Describe what actually created this image.",
     "technical_note": "Explain the engineering detail after reveal.",
@@ -99,7 +98,6 @@ Use MP3 or WAV for broad compatibility. Copy the file into `static/audio/` and r
     "body": "Listen once, then choose AI or Human.",
     "media": "/static/audio/sample11.mp3",  # CHANGE filename.
     "alt": "A speaker reading a short release note.",
-    "seconds": 45,                        # Allow time for playback and voting.
     "answer": "AI",                       # CHANGE to documented voice origin.
     "explanation": "This voice was synthesized from a supplied script.",
     "source": "Voice tool/model and generation date; used with permission.",
@@ -110,7 +108,7 @@ For a human voice, use your own recording or a consenting colleague. Avoid imper
 
 ## Video clips
 
-Use the manager’s **+ Video** button, select an MP4, WebM, OGV, MOV or M4V file up to 25 MB, fill in the title and known AI/HUMAN origin, preview it and save the deck. Uploads go to `static/videos/`. Commit the video and `questions.json`, redeploy and create a new room. MP4 with H.264 video and AAC audio is a useful choice for phones. Convert incompatible videos before uploading; the editor does not transcode them. Both presenter and player screens show manual playback controls.
+Use the manager’s **+ Video** button, select an MP4, WebM, OGV, MOV or M4V file up to 25 MB, fill in the editor title and known AI/HUMAN origin, preview it and save the deck. Uploads go to `static/videos/`. Commit the video and `questions.json`, redeploy and create a new room. MP4 with H.264 video and AAC audio is a useful choice for phones. Convert incompatible videos before uploading; the editor does not transcode them. Both presenter and player screens show manual playback controls.
 
 ## Link an online recording instead of uploading
 
@@ -123,7 +121,6 @@ The updated manager has **Media source → Online link** for audio/video. Paste 
     "media_url": "https://www.youtube.com/watch?v=fn3KWM1kuAw",  # CHANGE URL.
     "media_start": 0,          # CHANGE absolute start in whole seconds.
     "media_end": 18,           # CHANGE absolute end; omit for entire recording.
-    "seconds": 35,             # CHANGE voting timer, including playback time.
     "answer": "HUMAN",         # CHANGE to documented footage/voice origin.
     "explanation": "Explain the known origin after the timer ends.",
     "source": "Credit the creator and identify the recording.",
@@ -133,3 +130,18 @@ The updated manager has **Media source → Online link** for audio/video. Paste 
 Do not set both `media` and `media_url`. Uploaded images use `media` only. URLs must be HTTPS; audio needs a direct supported audio file URL, while YouTube is supported as video. A regular article/TED webpage is not a file URL; use the talk's YouTube video link or a recording you may legally host. No download, conversion or voice cloning happens automatically.
 
 The bundled sources/English deck and exact install list are in ContentSources.md and UpdateGuide.md. Replace both Content.py and questions.json when adopting the new default; a saved JSON deck takes priority.
+
+The presenter’s timer now applies to every round. Any older question-level seconds value is ignored. In the public game, only text/media content is shown, and the reveal is only AI or HUMAN. Titles, context, explanations and source notes remain available in the editor and these instructions.
+
+## Edit the LinkedIn, Teams and tweet screenshots
+
+The PNGs are already bundled; no image package is needed to play. To rebuild them locally:
+
+```bash
+python -m pip install Pillow
+python build_question_images.py
+```
+
+Use your existing virtual-environment Python on Windows, macOS or Linux. Edit the clearly named `LINKEDIN_POST`, `TEAMS_REQUEST`, `TEAMS_REPLY`, `PDF_LINES`, and `AI_TWEET` constants in `build_question_images.py`. The `linkedin()`, `teams()`, and `tweet()` functions control positions, dimensions, colors and font sizes. `identity()` controls avatar/name blur. Rebuilding overwrites `static/images/sample18.png`, `sample19.png`, `sample21.png`, and `sample22.png`. Inspect all four for text overflow after editing. `GENUINE_TWEET` preserves a verified public post: keep its wording intact to retain the HUMAN label, or replace it with another verified human-written post and update its source. Edit `AI_TWEET` for the fictional parody; if the text origin changes, update its answer too. Do not change `requirements.txt`; Pillow is optional for this authoring tool only.
+
+To change the displayed size on the projector, edit `.presenter-playing .round-image` at the end of `static/imagestyle.css` (currently `max-height: 72vh`). Phone image sizes retain their own limits. Keep `image_fit` set to `contain` to show the full screenshot. Commit the rebuilt PNGs and any deck changes, redeploy, and create a new room.

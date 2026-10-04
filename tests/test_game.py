@@ -24,9 +24,25 @@ class GameTests(unittest.TestCase):
         self.assertEqual(managed, validate_rounds(main.ROUNDS, root))
         self.assertEqual(len(managed), 10)
         self.assertEqual(sum(q['answer'] == 'AI' for q in managed), 5)
-        self.assertEqual([q['kind'] for q in managed].count('image'), 4)
-        self.assertEqual([q['kind'] for q in managed].count('audio'), 2)
-        self.assertEqual([q['kind'] for q in managed].count('video'), 2)
+        self.assertEqual([q['kind'] for q in managed].count('image'), 9)
+        self.assertEqual([q['kind'] for q in managed].count('audio'), 0)
+        self.assertEqual([q['kind'] for q in managed].count('video'), 0)
+        self.assertGreater(len(managed[4]['body'].split()), 70)
+        self.assertEqual(managed[2]['answer'], 'HUMAN')
+        self.assertEqual(managed[6]['answer'], 'AI')
+        self.assertTrue(all(not q.get('media_url') for q in managed))
+
+    def test_lobby_withholds_first_question_and_bonus_is_unscored(self):
+        before = self.state(self.p1)
+        self.assertEqual(before['phase'], 'lobby')
+        self.assertIsNone(before['question'])
+        response = self.client.get('/bonus')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Was this game made with AI or not ?', response.text)
+        self.assertEqual(self.client.get('/static/bonus.js').status_code, 200)
+        after = self.state(self.p1)
+        self.assertEqual(before['me'], after['me'])
+        self.assertEqual(after['phase'], 'lobby')
 
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -74,7 +90,7 @@ class GameTests(unittest.TestCase):
         for index, question in enumerate(main.ROUNDS):
             self.assertEqual(self.control('start').status_code, 200)
             live = self.state(self.p1)
-            self.assertEqual(live['duration'], question.get('seconds', 5))
+            self.assertEqual(live['duration'], 5)
             self.assertEqual(live['question'].get('difficulty'), question.get('difficulty'))
             for private_field in ('answer', 'explanation', 'source', 'source_url',
                                   'technical_note', 'discussion', 'technical_source_url'):
@@ -100,6 +116,36 @@ class GameTests(unittest.TestCase):
         self.assertEqual(final['me']['correct'], 10)
         self.assertEqual(final['leaderboard'][1]['score'], 0)
         self.assertEqual(self.control('start').status_code, 409)
+
+    def test_presenter_ten_second_timer_wins_every_round_and_closes_at_deadline(self):
+        room = self.client.post('/api/rooms', json={"seconds": 10}).json()
+        code = room['code']
+        host = {"Authorization": "Bearer " + room['token']}
+        player = self.client.post(f'/api/rooms/{code}/join', json={"nickname": "Timer tester"}).json()
+        headers = {"Authorization": "Bearer " + player['token']}
+        origin = main.time.time()
+        with main.store.room(code) as saved:
+            for index, question in enumerate(saved['rounds']):
+                question['seconds'] = 25 if index % 2 else 120
+        for index in range(10):
+            start = origin + index * 100
+            with patch.object(main.time, 'time', return_value=start):
+                state = self.client.get(f'/api/rooms/{code}/state', headers=host).json()
+                response = self.client.post(f'/api/rooms/{code}/control', headers=host,
+                                            json={"action": "start", "revision": state['revision']})
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.json()['duration'], 10)
+                self.assertEqual(response.json()['deadline'], start + 10)
+            with patch.object(main.time, 'time', return_value=start + 9.99):
+                self.assertEqual(self.client.get(f'/api/rooms/{code}/state', headers=headers).json()['phase'], 'live')
+            with patch.object(main.time, 'time', return_value=start + 10):
+                late = self.client.post(f'/api/rooms/{code}/vote', headers=headers,
+                                       json={"answer": "AI", "round_index": index})
+                self.assertEqual(late.status_code, 409)
+                state = self.client.get(f'/api/rooms/{code}/state', headers=host).json()
+                self.assertEqual(state['phase'], 'revealed')
+                self.assertEqual(self.client.post(f'/api/rooms/{code}/control', headers=host,
+                                                 json={"action": "next", "revision": state['revision']}).status_code, 200)
 
     def test_answer_secrecy_auth_and_player_control(self):
         self.control('start')

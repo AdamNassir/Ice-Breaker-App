@@ -8,7 +8,7 @@
   let session = null, state = null, polling = false, votePending = false, controlPending = false;
   let stageKey = '', boardKey = '', clockEnd = 0, noticeTimeout = null, qrAttempt = 0;
   const query = new URLSearchParams(location.search);
-  let lastHost = '';
+  let lastHost = '', playerLink = '';
   try { if (host) lastHost = sessionStorage.getItem('icebreaker:last-host') || ''; } catch {}
   const initialCode = (query.get('room') || lastHost).toUpperCase();
 
@@ -52,8 +52,7 @@
     $('entry').hidden = true; $('game').hidden = false; $('leave').hidden = false;
     if (host) {
       $('share-code').textContent = value.code;
-      const link = value.join_url || `${location.origin}/?room=${value.code}`;
-      $('join-url').textContent = link; $('join-url').href = link;
+      playerLink = value.join_url || `${location.origin}/?room=${value.code}`;
       loadQR(value);
     }
   }
@@ -62,7 +61,7 @@
     const qr = $('join-qr'), status = $('qr-status'), retry = $('retry-qr');
     const attempt = ++qrAttempt;
     qr.hidden = true; retry.hidden = true;
-    status.textContent = 'Creating QR code…';
+    status.hidden = false; status.textContent = 'Creating QR code…';
     try {
       const result = await api(`/api/rooms/${value.code}/qr`);
       if (session !== value || attempt !== qrAttempt) return;
@@ -83,9 +82,9 @@
       matrix.forEach((row, y) => row.forEach((dark, x) => {
         if (dark) context.fillRect(x * scale, y * scale, scale, scale);
       }));
-      $('join-url').textContent = result.join_url; $('join-url').href = result.join_url;
+      playerLink = result.join_url;
       qr.hidden = false;
-      status.textContent = 'Scan with your phone camera.';
+      status.textContent = ''; status.hidden = true;
     } catch (error) {
       if (session === value && attempt === qrAttempt) {
         status.textContent = `QR code unavailable: ${error.message} Use the player link or room code.`;
@@ -107,38 +106,53 @@
     return wrap;
   }
 
+  function placement(player, me, podium = false) {
+    const row = element(podium ? 'article' : 'li', `final-player${podium ? ' podium-player' : ''}${player.id === me ? ' final-me' : ''}`);
+    row.dataset.rank = player.rank; row.dataset.playerId = player.id;
+    const rank = element('span', 'final-rank', String(player.rank));
+    rank.setAttribute('aria-label', `Rank ${player.rank}`);
+    if (player.rank <= 3) {
+      const medal = element('span', 'final-medal', ['🥇', '🥈', '🥉'][player.rank - 1]);
+      medal.setAttribute('aria-hidden', 'true'); rank.prepend(medal);
+    }
+    row.append(rank, element('strong', 'final-name', player.nickname), element('span', 'final-score', String(player.score)));
+    return row;
+  }
+
+  function results(s) {
+    const wrap = element('section', 'final-standings');
+    wrap.setAttribute('aria-label', 'Final placements');
+    const ranks = [1, 2, 3].filter(rank => s.leaderboard.some(player => player.rank === rank));
+    const podium = element('div', `final-podium podium-count-${ranks.length}`);
+    for (const rank of ranks) {
+      const place = element('div', `podium-place podium-rank-${rank}`);
+      s.leaderboard.filter(player => player.rank === rank).forEach(player => place.append(placement(player, s.me?.id, true)));
+      podium.append(place);
+    }
+    wrap.append(podium);
+    const rest = element('ol', 'final-list');
+    s.leaderboard.filter(player => player.rank > 3).forEach(player => rest.append(placement(player, s.me?.id)));
+    if (rest.children.length) wrap.append(rest);
+    const bonus = element('a', 'primary bonus-link', 'Was this game made with AI or not ?');
+    bonus.href = '/bonus';
+    wrap.append(bonus);
+    return wrap;
+  }
+
   function renderStage(s) {
-    const signature = JSON.stringify([s.phase, s.round_index, s.question]);
+    const signature = JSON.stringify([s.phase, s.round_index, s.question, s.phase === 'finished' ? s.leaderboard : null]);
     if (signature === stageKey) return;
     stageKey = signature;
     const stage = $('stage'); stage.replaceChildren();
     if (s.phase === 'lobby') {
-      stage.append(waiting(host ? 'The room is open.' : "You're in.", host ?
-        'Share the player link or room code. Start the first round when everyone is ready.' :
-        `Welcome, ${s.me.nickname}. Watch this screen for the first round.`));
+      if (!host) stage.append(waiting("You're in.", `Welcome, ${s.me.nickname}. Watch this screen for the first round.`));
     } else if (s.phase === 'ready') {
       stage.append(waiting(`Round ${s.round_number} is next.`, host ?
         'Take a moment, then start the timer when you are ready.' : 'Your presenter will start the next round.'));
     } else if (s.phase === 'finished') {
-      const winners = s.leaderboard.filter(p => p.rank === 1);
-      const title = winners.length > 1 ? 'A shared first place!' : `${winners[0]?.nickname || 'Everyone'} takes first place!`;
-      const wrap = waiting('The verdict is in.', title, '★');
-      if (!host) {
-        wrap.append(element('div', 'results-score', `${s.me.score} points`),
-          element('p', '', `Rank ${s.me.rank} · ${s.me.correct} correct out of ${s.me.history.length} rounds played`));
-      }
-      wrap.append(element('p', 'final-note', 'What fooled you? Discuss the clues you trusted. Provenance is stronger evidence than appearance.'));
-      stage.append(wrap);
+      stage.append(results(s));
     } else {
       const q = s.question;
-      const heading = element('div', 'content-meta');
-      heading.append(element('span', 'kind', q.kind === 'text' ? 'Written content' : q.kind));
-      if (Number.isInteger(q.difficulty) && q.difficulty >= 1 && q.difficulty <= 5) {
-        const levels = ['Warm-up', 'Inspection', 'Subtle behavior', 'Concurrency', 'Expert'];
-        heading.append(element('span', 'difficulty', `Level ${q.difficulty}/5 · ${levels[q.difficulty - 1]}`));
-      }
-      stage.append(heading, element('h2', '', q.title));
-      if (q.context) stage.append(element('p', 'question-context', q.context));
       if (q.kind === 'image') {
         const img = element('img', 'round-image'); img.src = q.media; img.alt = q.alt || 'Round image';
         if (['contain', 'cover'].includes(q.image_fit)) img.style.objectFit = q.image_fit;
@@ -149,12 +163,10 @@
         stage.append(img);
       } else if (q.kind === 'audio' || q.kind === 'video') {
         const isVideo = q.kind === 'video';
-        stage.append(element('p', 'small', q.body || (isVideo ? 'Watch, then choose AI or Human.' : 'Listen, then choose AI or Human.')));
         const player = window.IcebreakerMedia.create(q, isVideo ? 'round-video' : 'round-audio', message => {
           if (!stage.querySelector('.image-error')) stage.append(element('p', 'image-error', message));
         });
         stage.append(player);
-        if (q.media_url) stage.append(element('p','small','Online clip. If playback is blocked, tell the presenter before voting.'));
       } else stage.append(element(q.kind === 'text' ? 'p' : 'pre', q.kind === 'text' ? 'text-content' : 'code-block', q.body));
     }
   }
@@ -163,33 +175,14 @@
     const panel = $('reveal'); panel.hidden = !s.reveal;
     if (!s.reveal) { panel.replaceChildren(); return; }
     const r = s.reveal;
-    const signature = JSON.stringify([r, s.me?.history]);
+    const signature = JSON.stringify([s.round_index, r.answer]);
     if (panel.dataset.signature === signature) return;
     panel.dataset.signature = signature; panel.replaceChildren();
-    panel.append(element('h3', '', `The answer is ${r.answer}.`), element('p', '', r.explanation));
-    if (r.technical_note) {
-      panel.append(element('h4', 'reveal-subtitle', 'Technical detail'), element('p', '', r.technical_note));
-    }
-    if (r.discussion) panel.append(element('p', 'discussion-prompt', `Discuss: ${r.discussion}`));
-    if (s.me) {
-      const last = s.me.history.find(row => row.round === s.round_number);
-      const message = last ? (last.correct ? `Correct! +${last.points} points · ${s.me.streak} in a row` :
-        last.answer ? 'A convincing disguise. Your streak starts fresh next round.' : 'No answer this round. Try the next one.') : 'You joined after this round ended.';
-      panel.append(element('p', 'result-note', message));
-    }
-    panel.append(element('p', 'vote-counts', `The room voted: AI ${r.distribution.AI} · HUMAN ${r.distribution.HUMAN}`));
-    const source = element('p', 'source', r.source);
-    if (r.source_url && /^https:\/\//.test(r.source_url)) {
-      const link = element('a', '', ' View source'); link.href = r.source_url; link.target = '_blank'; link.rel = 'noopener noreferrer'; source.append(link);
-    }
-    if (r.technical_source_url && /^https:\/\//.test(r.technical_source_url)) {
-      const link = element('a', '', ' Technical reference');
-      link.href = r.technical_source_url; link.target = '_blank'; link.rel = 'noopener noreferrer'; source.append(link);
-    }
-    panel.append(source);
+    panel.append(element('h3', '', r.answer));
   }
 
   function renderBoard(s) {
+    if (host) return;
     const signature = JSON.stringify([s.leaderboard, s.me?.id]);
     if (signature === boardKey) return;
     boardKey = signature;
@@ -207,6 +200,18 @@
     if (state && s.server_time < state.server_time) return; // Ignore out-of-order HTTP responses.
     const newSnapshot = s !== state;
     state = s;
+    const finished = s.phase === 'finished';
+    document.body.classList.toggle('results-mode', finished);
+    document.querySelectorAll('.topbar, footer, .game-heading, #round-progress, .round-toolbar, .side-card, .host-controls, #vote-status, #connection').forEach(node => node.hidden = finished);
+    if (host) {
+      const lobby = s.phase === 'lobby';
+      document.body.classList.toggle('presenter-lobby', lobby);
+      document.body.classList.toggle('presenter-playing', !lobby && !finished);
+      $('qr-lobby').hidden = !lobby;
+      $('stage').hidden = lobby;
+      document.querySelectorAll('.game-heading, #round-progress, .round-toolbar').forEach(node => node.hidden = lobby || finished);
+    }
+    if (finished) $('notice').hidden = true;
     // Use monotonic browser time rather than the phone's possibly inaccurate wall clock.
     if (newSnapshot) clockEnd = performance.now() + Math.max(0, (s.deadline - s.server_time) * 1000 - roundTrip / 2);
     $('room-title').textContent = s.title;
@@ -214,7 +219,7 @@
     $('phase-label').textContent = labels[s.phase];
     $('round-label').textContent = s.phase === 'finished' ? `${s.round_count} rounds complete` : `Round ${s.round_number} / ${s.round_count}`;
     $('room-meta').textContent = `${s.player_count} player${s.player_count === 1 ? '' : 's'} · Room ${s.code}`;
-    $('board-title').textContent = s.phase === 'finished' ? 'Final standings' : 'Leaderboard';
+    if (!host) $('board-title').textContent = s.phase === 'finished' ? 'Final standings' : 'Leaderboard';
     const progress = $('round-progress'); progress.replaceChildren();
     for (let i = 0; i < s.round_count; i++) {
       const node = element('span', i < s.round_index || s.phase === 'finished' || (i === s.round_index && s.phase === 'revealed') ? 'done' :
@@ -230,17 +235,16 @@
       button.disabled = controlPending || s.phase === 'live' || !s.player_count;
       button.textContent = s.phase === 'live' ? 'Round in progress' : s.phase === 'revealed' ?
         s.round_number === s.round_count ? 'Show final results' : 'Next round' : `Start round ${s.round_number}`;
-      $('control-help').textContent = s.phase === 'live' ? 'Answers reveal when the timer reaches zero.' : s.phase === 'revealed' ?
-        'Discuss the reveal, then continue when ready.' : s.phase === 'finished' ? 'Create a new room for another game.' : 'The timer starts when you do.';
+      $('control-help').textContent = '';
     } else {
       $('my-score').textContent = s.me.score; $('my-streak').textContent = s.me.streak; $('my-rank').textContent = s.me.rank;
-      $('vote-controls').hidden = !['live','revealed'].includes(s.phase);
+      $('vote-controls').hidden = s.phase !== 'live';
       document.querySelectorAll('[data-answer]').forEach(button => {
         button.classList.toggle('selected', button.dataset.answer === s.me.vote);
         button.disabled = votePending || s.phase !== 'live' || Boolean(s.me.vote) || performance.now() >= clockEnd;
       });
       $('vote-status').textContent = s.phase === 'live' ? (s.me.vote ? `${s.me.vote} locked in. Wait for the reveal.` : 'One answer. Make it count.') :
-        s.phase === 'revealed' ? 'Your presenter will choose when to continue.' : '';
+        '';
     }
     updateClock();
   }
@@ -287,8 +291,8 @@
       finally { controlPending = false; if (state) render(state); }
     });
     $('copy-link').addEventListener('click', async () => {
-      try { await navigator.clipboard.writeText($('join-url').href); notify('Player link copied.'); }
-      catch { notify('Copy the player link shown above. Clipboard access is unavailable here.'); }
+      try { await navigator.clipboard.writeText(playerLink); notify('Player link copied.'); }
+      catch { notify('Clipboard access is unavailable here. Use the QR code or room code.'); }
     });
   } else {
     $('room-code').value = initialCode;
@@ -315,6 +319,8 @@
     try { if (host) sessionStorage.removeItem('icebreaker:last-host'); } catch {}
     history.replaceState(null, '', host ? '/presenter' : '/');
     $('entry').hidden = false; $('game').hidden = true; $('leave').hidden = true;
+    document.body.classList.remove('results-mode', 'presenter-lobby', 'presenter-playing');
+    document.querySelectorAll('.topbar, footer, .game-heading, #round-progress, .round-toolbar, .side-card, .host-controls, #vote-status, #connection').forEach(node => node.hidden = false);
     $('connection').textContent = ''; if (!host) $('room-code').value = '';
     stageKey = ''; boardKey = '';
   });
