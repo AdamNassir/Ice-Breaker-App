@@ -36,7 +36,7 @@ class GameTests(unittest.TestCase):
         self.assertEqual(managed[7]['answer'], 'AI')
         self.assertEqual(managed[4]['reveal_sources'], [])
         self.assertTrue(all(q['title'] and q['context'] for q in managed))
-        self.assertIn('manager’s reply', managed[8]['context'])
+        self.assertIn('manager’s reply', managed[8]['context'].casefold())
         self.assertEqual(managed[1]['media'], '/static/images/sample26.jpg')
         self.assertEqual(managed[6]['media'], '/static/images/sample27.png')
         self.assertEqual(managed[6]['answer'], 'AI')
@@ -155,7 +155,25 @@ class GameTests(unittest.TestCase):
             question = dict(main.ROUNDS[5])
             question["context"] = "Look closely at the people in the painting. AI or HUMAN?"
             room["rounds"] = [question]
-        self.assertEqual(self.state()["question"]["context"], "AI or HUMAN?")
+        self.assertEqual(self.state()["question"]["context"], "Painting: AI or HUMAN?")
+        cases = [
+            ("Look closely at the jump. Was this photograph made by AI or a human?", "Photograph: AI or HUMAN?"),
+            ("Read the post. Who wrote it: AI or HUMAN?", "Post text: AI or HUMAN?"),
+            ("Inspect the photograph. AI or HUMAN?", "Photograph: AI or HUMAN?"),
+            ("Read the French article. Who wrote it: AI or HUMAN?", "Article text: AI or HUMAN?"),
+            ("Read the French post.", "Post text: AI or HUMAN?"),
+            ("A conversation I may or may not have had during my internship. Judge only the manager’s reply: AI or HUMAN.", "Manager’s reply: AI or HUMAN?"),
+            ("Only the attachment caption: AI or HUMAN?", "Only the attachment caption: AI or HUMAN?"),
+        ]
+        for old_intro, expected in cases:
+            question = dict(main.ROUNDS[0], context=old_intro)
+            self.assertEqual(validate_rounds([question], main.ROOT)[0]["context"], expected)
+            with main.store.room(self.code) as room:
+                room["rounds"] = [question]
+            for headers in (self.host, self.p1):
+                self.assertEqual(self.state(headers)["question"]["context"], expected)
+            with main.store.room(self.code) as room:
+                self.assertEqual(room["rounds"][0]["context"], old_intro)
         for path in ("/", "/presenter", "/bonus"):
             self.assertEqual(self.client.get(path).headers["cache-control"], "no-store")
 

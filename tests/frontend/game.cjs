@@ -20,7 +20,7 @@ function shared(w){w.eval(fs.readFileSync(project+'/static/newsarticle.js','utf8
  set(w,'text-style','news');assert(d.querySelector('.news-article'));assert(!d.querySelector('.preview-text'));
  $('save-deck').click();await until(()=>$('status').textContent.startsWith('Deck saved.')&&!$('save-deck').disabled);
  $('reload-deck').click();await until(()=>!$('reload-deck').disabled);d.querySelectorAll('.question-item')[4].click();assert.equal($('text-style').value,'news');assert(d.querySelector('.news-article'));
- const unsafe=w.IcebreakerNews.create({body:'<img src=x onerror=alert(1)>\n\n<script>bad()</script>'});assert(!unsafe.querySelector('.news-article img,.news-article script'));assert.equal(unsafe.querySelectorAll('img').length,2);for(const img of unsafe.querySelectorAll('img'))assert(img.src.endsWith('/static/branding/publication.svg'));assert(unsafe.textContent.includes('<script>bad()</script>'));
+ const unsafe=w.IcebreakerNews.create({body:'<img src=x onerror=alert(1)>\n\n<script>bad()</script>'});assert(!unsafe.querySelector('.news-article-header img,.news-body img,.news-site script,[onerror]'));assert.equal(unsafe.querySelectorAll('img').length,8);for(const img of unsafe.querySelectorAll('img'))assert(['/static/branding/publication.svg','/static/news/housing.jpg','/static/news/football.jpg','/static/news/ai.jpg'].some(path=>img.src.endsWith(path)));assert(unsafe.textContent.includes('<script>bad()</script>'));
  let player;
  d.querySelectorAll('.question-item')[6].click();assert(d.querySelector('#preview img').src.endsWith('/static/images/sample27.png'));
  d.querySelectorAll('.question-item')[2].click();assert(d.querySelector('#preview img').src.endsWith('/static/images/sample23.png'));assert(!d.querySelector('#preview audio'));

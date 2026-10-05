@@ -1,36 +1,34 @@
-# Completed update — logo blending, visible news layout, nine rounds and expanded SQL
+# Completed update — news photographs, believable articles and Teams message direction
 
 ## Resulting behavior
 
-- The complete LogicLever JPEG remains unchanged. CSS multiply blending in the game and manager blends its white background into the surrounding surface, retaining its tagline and contain sizing. TotalEnergies is unchanged.
-- The painting intro is now only “AI or HUMAN?”. Its neutral alt text does not point out a hidden character. The server also removes the exact old hint from public views of existing snapshots, without changing saved room data.
-- The active deck now contains **nine rounds**: seven images/two French text articles, seven AI/two HUMAN. The previous tenth moth-logbook round is removed. Its image remains available for custom/older decks. Rankings and the phone-only bonus follow round nine. A perfect game now earns 1,550 points.
-- The employee-data SQL card is expanded with readable comments, two CTEs, four source tables, joins and a conditional-aggregate pivot. Pre-aggregation prevents duplicated totals. The HR use case remains implied in the code; the short introduction does not narrate it. AI classification is unchanged.
-- The full Le Parisien page renderer is preserved. A reproduced legacy failure path caused older bundled articles to fall back to plain text because their stored format flag was missing/defaulted to plain. The shared parser and public-state projection now recognize those two specific legacy title/headline pairs, including existing room snapshots. Current article titles missing the format field receive news style; custom/ordinary explicit plain text stays supported. Stored room content is not rewritten. The complete frontend page uses masthead, French navigation, article/chapo/byline, sidebar, related stories and footer.
-- HTML responses use no-store, and game/manager cache keys are refreshed. New checks load the actual shipped HTML, scripts and styles over HTTP to detect missing asset integration, rather than relying solely on manual script/CSS injection.
+- The complete news website now has six photographic neighbour cards: three actual recent Le Parisien photographs, repeated in the sidebar and related row, replacing colour placeholders. The original JPEGs are bundled locally without image edits or remote hotlinks. Source articles, dates, image URLs and observed credits are recorded in LayoutSources.md.
+- Replaced La rédaction with the requested named mock bylines: Sébastien Lernould for the economy article and Dominique Sévérac for the sports article, both verified on their author pages. Decorative publication timestamps complete the arrangement. Neither journalist wrote/published the fictional central story; this is explicit in private provenance.
+- Rewrote both French AI articles more plausibly: a wrong bitcoin price on one platform with a brief suspension/review; a partner’s accidentally published Ballon d’Or webpage, with prepared pages for several candidates as an alternative explanation. No trophy-by-mail, private-mail-access or delivery-tracker premise remains.
+- Teams now shows Adam’s outgoing document submission on the right in light blue and the incoming manager response on the left in light grey. Adam Nassir is the actual supplied sender name and is blurred. The manager remains fictional/anonymized, the messages are fictional and unchanged, and the PDF stays closed.
+- Includes the pending prompt cleanup across all nine questions: only the classification target remains. No read/look/inspect commands appear. The standalone legacy Read the French post prompt is also cleaned when decks or existing room snapshots are displayed. Custom part-specific classification targets remain intact.
+- The deck still has nine rounds with seven AI/two HUMAN; scoring, timer, QR, Next/Enter, phone zoom, final placements/confetti and phone-only bonus are preserved. JSON and Content.py fallback remain equivalent.
 
 ## Install / redeploy
 
-1. Extract this **complete ZIP** and replace all delivered app source, keeping your own .env, secrets and virtual environment. Deploy main.py and question_content.py together. Use the included questions.json and Content.py together to adopt the nine-round default.
-2. Include all static files, especially the expanded static/images/sample23.png, static/style.css, static/newsarticle.js, static/newsarticle.css and static/branding/publication.svg. The shared renderer must be present along with its CSS. No production dependency or Supabase migration is added.
-3. Restart the local question manager and refresh it. If you preserve a custom deck, select Text presentation → News article for your article entries and save. The specific legacy bundled entries are recognized automatically; arbitrary plain text is not forcibly reclassified.
-4. Redeploy through the usual Vercel workflow and open /presenter from the new deployment. Create a **new room** to adopt nine rounds/new content. Existing snapshots keep their original question count/text, while the known news-layout and exact painting-hint display fixes apply to them.
-5. Verify the nine-round flow, full news-page scrolling and SQL zoom on the event phones/projector. No automatic publishing or deployment was performed.
+1. Replace delivered app source with the complete ZIP, preserving your own .env, virtual environment and secrets.
+2. Redeploy normally and create a NEW room to load the revised article writing. Existing room snapshots intentionally keep their saved content; recognized older viewing instructions are normalized for display.
+3. Include the new static/news directory with all three JPEGs. Updated HTML cache keys load the new shared news JS/CSS on player, presenter and local manager.
+4. Restart/reload the local question manager. No runtime dependency changes. To rebuild the Teams image later, install optional Pillow and run the documented build_question_images.py authoring script; the deployed app only serves its bundled PNG.
 
 ## Validation
 
-43 Python tests and the complete check_project.py gate pass. Tests cover nine-round scores/final advancement, legacy article deck/API migration without snapshot mutation or source leaks, preservation of custom plain text, old painting-hint removal and no-store HTML headers. New HTTP-loaded player/presenter/manager checks fetch and execute the actual shipped page resources and verify computed article grid/masthead/scroll styling, navigation/sidebar/footer and logo blending. Existing save/upload, full news/plain preview, timer, Next/Enter, image gestures, circle, podium/confetti and bonus/workflow checks pass. The expanded SQL screenshot was visually inspected. Its relational behavior was exercised on synthetic SQLite data with only DATE-literal syntax adapted; this is not PostgreSQL execution. The archive manifest/bytes and a fresh extraction are verified with the full gate before delivery.
+43 Python tests and the complete check_project.py gate pass. HTTP-loaded player/presenter/manager checks verify six local JPEG cards, actual responses/bytes, cover framing with no inherited minimum height, both named bylines and removal of La rédaction. Hostile question markup remains literal text; only fixed trusted logo/photo assets are created. Legacy prompt normalization preserves custom targets and stored room snapshots. Full nine-round API/frontend checks cover timing, scoring, Next/Enter, zoom, ranking/confetti, bonus/workflow, manager save/reload and upload. The rebuilt Teams PNG and all three downloaded news photographs were visually inspected. JSON/fallback match. Complete archive manifest/bytes are compared with the last delivered ZIP and a fresh extraction passes the same full gate.
 
-## Remaining exact-copy limitation
+## Limits
 
-Le Parisien is a complete native page reconstruction, with the authentic vector logo and references recorded in LayoutSources.md. Neither its full layout nor the unchanged LinkedIn/X/Teams cards is proven pixel-identical. Native Chromium still could not launch here, so no physical browser/phone/projector screenshot comparison, live Vercel/Supabase test or exact licensed-font match is claimed. Preserve the viewport-matched comparison requirement for human review.
+Native Chromium rendering, pixel-identical layout matching, physical phone/projector testing and live Vercel/Supabase deployment are not claimed. The existing viewport/font matching limitation remains documented in LayoutSources.md and Verification.md. Editorial photographs are sourced/credited; no public-domain or Creative Commons licence is claimed. The article bodies, borrowed-name bylines and displayed timestamps are fictional quiz presentation, not reports published by the outlet.
 
-## Modified files since the previous complete ZIP
+## Modified files since the last delivered complete ZIP
 
 - `Content.py`
 - `ContentSources.md`
 - `CreationInstructions.md`
-- `HowToAddImages.md`
 - `LayoutSources.md`
 - `QuestionManager.md`
 - `ReadMe.md`
@@ -39,23 +37,24 @@ Le Parisien is a complete native page reconstruction, with the authentic vector 
 - `build_question_images.py`
 - `main.py`
 - `manager_assets/index.html`
-- `manager_assets/style.css`
 - `question_content.py`
 - `questions.json`
-- `static/bonus.html`
-- `static/images/sample23.png`
+- `static/images/sample19.png`
 - `static/index.html`
+- `static/newsarticle.css`
+- `static/newsarticle.js`
 - `static/presenter.html`
-- `static/style.css`
 - `tests/frontend/game.cjs`
-- `tests/frontend/keyboard.cjs`
+- `tests/frontend/resources.cjs`
 - `tests/run_frontend.py`
 - `tests/test_game.py`
 
 ## Added files
 
-- `tests/frontend/resources.cjs`
+- `static/news/ai.jpg`
+- `static/news/football.jpg`
+- `static/news/housing.jpg`
 
 ## Removed files
 
-None. The tenth question is removed from the deck; its media remains available for older rooms/custom decks.
+None.

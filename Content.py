@@ -9,7 +9,7 @@ Sources, fictional status and classifications: ContentSources.md.
 ROUNDS = [{'title': 'LinkedIn Post by a Manager',
   'kind': 'image',
   'seconds': 25,
-  'context': 'Read the post. Who wrote it: AI or HUMAN?',
+  'context': 'Post text: AI or HUMAN?',
   'answer': 'AI',
   'explanation': 'The post is an original AI-written satire. The interface is a fictional '
                  'reconstruction, not a real LinkedIn account.',
@@ -23,7 +23,7 @@ ROUNDS = [{'title': 'LinkedIn Post by a Manager',
  {'title': 'Michael Jordan’s Free-Throw-Line Dunk',
   'kind': 'image',
   'seconds': 25,
-  'context': 'Look closely at the jump. Was this photograph made by AI or a human?',
+  'context': 'Photograph: AI or HUMAN?',
   'media': '/static/images/sample26.jpg',
   'alt': 'Michael Jordan airborne during a free-throw-line dunk, with the court, hoop and crowd '
          'visible.',
@@ -47,7 +47,7 @@ ROUNDS = [{'title': 'LinkedIn Post by a Manager',
   'alt': 'A commented SQL query combining employee, payroll, department and certification tables.',
   'seconds': 25,
   'answer': 'AI',
-  'context': 'Judge who wrote this SQL query: AI or HUMAN.',
+  'context': 'SQL code: AI or HUMAN?',
   'explanation': 'Original AI-written SQL with two common table expressions, four source tables, '
                  'explanatory comments and a conditional-aggregate pivot. It summarizes a payroll '
                  'month by department and highest valid certification rank. Pre-aggregation '
@@ -63,7 +63,7 @@ ROUNDS = [{'title': 'LinkedIn Post by a Manager',
  {'title': 'Photograph of Nikola Tesla in His Laboratory',
   'kind': 'image',
   'seconds': 25,
-  'context': 'Inspect the photograph. AI or HUMAN?',
+  'context': 'Photograph: AI or HUMAN?',
   'media': '/static/images/sample16.jpg',
   'alt': 'A seated person reading near large electrical equipment and bright arcs in a historical '
          'photograph.',
@@ -80,34 +80,39 @@ ROUNDS = [{'title': 'LinkedIn Post by a Manager',
   'image_reveal': 'Nikola Tesla in his Colorado Springs laboratory — December 1899.\n'
                   'Source: Dickenson V. Alley. Historical double exposure.'},
  {'title': 'News Article About a Bitcoin Price Drop',
-  'context': 'Read the French article. Who wrote it: AI or HUMAN?',
+  'context': 'Article text: AI or HUMAN?',
   'kind': 'text',
   'answer': 'AI',
   'seconds': 25,
-  'body': 'Le bitcoin affiche une chute de 50 % après une erreur dans un flux de cotation\n'
+  'body': 'Le bitcoin affiché en baisse de 50 % sur une plateforme après un incident technique\n'
           '\n'
-          'Le bitcoin a brièvement semblé perdre la moitié de sa valeur lundi, après qu’une mise à '
-          'jour logicielle a transmis un prix erroné à plusieurs applications de trading. La '
-          'baisse affichée a déclenché des ordres de vente automatiques avant que les opérateurs '
-          'ne corrigent le flux de données.\n'
+          'Une plateforme d’échange a suspendu les transactions pendant vingt minutes lundi matin '
+          'après avoir affiché un cours du bitcoin inférieur de moitié à celui des autres marchés. '
+          'L’écart serait lié à un problème de synchronisation de son flux de prix.\n'
           '\n'
-          'Les cours réels sont revenus à leur niveau habituel en quelques minutes, mais les '
-          'captures d’écran de la chute ont continué à circuler. Une plateforme a demandé à ses '
-          'clients de ne plus actualiser l’application pendant que ses ingénieurs rétablissaient '
-          'le graphique. Les utilisateurs qui avaient passé la matinée à « acheter la baisse » ont '
-          'été invités à vérifier s’ils avaient effectivement acheté quelque chose.',
+          'L’anomalie est apparue peu après une opération de maintenance. Des utilisateurs ont '
+          'partagé des captures d’écran montrant une chute brutale, alors que les principales '
+          'plateformes ne signalaient aucun mouvement comparable. Les ordres en attente ont été '
+          'bloqués le temps de rétablir la cotation.\n'
+          '\n'
+          'Le service a ensuite repris avec un cours corrigé. La plateforme examine les '
+          'transactions exécutées pendant l’incident et doit contacter les clients concernés. '
+          'Certains avaient cru profiter d’une occasion exceptionnelle avant de voir leur achat '
+          'disparaître de l’historique.',
   'explanation': 'Original AI-written French fiction for the game. The story is invented, not a '
                  'report or quotation from the publication whose interface is reconstructed.',
-  'source': 'Original AI-written French news-style fiction for the quiz, October 5, 2026. All '
-            'incidents and quoted snippets are invented. Le Parisien supplies the website layout '
-            'reference only; this is not a published Le Parisien article.',
+  'source': 'Original AI-written French news-style fiction for the quiz, October 5, 2026. The '
+            'incidents, platform/partner statements and quotes are invented. Le Parisien is the '
+            'layout reference only. Displayed journalist names are borrowed solely for the '
+            'requested mock byline; neither journalist wrote or published this story. Actual '
+            'neighbouring news photos and their origins are documented in LayoutSources.md.',
   'discussion': '',
   'reveal_sources': [],
   'text_style': 'news'},
  {'title': 'Painting of Napoleon’s Coronation',
   'kind': 'image',
   'seconds': 25,
-  'context': 'AI or HUMAN?',
+  'context': 'Painting: AI or HUMAN?',
   'media': '/static/images/sample13.jpg',
   'alt': 'A painting of an imperial ceremony with guests in ornate robes.',
   'image_fit': 'contain',
@@ -127,7 +132,7 @@ ROUNDS = [{'title': 'LinkedIn Post by a Manager',
   'alt': 'A French-language X-style post displaying Emmanuel Macron’s name, handle and portrait.',
   'seconds': 25,
   'answer': 'AI',
-  'context': 'Read the French post. Judge the writing, not the account: AI or HUMAN?',
+  'context': 'Post text: AI or HUMAN?',
   'explanation': 'Original AI-written fictional French post announcing a ten-hospital trial of '
                  'French-developed AI to anticipate emergency-department demand using anonymized '
                  'data. Emmanuel Macron did not write, announce or post this invented trial. '
@@ -140,27 +145,32 @@ ROUNDS = [{'title': 'LinkedIn Post by a Manager',
             'picture retained as profile-source.png.',
   'discussion': ''},
  {'title': 'News Article About a Ballon d’Or Leak',
-  'context': 'Read the French article. Who wrote it: AI or HUMAN?',
+  'context': 'Article text: AI or HUMAN?',
   'kind': 'text',
   'answer': 'AI',
   'seconds': 25,
-  'body': 'Ballon d’or : le nom de Mbappé apparaît dans un suivi de livraison avant la cérémonie\n'
+  'body': 'Ballon d’or : une page publiée par erreur relance la rumeur d’une victoire de Mbappé\n'
           '\n'
-          'Le nom de Kylian Mbappé est apparu mardi comme destinataire d’un trophée doré sur une '
-          'page de suivi de livraison. Des supporters y ont vu une fuite du résultat du Ballon '
-          'd’or avant la cérémonie. Le colis portait les mentions « signature obligatoire » et « '
-          'ne pas laisser à l’accueil ».\n'
+          'Une page présentant Kylian Mbappé comme lauréat du Ballon d’or a été brièvement '
+          'accessible sur le site d’un partenaire de la cérémonie. Retirée quelques minutes plus '
+          'tard, elle a suffi à déclencher une vague de réactions sur les réseaux sociaux.\n'
           '\n'
-          'Les organisateurs ont rappelé qu’un suivi de colis ne constituait pas une annonce '
-          'officielle et que plusieurs trophées personnalisés pouvaient être préparés pour les '
-          'finalistes. Le lien a disparu en moins d’une heure, alors que le colis affichait '
-          'toujours le statut « destinataire absent ». Les supporters ont aussitôt débattu pour '
-          'savoir s’il fallait y voir une nouvelle occasion manquée.',
+          'Le texte, accompagné d’une photographie du joueur, portait un titre de félicitations et '
+          'un bouton renvoyant vers la retransmission de la soirée. Plusieurs internautes en ont '
+          'conservé des captures avant sa suppression. Aucun classement ni détail sur le vote du '
+          'jury n’était visible.\n'
+          '\n'
+          'Le partenaire évoque un contenu de préparation mis en ligne prématurément. Des pages '
+          'similaires auraient été prévues pour plusieurs candidats afin de permettre une '
+          'publication rapide après l’annonce du résultat. Cela n’a pas empêché des supporters de '
+          'célébrer une victoire encore non confirmée.',
   'explanation': 'Original AI-written French fiction for the game. The story is invented, not a '
                  'report or quotation from the publication whose interface is reconstructed.',
-  'source': 'Original AI-written French news-style fiction for the quiz, October 5, 2026. All '
-            'incidents and quoted snippets are invented. Le Parisien supplies the website layout '
-            'reference only; this is not a published Le Parisien article.',
+  'source': 'Original AI-written French news-style fiction for the quiz, October 5, 2026. The '
+            'incidents, platform/partner statements and quotes are invented. Le Parisien is the '
+            'layout reference only. Displayed journalist names are borrowed solely for the '
+            'requested mock byline; neither journalist wrote or published this story. Actual '
+            'neighbouring news photos and their origins are documented in LayoutSources.md.',
   'discussion': '',
   'reveal_sources': [],
   'text_style': 'news'},
@@ -168,10 +178,9 @@ ROUNDS = [{'title': 'LinkedIn Post by a Manager',
   'kind': 'image',
   'media': '/static/images/sample19.png',
   'image_fit': 'contain',
-  'alt': 'An anonymized French Teams conversation: an intern submits a document-search handover '
-         'PDF and a manager replies.',
-  'context': 'A conversation I may or may not have had during my internship. Judge only the '
-             'manager’s reply: AI or HUMAN.',
+  'alt': 'A French Teams conversation with Adam’s blurred identity: his document submission is on '
+         'the right in blue, and the manager’s reply is on the left in grey.',
+  'context': 'Manager’s reply: AI or HUMAN?',
   'answer': 'AI',
   'explanation': 'AI wrote the manager’s mistaken French validation reply. The first message '
                  'concerns searching technical documents; the manager imagines flight monitoring, '
@@ -182,6 +191,9 @@ ROUNDS = [{'title': 'LinkedIn Post by a Manager',
             'aerospace document-search/GraphRAG internship. Less technical wording requested; '
             'reply invents aircraft operations instead of discussing document retrieval. The PDF '
             'and anonymized identities are fictional; its contents are not displayed. Judge only '
-            'the manager’s reply.',
+            'the manager’s reply. Adam Nassir is the presenter-supplied sender name, blurred in '
+            'the outgoing message header. The outgoing document message is on the right in light '
+            'blue; the incoming manager reply is on the left in light grey. The manager identity '
+            'remains fictional and blurred.',
   'discussion': '',
   'seconds': 25}]

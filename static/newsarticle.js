@@ -2,10 +2,11 @@
 (() => {
   'use strict';
   const SECTIONS = ['À la une', 'En continu', 'Paris & Île-de-France', 'Faits divers', 'Politique', 'International', 'Économie', 'Société', 'Sports', 'Culture'];
+  // Photos copied unchanged from recent Le Parisien stories; private credits in LayoutSources.md.
   const RELATED = [
-    {section:'ÉCONOMIE', title:'Télétravail : comment les entreprises organisent le retour au bureau', color:'office'},
-    {section:'SPORTS', title:'Football : les rendez-vous à suivre cette semaine', color:'sport'},
-    {section:'HIGH-TECH', title:'Téléphones : ce qui change avec la prochaine mise à jour', color:'tech'}
+    {section:'VIE ÉTUDIANTE', title:'Aides au logement : ce qui change en octobre', image:'housing', alt:'Étudiants près du campus de l’UTC à Compiègne'},
+    {section:'SPORTS', title:'France-Belgique : les Bleus préparent leur prochain match', image:'football', alt:'Zinedine Zidane en conférence de presse'},
+    {section:'HIGH-TECH', title:'OpenAI se sépare de trois chercheurs en sécurité', image:'ai', alt:'Logo OpenAI lors d’un événement'}
   ];
   function node(tag, name, value) {
     const el = document.createElement(tag);
@@ -32,8 +33,11 @@
   }
   function card(item, compact) {
     const result = node('div', compact ? 'news-trending-item' : 'news-related-item');
-    const thumb = node('div', `news-thumb news-thumb-${item.color}`);
-    thumb.setAttribute('aria-hidden','true');
+    const thumb = node('img', 'news-thumb');
+    thumb.src = `/static/news/${item.image}.jpg`;
+    thumb.alt = item.alt;
+    thumb.width = 240; thumb.height = 160;
+    thumb.loading = 'lazy'; thumb.decoding = 'async';
     const text = node('div', 'news-card-copy');
     text.append(node('span', 'news-card-section', item.section), node('h4', 'news-card-headline', item.title));
     result.append(thumb, text); return result;
@@ -72,11 +76,11 @@
     // The first story paragraph is the chapo, followed by the byline and body.
     if (parts.length) heading.append(node('p', 'news-paragraph news-chapo', parts.shift()));
     const byline = node('div', 'news-byline');
-    byline.append(node('span', '', 'Par '), node('span', 'news-author', 'La rédaction'));
+    byline.append(node('span', '', 'Par '), node('span', 'news-author', section === 'Sports' ? 'Dominique Sévérac' : 'Sébastien Lernould'));
     const share = node('div', 'news-sharebar'); share.setAttribute('aria-hidden','true');
     for (const label of ['f', 'X', '✉']) share.append(node('span', 'news-share-symbol', label));
     share.append(icon('share'));
-    heading.append(byline, share);
+    heading.append(byline, node('div', 'news-dateline', section === 'Sports' ? 'Le 5 octobre 2026 à 09h24' : 'Le 5 octobre 2026 à 08h12'), share);
     const body = node('div', 'news-body');
     for (const part of parts) body.append(node('p', 'news-paragraph', part));
     const topics = node('div', 'news-topics');

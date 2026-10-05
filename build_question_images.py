@@ -229,7 +229,8 @@ def linkedin():
 
 def teams():
     # Reference: Microsoft's current combined Chat view, accessed October 2026.
-    # Native editable UI reconstruction; every account and message is fictional.
+    # Native editable UI reconstruction; messages/manager are fictional.
+    # The supplied sender name Adam Nassir is blurred; no real message transcript.
     im=Image.new("RGB",(1800,1120),"#f5f5f5");d=ImageDraw.Draw(im)
     text(d,(24,17),"···",27,"#525252")
     text(d,(99,18),"Microsoft Teams",22,"#424242",True)
@@ -280,24 +281,27 @@ def teams():
     def height(value, width):
         return paragraph(ImageDraw.Draw(Image.new("RGB",(1,1))), (0,0), value,
                          width, 30, 43)
-    avatar(im,(443,230),44,color="#c4ceda",blur=5)
-    blurred_label(im,(503,222),"Alexandre Martin",23,245,34,bg="#f5f5f5",radius=4)
-    d=ImageDraw.Draw(im);text(d,(771,223),"09:41",20,"#616161")
-    request_bottom=286+height(TEAMS_REQUEST,1192)+18
-    d.rounded_rectangle((500,266,1738,request_bottom),8,fill="white")
-    paragraph(d,(523,286),TEAMS_REQUEST,1192,30,43)
-    pdf_y=request_bottom+16
-    d.rounded_rectangle((500,pdf_y,1230,pdf_y+88),7,fill="white",outline="#d8d8d8")
-    d.rounded_rectangle((519,pdf_y+21,568,pdf_y+68),4,fill="#bd302f")
-    text(d,(526,pdf_y+35),"PDF",16,"white",True)
-    text(d,(589,pdf_y+17),"Bilan_Stage_Recherche_Documents.pdf",28,bold=True)
-    text(d,(589,pdf_y+55),"84 KB",20,"#616161")
-    reply_y=pdf_y+158
-    blurred_label(im,(1338,reply_y-44),"Camille Bernard",23,245,34,bg="#f5f5f5",radius=4)
-    d=ImageDraw.Draw(im);text(d,(1600,reply_y-42),"Manager · 09:42",19,"#616161")
-    reply_bottom=reply_y+22+height(TEAMS_REPLY,1070)+18
-    d.rounded_rectangle((620,reply_y,1738,reply_bottom),8,fill="#e8ebfa")
-    paragraph(d,(644,reply_y+22),TEAMS_REPLY,1070,30,43)
+    # Adam sends the handover: right-aligned outgoing blue bubble + attachment.
+    outgoing = "#dce6ff"
+    blurred_label(im,(1395,222),"Adam Nassir",23,215,34,bg="#f5f5f5",radius=7)
+    d=ImageDraw.Draw(im);text(d,(1647,223),"09:41",20,"#616161")
+    request_bottom=286+height(TEAMS_REQUEST,1018)+18
+    d.rounded_rectangle((676,266,1738,request_bottom),8,fill=outgoing)
+    paragraph(d,(698,286),TEAMS_REQUEST,1018,30,43)
+    pdf_y=request_bottom+12
+    d.rounded_rectangle((1008,pdf_y,1738,pdf_y+88),7,fill=outgoing,outline="#bbc9ed")
+    d.rounded_rectangle((1027,pdf_y+21,1076,pdf_y+68),4,fill="#bd302f")
+    text(d,(1034,pdf_y+35),"PDF",16,"white",True)
+    text(d,(1097,pdf_y+17),"Bilan_Stage_Recherche_Documents.pdf",28,bold=True)
+    text(d,(1097,pdf_y+55),"84 KB",20,"#616161")
+    # Manager responds: incoming neutral bubble at the left of the conversation.
+    reply_y=pdf_y+151
+    avatar(im,(443,reply_y-38),44,color="#c4ceda",blur=5)
+    blurred_label(im,(503,reply_y-44),"Alexandre Martin",23,245,34,bg="#f5f5f5",radius=6)
+    d=ImageDraw.Draw(im);text(d,(772,reply_y-42),"Manager · 09:42",19,"#616161")
+    reply_bottom=reply_y+22+height(TEAMS_REPLY,994)+18
+    d.rounded_rectangle((500,reply_y,1540,reply_bottom),8,fill="#ededed")
+    paragraph(d,(523,reply_y+22),TEAMS_REPLY,994,30,43)
     input_y=reply_bottom+38
     d.rounded_rectangle((467,input_y,1738,input_y+60),7,fill="white",outline="#b9b9b9")
     text(d,(486,input_y+19),"Type a message",24,"#757575")

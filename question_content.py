@@ -27,6 +27,30 @@ LEGACY_NEWS_HEADLINES = {
 }
 
 
+# Normalize exact legacy game introductions, retaining the classification target.
+# Custom prompts identifying another part of the content are left untouched.
+LEGACY_CLASSIFICATION_CONTEXTS = {'Read the French post.': 'Post text: AI or HUMAN?',
+ 'Read the post. Who wrote it: AI or HUMAN?': 'Post text: AI or HUMAN?',
+ 'Look closely at the jump. Was this photograph made by AI or a human?': 'Photograph: AI or HUMAN?',
+ 'Judge who wrote this SQL query: AI or HUMAN.': 'SQL code: AI or HUMAN?',
+ 'Inspect the photograph. AI or HUMAN?': 'Photograph: AI or HUMAN?',
+ 'Read the French article. Who wrote it: AI or HUMAN?': 'Article text: AI or HUMAN?',
+ 'Read the French post. Judge the writing, not the account: AI or HUMAN?': 'Post text: AI or '
+                                                                           'HUMAN?',
+ 'A conversation I may or may not have had during my internship. Judge only the manager’s reply: AI or HUMAN.': 'Manager’s '
+                                                                                                                'reply: '
+                                                                                                                'AI '
+                                                                                                                'or '
+                                                                                                                'HUMAN?',
+ 'Look closely at the people in the painting. AI or HUMAN?': 'Painting: AI or HUMAN?'}
+
+
+def classification_context(value):
+    if not isinstance(value, str):
+        return value
+    return LEGACY_CLASSIFICATION_CONTEXTS.get(value.strip(), value)
+
+
 def text_presentation(question):
     if question.get("kind") != "text":
         return "plain"
@@ -123,9 +147,14 @@ class Question(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def legacy_news_layout(cls, value):
-        if isinstance(value, dict) and text_presentation(value) == "news":
-            value = {**value, "text_style": "news"}
+    def legacy_display_fields(cls, value):
+        if isinstance(value, dict):
+            if text_presentation(value) == "news":
+                value = {**value, "text_style": "news"}
+            if "context" in value:
+                clean = classification_context(value["context"])
+                if clean != value["context"]:
+                    value = {**value, "context": clean}
         return value
 
     @model_validator(mode="after")
