@@ -165,7 +165,7 @@
     setTimeout(() => layer.remove(), 4300);
   }
 
-  function imageFrame(q, highlight) {
+  function imageFrame(q, highlight, zoomView) {
     const frame = element('figure', 'image-frame');
     const img = element('img', 'round-image'); img.src = q.media; img.alt = q.alt || 'Round image';
     if (['contain', 'cover'].includes(q.image_fit)) img.style.objectFit = q.image_fit;
@@ -195,7 +195,7 @@
       img.addEventListener('load', position);
       if (img.complete) position();
     }
-    return frame;
+    return host ? frame : window.IcebreakerImages.create(frame, zoomView);
   }
 
   function playerBonus(code) {
@@ -227,7 +227,11 @@
     const signature = JSON.stringify([s.code, s.phase, s.round_index, s.question, s.phase === 'finished' ? s.leaderboard : null]);
     if (signature === stageKey) return;
     stageKey = signature;
-    const stage = $('stage'); stage.replaceChildren();
+    const stage = $('stage');
+    const imageKey = s.question?.kind === 'image' ? `${s.code}:${s.round_index}:${s.question.media}` : '';
+    const zoomView = imageKey && stage.dataset.imageKey === imageKey ? stage.querySelector('.image-viewer')?.getView() : undefined;
+    stage.dataset.imageKey = imageKey;
+    stage.replaceChildren();
     stage.classList.toggle('text-stage', ['live', 'revealed'].includes(s.phase) && s.question?.kind === 'text');
     if (s.phase === 'lobby') {
       if (!host) stage.append(waiting("You're in.", `Welcome, ${s.me.nickname}. Watch this screen for the first round.`));
@@ -240,7 +244,7 @@
     } else {
       const q = s.question;
       if (q.kind === 'image') {
-        stage.append(imageFrame(q, s.reveal?.image_highlight));
+        stage.append(imageFrame(q, s.reveal?.image_highlight, zoomView));
       } else if (q.kind === 'audio' || q.kind === 'video') {
         const isVideo = q.kind === 'video';
         const player = window.IcebreakerMedia.create(q, isVideo ? 'round-video' : 'round-audio', message => {
@@ -377,13 +381,27 @@
       } catch (error) { notify(error.message, error.status === 503); } finally { $('create-button').disabled = false; }
     });
     $('control-button').addEventListener('click', async () => {
-      if (!state || controlPending) return;
+      if (!state || !session || controlPending || $('control-button').disabled || $('control-button').hidden) return;
       controlPending = true; $('control-button').disabled = true;
       try {
         const s = await api(`/api/rooms/${session.code}/control`, {action:state.phase === 'revealed' ? 'next' : 'start', revision:state.revision});
         render(s);
       } catch (error) { notify(error.message); await poll(); }
       finally { controlPending = false; if (state) render(state); }
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' || event.defaultPrevented || event.isComposing ||
+          event.altKey || event.ctrlKey || event.metaKey || event.shiftKey ||
+          !state || state.phase !== 'revealed') return;
+      const button = $('control-button');
+      // Keep form fields and unrelated controls' normal keyboard behavior.
+      const target = event.target;
+      if (target instanceof Element && (target.isContentEditable ||
+          target.closest('input, textarea, select, a, [contenteditable], [role="button"], button') && target !== button)) return;
+      event.preventDefault();
+      // Suppress held keys and double presses while the next round is starting.
+      if (event.repeat || controlPending || button.disabled || button.hidden) return;
+      button.click();
     });
     $('copy-link').addEventListener('click', async () => {
       try { await navigator.clipboard.writeText(playerLink); notify('Player link copied.'); }

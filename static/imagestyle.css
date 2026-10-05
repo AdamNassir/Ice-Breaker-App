@@ -30,3 +30,15 @@
 .image-frame{position:relative;width:100%;margin:0;line-height:0}
 .image-highlight{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:hidden}
 .image-frame .image-error{line-height:1.4}
+
+/* Phone/player inspection: only the image and its reveal overlay move. */
+.image-viewport{overflow:hidden;position:relative;border-radius:12px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:zoom-in}
+.image-viewport:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
+.image-viewport .image-frame{transform-origin:center;will-change:transform}
+.image-viewport img{-webkit-user-drag:none}
+.image-viewport.is-zoomed{cursor:grab}
+.image-viewport.is-dragging.is-zoomed{cursor:grabbing}
+.image-zoom-controls{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:10px;line-height:1.2}
+.image-zoom-button{min-width:44px;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--red);font-size:18px;font-weight:700;touch-action:manipulation}
+.image-zoom-button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.image-zoom-level{min-width:52px;text-align:center;font-size:14px;color:var(--muted)}

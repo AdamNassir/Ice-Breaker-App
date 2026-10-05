@@ -1,55 +1,38 @@
-# Install the presentation and reveal update
-
-This complete ZIP keeps ten English rounds, five AI and five HUMAN, with all local media and the matching JSON/Python decks.
+# Install the code and aerospace GraphRAG questions
 
 ## Changes
 
-- Teams messages are larger and use the full chat area. The PDF stays as an attachment; its interior panel is removed.
-- Text questions have smaller presenter type and compact paragraph spacing; no words or excerpts are removed.
-- Truth Social follows the supplied compact white reference; X follows the supplied dark reference. Post wording and coarse identity pixelation remain.
-- The final podium emits a short confetti burst once per room. Reduced-motion preferences skip the animation. The presenter stays on rankings; the bonus remains phone-only.
-- Real-photo reveals show what the image depicts, its date and source link. Social posts receive no context.
-- The painting gets a red circle around Inspector Gadget only at reveal. The original image is unchanged; the circle is a responsive SVG overlay.
+- Round 3 replaces the real Trump Truth Social post with a sourced Python download loop and a document-ingestion scenario. The documentation code is unchanged; its formatting is recreated in a zoomable image.
+- Round 9 replaces the coffee-rota Teams exchange with an English aerospace GraphRAG internship handover. The validation reply invents aircraft-control features unrelated to the actual pipeline.
+- The existing Teams layout, blurred identities and PDF attachment-only presentation remain. The new PDF filename is `GraphRAG_Q3_Technical_Wrapup.pdf`.
 
 ## Install
 
-1. Back up custom questions and stop local servers.
-2. Extract the enclosed project and replace **all modified files** listed below. In particular, replace `main.py` and `question_content.py` together with `questions.json` and `Content.py`: the new reveal fields need the updated parser/API.
-3. Preserve your `.env` and deployment environment variables. No dependency installation or Supabase migration is needed.
-4. Restart the manager and choose Reload saved; confirm ten questions and no missing-media error.
-5. Commit all modified files, including the three PNGs, redeploy to Vercel and hard-refresh presenter/player pages.
-6. Create a **new room** to load the new captions and circle. Existing rooms keep their older question snapshots.
+1. Extract the complete ZIP. Replace all modified files below and add `static/images/sample23.png`. Preserve your `.env` and back up custom deck/media files before replacing the default deck.
+2. Replace **both** `questions.json` and `Content.py`, plus the image builder and updated Teams PNG.
+3. Restart a local server, or commit the changes and redeploy to Vercel. Hard-refresh presenter and player pages.
+4. Create a **new room**: rooms store question snapshots, so an existing room keeps its old deck. The question manager should load ten questions without missing-media errors.
+
+No dependency installation or Supabase migration is required. Pillow is needed only if you choose to rebuild the images yourself. The removed Truth Social round's image stays bundled for older rooms.
 
 ## Modified files relative to the previous ZIP
 
 - `Content.py`
 - `ContentSources.md`
 - `HowToAddImages.md`
-- `QuestionManager.md`
 - `ReadMe.md`
 - `UpdateGuide.md`
 - `Verification.md`
 - `build_question_images.py`
-- `main.py`
-- `manager_assets/app.js`
-- `manager_assets/index.html`
-- `question_content.py`
 - `questions.json`
-- `static/app.js`
 - `static/images/sample19.png`
-- `static/images/sample21.png`
-- `static/images/sample22.png`
-- `static/imagestyle.css`
-- `static/index.html`
-- `static/presenter.html`
-- `static/style.css`
-- `tests/test_game.py`
-- `tests/test_question_manager.py`
 
-No files were added or removed in this update.
+## Added file
 
-## Check before presenting
+- `static/images/sample23.png`
 
-Choose ten seconds, join on a phone, then Start. Check the enlarged Teams conversation and compact texts. At the three real-photo reveals, check subject/date/source; check no extra text appears after social posts. The red circle must stay hidden while voting and appear on the painting's reveal. At final results, check confetti and placements, with the bonus question only on phones.
+No files were removed. Runtime JavaScript/CSS/Python, dependency files and deployment configuration are unchanged.
 
-The photo caption can be edited in the manager's Answer notes section. Circle coordinates, text spacing and confetti settings are documented in HowToAddImages.md.
+## Rehearsal
+
+Start a new room. Confirm round 3 shows the usage scenario and code, not Truth Social. Confirm round 9 shows the GraphRAG handover and new PDF filename. Test pinch zoom on both images. The first reveal should be HUMAN and the Teams reveal AI; no additional source/context text appears for either. Timers, Enter/Next round and final placements should work as before.

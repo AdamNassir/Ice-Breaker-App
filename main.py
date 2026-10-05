@@ -313,9 +313,10 @@ def control(code: str, body: Control, authorization: str | None = Header(default
                 state["phase"] = "finished"
             else:
                 state["index"] += 1
-                state["phase"] = "ready"
                 state["votes"] = {}
-                state["deadline"] = None
+                state["duration"] = state["default_seconds"]
+                state["deadline"] = time.time() + state["duration"]
+                state["phase"] = "live"
             state["revision"] += 1
         else:
             error = (409, "That action is unavailable in this phase.")

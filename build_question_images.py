@@ -1,9 +1,9 @@
-"""Rebuild the four social screenshots: python build_question_images.py.
+"""Rebuild the three social screenshots and code card: python build_question_images.py.
 
 Optional authoring dependency only: python -m pip install Pillow
 The deployed game uses the bundled PNGs and does not need Pillow.
 Edit LINKEDIN_POST, TEAMS_REQUEST, TEAMS_REPLY, or AI_TWEET below.
-GENUINE_TWEET reproduces a verified public post; preserve it for HUMAN provenance.
+COMMON_CODE reproduces a sourced documentation excerpt; preserve it for HUMAN provenance.
 All interface graphics are reconstructions; the other social texts are fictional.
 """
 from pathlib import Path
@@ -22,21 +22,31 @@ LINKEDIN_POST = (
     "#BuildInPublic #AgenticEverything"
 )
 TEAMS_REQUEST = (
-    "Hi, here is the final technical document for the quarterly project wrap-up. "
-    "It covers our shared spreadsheet for the office coffee rota: who refills "
-    "the beans each week. Can you read it and validate before I close the project?"
+    "Hi, here's the Q3 aerospace GraphRAG handover. It covers MinerU/DocLing OCR, "
+    "extraction and normalization; Neo4j entities, relations and ontologies; "
+    "Microsoft GraphRAG, LightRAG and RAGAnything; plus vector/text indexing "
+    "and hybrid retrieval for document-grounded answers. Please review the "
+    "attached technical report and validate before I leave."
 )
 TEAMS_REPLY = (
-    "Validated. This is a strong plan for automating coffee supply across all our "
-    "offices. The live inventory dashboard should predict demand, place orders "
-    "with suppliers and reroute deliveries when a site runs low. I also like "
-    "the access controls that stop unauthorized purchases and the backup "
-    "system that keeps everything running during an outage. My only "
-    "recommendation is to add a rollout plan for international offices. "
-    "Otherwise, ready to launch."
+    "Validated. Neo4j should now guide aircraft through turbulence and approve "
+    "repairs automatically. Hybrid retrieval can switch between electric and "
+    "jet propulsion depending on the question. I'd add a fallback autopilot "
+    "for when the document database is offline. Otherwise, the fleet is ready "
+    "for take-off."
 )
-GENUINE_TWEET = 'Has anyone noticed that, since I said "I HATE TAYLOR SWIFT," she\'s no longer "HOT?"'
-GENUINE_TWEET_SOURCE = "https://truthsocial.com/@realDonaldTrump/posts/114517718765768352"
+CODE_SCENARIO = (
+    "Scenario: A document-ingestion job has already opened a streamed HTTP "
+    "response, r. Save the incoming download to filename without loading "
+    "the whole file into memory."
+)
+# Exact excerpt from Requests Quickstart, Raw Response Content. Preserve spacing.
+COMMON_CODE = (
+    "with open(filename, 'wb') as fd:\n"
+    "    for chunk in r.iter_content(chunk_size=128):\n"
+    "        fd.write(chunk)"
+)
+CODE_SOURCE = "https://requests.readthedocs.io/en/latest/user/quickstart/#raw-response-content"
 AI_TWEET = (
     "We will build the biggest FIREWALL anyone has ever seen. Beautiful firewall. "
     "And the hackers are going to pay for it. They said nobody could secure a "
@@ -258,7 +268,7 @@ def teams():
     d.rounded_rectangle((500,pdf_y,1230,pdf_y+88),7,fill="white",outline="#d8d8d8")
     d.rounded_rectangle((519,pdf_y+21,568,pdf_y+68),4,fill="#bd302f")
     text(d,(526,pdf_y+35),"PDF",16,"white",True)
-    text(d,(589,pdf_y+17),"Q3_Final_Technical_Document.pdf",28,bold=True)
+    text(d,(589,pdf_y+17),"GraphRAG_Q3_Technical_Wrapup.pdf",28,bold=True)
     text(d,(589,pdf_y+55),"84 KB",20,"#616161")
     reply_y=pdf_y+158
     blurred_label(im,(1338,reply_y-44),"Camille Bernard",23,245,34,bg="#f5f5f5",radius=4)
@@ -274,6 +284,36 @@ def teams():
     if final_height>1120:raise ValueError("Teams messages overflow; adjust text/size.")
     im=im.crop((0,0,1800,final_height))
     im.save(ROOT/"sample19.png",optimize=True)
+
+
+def code_card():
+    """Recreate a documentation code block: exact text, indentation and quotes."""
+    import io, tokenize, keyword
+    im = Image.new("RGB", (1600, 720), "white")
+    d = ImageDraw.Draw(im)
+    bottom = paragraph(d, (46, 35), CODE_SCENARIO, 1508, 33, 45)
+    code_top = bottom + 34
+    d.rectangle((46, code_top, 1554, code_top + 240), fill="#f5f5f5", outline="#e1e4e5", width=2)
+    names = ["DejaVuSansMono.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+             str(Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts" / "consola.ttf"),
+             "/System/Library/Fonts/Menlo.ttc"]
+    face = None
+    for name in names:
+        try: face = ImageFont.truetype(name, 38); break
+        except OSError: pass
+    if face is None: face = ImageFont.load_default(size=38)
+    # Color tokens only. Never reformat the copied code or replace its names.
+    lines = COMMON_CODE.splitlines()
+    for row, line in enumerate(lines):
+        if d.textlength(line, font=face) > 1438: raise ValueError("Code line overflows the card.")
+        d.text((81, code_top + 36 + row * 58), line, font=face, fill="#222222")
+    for token in tokenize.generate_tokens(io.StringIO(COMMON_CODE).readline):
+        value, (row, column) = token.string, token.start
+        color = "#008000" if keyword.iskeyword(value) else "#ba2121" if token.type == tokenize.STRING else "#666666" if token.type == tokenize.NUMBER else None
+        if color:
+            x = 81 + d.textlength(lines[row-1][:column], font=face)
+            d.text((x, code_top + 36 + (row-1)*58), value, font=face, fill=color)
+    im.crop((0, 0, 1600, code_top + 282)).save(ROOT / "sample23.png", optimize=True)
 
 
 def tweet(value, filename, platform="X"):
@@ -329,6 +369,6 @@ if __name__ == "__main__":
     ROOT.mkdir(parents=True, exist_ok=True)
     linkedin()
     teams()
-    tweet(GENUINE_TWEET, "sample21.png", platform="Truth Social")
+    code_card()
     tweet(AI_TWEET, "sample22.png")
-    print("Created static/images/sample18.png, sample19.png, sample21.png and sample22.png")
+    print("Created static/images/sample18.png, sample19.png, sample23.png and sample22.png")

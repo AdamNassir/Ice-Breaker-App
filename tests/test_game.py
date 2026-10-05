@@ -88,8 +88,9 @@ class GameTests(unittest.TestCase):
                                 json={"answer": answer, "round_index": index})
 
     def test_complete_game_streak_scores_and_results(self):
+        self.assertEqual(self.control('start').status_code, 200)
         for index, question in enumerate(main.ROUNDS):
-            self.assertEqual(self.control('start').status_code, 200)
+            self.assertEqual(self.state()['phase'], 'live')
             live = self.state(self.p1)
             self.assertEqual(live['duration'], 5)
             self.assertEqual(live['question'].get('difficulty'), question.get('difficulty'))
@@ -112,7 +113,14 @@ class GameTests(unittest.TestCase):
                 self.assertEqual(s['reveal'].get('discussion'), question.get('discussion'))
                 score = s['me']['score']
                 self.assertEqual(self.state(self.p1)['me']['score'], score)
-            self.assertEqual(self.control('next').status_code, 200)
+            advanced = self.control('next')
+            self.assertEqual(advanced.status_code, 200)
+            if index < len(main.ROUNDS) - 1:
+                self.assertEqual(advanced.json()['phase'], 'live')
+                self.assertEqual(advanced.json()['round_index'], index + 1)
+                self.assertEqual(advanced.json()['answered_count'], 0)
+                self.assertIsNone(advanced.json()['reveal'])
+                self.assertIsNone(self.state(self.p1)['me']['vote'])
         final = self.state(self.p1)
         self.assertEqual(final['phase'], 'finished')
         self.assertEqual(final['me']['score'], 1750)
@@ -136,8 +144,11 @@ class GameTests(unittest.TestCase):
             with patch.object(main.time, 'time', return_value=start):
                 state = self.client.get(f'/api/rooms/{code}/state', headers=host).json()
                 response = self.client.post(f'/api/rooms/{code}/control', headers=host,
-                                            json={"action": "start", "revision": state['revision']})
+                                            json={"action": "start" if index == 0 else "next", "revision": state['revision']})
                 self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.json()['phase'], 'live')
+                self.assertEqual(response.json()['round_index'], index)
+                self.assertIsNone(response.json()['reveal'])
                 self.assertEqual(response.json()['duration'], 10)
                 self.assertEqual(response.json()['deadline'], start + 10)
             with patch.object(main.time, 'time', return_value=start + 9.99):
@@ -148,8 +159,15 @@ class GameTests(unittest.TestCase):
                 self.assertEqual(late.status_code, 409)
                 state = self.client.get(f'/api/rooms/{code}/state', headers=host).json()
                 self.assertEqual(state['phase'], 'revealed')
-                self.assertEqual(self.client.post(f'/api/rooms/{code}/control', headers=host,
-                                                 json={"action": "next", "revision": state['revision']}).status_code, 200)
+            with patch.object(main.time, 'time', return_value=start + 50):
+                paused = self.client.get(f'/api/rooms/{code}/state', headers=host).json()
+                self.assertEqual(paused['phase'], 'revealed')
+                self.assertEqual(paused['round_index'], index)
+        with patch.object(main.time, 'time', return_value=start + 50):
+            final = self.client.post(f'/api/rooms/{code}/control', headers=host,
+                                    json={"action": "next", "revision": paused['revision']})
+            self.assertEqual(final.status_code, 200)
+            self.assertEqual(final.json()['phase'], 'finished')
 
     def test_answer_secrecy_auth_and_player_control(self):
         self.control('start')
@@ -181,8 +199,26 @@ class GameTests(unittest.TestCase):
         stale = self.client.post(f'/api/rooms/{self.code}/control', headers=self.host,
                                 json={"action":"next", "revision":revision})
         self.assertEqual(stale.status_code, 409)
-        self.control('start')
+        self.assertEqual(self.control('start').status_code, 409)
+        self.assertEqual(self.state()['phase'], 'live')
         self.assertEqual(self.vote(self.p2, 'HUMAN', 0).status_code, 409)
+
+    def test_concurrent_next_starts_exactly_one_round(self):
+        self.control('start')
+        self.expire()
+        revealed = self.state()
+        self.assertEqual(revealed['phase'], 'revealed')
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            results = list(executor.map(lambda _: self.client.post(
+                f'/api/rooms/{self.code}/control', headers=self.host,
+                json={"action": "next", "revision": revealed['revision']}).status_code, range(5)))
+        self.assertEqual(results.count(200), 1)
+        self.assertEqual(results.count(409), 4)
+        live = self.state()
+        self.assertEqual(live['phase'], 'live')
+        self.assertEqual(live['round_index'], 1)
+        self.assertEqual(live['revision'], revealed['revision'] + 1)
+        self.assertEqual(live['duration'], 5)
 
     def test_concurrent_duplicate_vote_is_atomic(self):
         self.control('start')
@@ -193,8 +229,8 @@ class GameTests(unittest.TestCase):
         self.assertEqual(self.state()['answered_count'], 1)
 
     def test_wrong_and_missing_answers_break_streak(self):
+        self.control('start')
         for index in range(3):
-            self.control('start')
             if index < 2:
                 answer = main.ROUNDS[index]['answer'] if index == 0 else ('AI' if main.ROUNDS[index]['answer']=='HUMAN' else 'HUMAN')
                 self.vote(self.p1, answer, index)
@@ -226,7 +262,7 @@ class GameTests(unittest.TestCase):
             self.assertEqual(self.client.get('/api/health').status_code, 503)
 
     def test_media_and_pages_exist(self):
-        for url in ['/', '/presenter', '/static/style.css', '/static/imagestyle.css', '/static/app.js', '/static/media.js']:
+        for url in ['/', '/presenter', '/static/style.css', '/static/imagestyle.css', '/static/app.js', '/static/media.js', '/static/imagezoom.js']:
             self.assertEqual(self.client.get(url).status_code, 200)
         for question in main.ROUNDS:
             if question.get('media'):
