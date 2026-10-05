@@ -3,7 +3,7 @@
 Optional authoring dependency only: python -m pip install Pillow
 The deployed game uses the bundled PNGs and does not need Pillow.
 Edit LINKEDIN_POST, TEAMS_REQUEST, TEAMS_REPLY, or AI_TWEET below.
-COMMON_CODE reproduces a sourced documentation excerpt; preserve it for HUMAN provenance.
+AI_SQL is original AI-written SQL; SQL_STYLE_SOURCE credits its formatting reference.
 All interface graphics are reconstructions; the other social texts are fictional.
 """
 from pathlib import Path
@@ -35,18 +35,16 @@ TEAMS_REPLY = (
     "for when the document database is offline. Otherwise, the fleet is ready "
     "for take-off."
 )
-CODE_SCENARIO = (
-    "Scenario: A document-ingestion job has already opened a streamed HTTP "
-    "response, r. Save the incoming download to filename without loading "
-    "the whole file into memory."
-)
-# Exact excerpt from Requests Quickstart, Raw Response Content. Preserve spacing.
-COMMON_CODE = (
-    "with open(filename, 'wb') as fd:\n"
-    "    for chunk in r.iter_content(chunk_size=128):\n"
-    "        fd.write(chunk)"
-)
-CODE_SOURCE = "https://requests.readthedocs.io/en/latest/user/quickstart/#raw-response-content"
+# Original AI rewrite of the PostgreSQL aggregate-query pattern.
+# Preserve uppercase clauses, lowercase names and four-space clause indentation.
+AI_SQL = """SELECT department, count(*) AS headcount,
+       round(avg(annual_salary), 2) AS average_salary
+    FROM employees
+    WHERE employment_status = 'active'
+    GROUP BY department
+    HAVING count(*) >= 5
+    ORDER BY average_salary DESC;"""
+SQL_STYLE_SOURCE = "https://www.postgresql.org/docs/current/tutorial-agg.html"
 AI_TWEET = (
     "We will build the biggest FIREWALL anyone has ever seen. Beautiful firewall. "
     "And the hackers are going to pay for it. They said nobody could secure a "
@@ -287,13 +285,12 @@ def teams():
 
 
 def code_card():
-    """Recreate a documentation code block: exact text, indentation and quotes."""
-    import io, tokenize, keyword
-    im = Image.new("RGB", (1600, 720), "white")
+    """Bare SQL, in the clause layout of the PostgreSQL tutorial reference."""
+    lines = AI_SQL.splitlines()
+    height = 120 + len(lines) * 58
+    im = Image.new("RGB", (1600, height), "white")
     d = ImageDraw.Draw(im)
-    bottom = paragraph(d, (46, 35), CODE_SCENARIO, 1508, 33, 45)
-    code_top = bottom + 34
-    d.rectangle((46, code_top, 1554, code_top + 240), fill="#f5f5f5", outline="#e1e4e5", width=2)
+    d.rectangle((46, 30, 1554, height - 30), fill="#f5f5f5", outline="#dddddd", width=2)
     names = ["DejaVuSansMono.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
              str(Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts" / "consola.ttf"),
              "/System/Library/Fonts/Menlo.ttc"]
@@ -302,18 +299,11 @@ def code_card():
         try: face = ImageFont.truetype(name, 38); break
         except OSError: pass
     if face is None: face = ImageFont.load_default(size=38)
-    # Color tokens only. Never reformat the copied code or replace its names.
-    lines = COMMON_CODE.splitlines()
+    # Draw unchanged whitespace and text; no title, scenario, comments or source clues.
     for row, line in enumerate(lines):
         if d.textlength(line, font=face) > 1438: raise ValueError("Code line overflows the card.")
-        d.text((81, code_top + 36 + row * 58), line, font=face, fill="#222222")
-    for token in tokenize.generate_tokens(io.StringIO(COMMON_CODE).readline):
-        value, (row, column) = token.string, token.start
-        color = "#008000" if keyword.iskeyword(value) else "#ba2121" if token.type == tokenize.STRING else "#666666" if token.type == tokenize.NUMBER else None
-        if color:
-            x = 81 + d.textlength(lines[row-1][:column], font=face)
-            d.text((x, code_top + 36 + (row-1)*58), value, font=face, fill=color)
-    im.crop((0, 0, 1600, code_top + 282)).save(ROOT / "sample23.png", optimize=True)
+        d.text((81, 60 + row * 58), line, font=face, fill="#222222")
+    im.save(ROOT / "sample23.png", optimize=True)
 
 
 def tweet(value, filename, platform="X"):

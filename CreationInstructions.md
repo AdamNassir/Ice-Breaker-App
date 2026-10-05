@@ -78,11 +78,11 @@ state["revision"] += 1
 
 - Add streaks, it is supposed to be ludic after all. Correct answers give 100 points. Add 25 points for each additional consecutive correct answer, capped at 100 bonus points per round. Incorrect or missed answers reset the streak. Keep the formula in editable server constants, but do not display an explanation of the formula in the public game.
 
-- Each normal question should display its content alone. Do not introduce the question with its title, difficulty, category, source, author or a discussion prompt. Text should be compact and easy to read. A context/scenario may be embedded in a supplied question asset when explicitly requested for that asset; do not add a generic introduction around it.
+- Each normal question should display its content alone. Do not introduce the question with its title, difficulty, category, source, author or a discussion prompt. Text should be compact and easy to read. For code questions, imply the scenario through table, column, variable or filter names. Do not add a prose scenario above the code. Other supplied assets may contain author-requested context; do not add a generic introduction around them.
 
 - On reveal, show AI or HUMAN. Do not display explanation paragraphs, technical notes, suggested discussion questions or text telling the presenter to discuss/continue. Keep those notes available to the author in the manager and private source files.
 
-- For configured real photographs, the reveal may also show a concise caption stating what the image is, its date and its source link. Do not add this contextual text to social posts, text questions or code cards. For an image with a configured hidden-character highlight, show a red circle only after reveal. Transform and scale the circle together with the image.
+- For configured real photographs, the reveal may also show a concise caption stating what the image is, its date and its source link. For explicitly configured HUMAN text excerpts, show concise source labels, publication dates and links only after reveal. Do not add discussion or explanation paragraphs. Do not add contextual text to social posts or code cards. For an image with a configured hidden-character highlight, show a red circle only after reveal. Transform and scale the circle together with the image.
 
 - Do not expose answer keys, explanations, source notes or reveal-only highlight coordinates in a live question payload. Keep Content.py, questions.json and source notes outside static/. Do not create a public API that returns the full saved deck.
 
@@ -146,10 +146,11 @@ question = {
     "explanation": private_answer_notes,
     "source": private_source_notes,
     "source_url": source_url,
+    "reveal_sources": [],     # opt-in HUMAN text credits: {"label": source_label, "url": https_url}
 }
 ```
 
-- Validate saves before replacing the deck. Reject unsupported media, invalid paths, traversal, malformed content and bad highlight coordinates. Keep a backup on save, and detect conflicting editor revisions. Allow the manager to open and repair a deck with missing media or malformed JSON instead of trapping the user behind an error.
+- Validate saves before replacing the deck. Reject unsupported media, invalid paths, traversal, malformed content and bad highlight coordinates or malformed reveal-source links. Preserve optional reveal-source credits through manager saves. Keep a backup on save, and detect conflicting editor revisions. Allow the manager to open and repair a deck with missing media or malformed JSON instead of trapping the user behind an error.
 
 - A new game room must take a snapshot of the saved deck. Existing rooms must not silently change questions when the author saves a different deck. Provide clear missing-media/deck errors, a working Reload saved control and exact deployment instructions for new media.
 

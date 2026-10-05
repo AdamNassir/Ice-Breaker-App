@@ -131,7 +131,7 @@ Do not set both `media` and `media_url`. Uploaded images use `media` only. URLs 
 
 The bundled sources/English deck and exact install list are in ContentSources.md and UpdateGuide.md. Replace both Content.py and questions.json when adopting the new default; a saved JSON deck takes priority.
 
-The presenter’s timer now applies to every round. Any older question-level seconds value is ignored. In the public game, only text/media content is shown, and the reveal is AI or HUMAN, with a short caption/source link for configured real photographs and an optional image highlight. Social posts receive no added context. Titles, context, explanations and source notes remain available in the editor and these instructions.
+The presenter’s timer now applies to every round. Any older question-level seconds value is ignored. In the public game, only text/media content is shown, and the reveal is AI or HUMAN, with a short caption/source link for configured real photographs and an optional image highlight. The April Fools text has explicitly configured source links at reveal. Social posts receive no added context. Titles, context, explanations and other source notes remain available in the editor and these instructions.
 
 ## Edit the LinkedIn, Teams, X and code images
 
@@ -142,11 +142,11 @@ python -m pip install Pillow
 python build_question_images.py
 ```
 
-Use your existing virtual-environment Python on Windows, macOS or Linux. Edit the clearly named `LINKEDIN_POST`, `TEAMS_REQUEST`, `TEAMS_REPLY`, `AI_TWEET`, `CODE_SCENARIO` and `COMMON_CODE` constants in `build_question_images.py`. The `linkedin()`, `teams()`, `tweet()` and `code_card()` functions control layout, colors and font sizes. The Teams request now describes the aerospace GraphRAG handover; the reply is deliberately wrong about aircraft control. Keep identities anonymized and the PDF as an attachment only.
+Use your existing virtual-environment Python on Windows, macOS or Linux. Edit the clearly named `LINKEDIN_POST`, `TEAMS_REQUEST`, `TEAMS_REPLY`, `AI_TWEET` and `AI_SQL` constants in `build_question_images.py`. The `linkedin()`, `teams()`, `tweet()` and `code_card()` functions control layout, colors and font sizes. The Teams request now describes the aerospace GraphRAG handover; the reply is deliberately wrong about aircraft control. Keep identities anonymized and the PDF as an attachment only.
 
 `SOCIAL_NAME_PIXEL_SIZE = 24` and `SOCIAL_AVATAR_PIXEL_SIZE = 20` control coarse pixelation on the remaining X parody. LinkedIn and Teams keep Gaussian blur. Rebuilding writes `static/images/sample18.png`, `sample19.png`, `sample22.png` and `sample23.png`. Inspect all four after editing. The former Truth Social image `sample21.png` remains bundled for older room snapshots and is not rebuilt or used in the current deck.
 
-`COMMON_CODE` preserves the exact three-line Requests excerpt. Keep its names, single quotes and four-space indentation for source fidelity. `CODE_SCENARIO` changes only the English usage scenario; `CODE_SOURCE` records its documentation URL. If you replace the code or change its origin, also update the answer/source in both `questions.json` and `Content.py`. Changing the image renderer does not automatically update deck provenance. Pillow is optional for authoring; no new deployment dependency is required.
+`AI_SQL` contains the original AI-written employee-data query. Keep the PostgreSQL reference's uppercase clauses, lowercase identifiers/functions and four-space clause indentation. `SQL_STYLE_SOURCE` records the formatting reference. `code_card()` renders only the SQL: do not add a prose scenario, title, comment or source clue. The scenario belongs in table/column/filter names. If you replace the code or change its origin, also update the answer/source in both `questions.json` and `Content.py`. Changing the image renderer does not automatically update deck provenance. Pillow is optional for authoring; no new deployment dependency is required.
 
 To change the displayed size on the projector, edit `.presenter-playing .round-image` at the end of `static/imagestyle.css` (currently `max-height: 72vh`). Phone image sizes retain their own limits. Keep `image_fit` set to `contain` to show the full screenshot. Commit the rebuilt PNGs and any deck changes, redeploy, and create a new room.
 

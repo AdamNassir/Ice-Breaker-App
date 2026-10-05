@@ -1,12 +1,12 @@
 # English fun deck: private answer key and credits
 
-Updated October 5, 2026. Ten rounds: five AI and five HUMAN; eight images and two texts; no audio or video rounds. All prompts, questions and reveals are in English. These are known-origin examples, not detector verdicts. The previous technical deck's sources remain in `ContentSources_Technical.md`; older credits remain in `ContentSources_Legacy.md`.
+Updated October 5, 2026. Ten rounds: six AI and four HUMAN; eight images and two texts; no audio or video rounds. All prompts, questions and reveals are in English. These are known-origin examples, not detector verdicts. The previous technical deck's sources remain in `ContentSources_Technical.md`; older credits remain in `ContentSources_Legacy.md`.
 
 ## Explain the rule before play
 
 AI means the writing, image, voice or footage was generated. HUMAN means people wrote, painted, photographed or recorded it. A human-made joke, staged photo or double exposure still counts as HUMAN. For the social screenshots, judge the **post or reply text**. Explain this rule before opening the room; the projected content contains no additional hints. This definition is about production, not whether a depicted event is plausible.
 
-The public game reveals AI or HUMAN. The three real photographs additionally show what they depict, their date and source; social posts and text questions show no added context. The AI painting gets a red circle around Inspector Gadget at reveal. Other notes are retained here and in the local manager. Strangeness is a decoy: human originals can be ridiculous, and generated originals can look ordinary. There is no claim of a measured difficulty curve.
+The public game reveals AI or HUMAN. The three real photographs additionally show what they depict, their date and source; the April Fools text additionally shows its four RFC source links and dates. Social posts and other text questions show no added context. The AI painting gets a red circle around Inspector Gadget at reveal. Other notes are retained here and in the local manager. Strangeness is a decoy: human originals can be ridiculous, and generated originals can look ordinary. There is no claim of a measured difficulty curve.
 
 ## Rounds and provenance
 
@@ -14,7 +14,7 @@ The public game reveals AI or HUMAN. The three real photographs additionally sho
 | --- | --- | --- | --- |
 | 1 | My AI agent deleted the roadmap | AI | Original AI-written post inside a fictional LinkedIn-style screenshot (`sample18.png`). All identities are fictional and blurred. Classification concerns the post text, not the interface renderer. |
 | 2 | The football upgrade nobody asked for | HUMAN | German Federal Archives photograph, August 1931; motorbike football. `sample15.jpg`: current Commons crop, re-encoded as JPEG without generative editing. |
-| 3 | The document download | HUMAN | Unchanged three-line file-download loop from the official Requests Quickstart. `sample23.png` recreates a light documentation code block with its original indentation, names and quotes, plus a document-ingestion scenario. Classification concerns the sourced code. |
+| 3 | The employee report | AI | Original AI-written SQL aggregating active employee headcount and average annual salary by department. `sample23.png` contains only code. Formatting follows the official PostgreSQL aggregate-query tutorial; no literal source excerpt or scenario paragraph. |
 | 4 | Perfectly normal office lighting | HUMAN | Dickenson V. Alley's Tesla laboratory photograph, December 1899. Historical double exposure; resized/re-encoded, no generative editing. `sample16.jpg`. |
 | 5 | The protocol committee got creative | HUMAN | Exact English excerpts from RFCs 1149, 2549, 6214 and 2324, all published April 1. Visible omission markers separate nonadjacent selections and documents. No paraphrasing or translation. |
 | 6 | An unexpected guest at the coronation | AI | Original generated imperial ceremony with an Inspector Gadget cameo, October 4, 2026. Historical pastiche, not an altered museum original. `sample13.jpg`. |
@@ -43,7 +43,7 @@ The public game reveals AI or HUMAN. The three real photographs additionally sho
 
 ### April Fools excerpt mapping
 
-The text question combines short unchanged excerpts from four genuine April Fools RFCs. `[...]` marks omitted material or a change of document. Sources and authors:
+The text question combines short unchanged excerpts from four genuine April Fools RFCs. `[...]` marks omitted material or a change of document. Sources and authors (all four links and dates are now shown on the round reveal):
 
 - [RFC 1149](https://www.rfc-editor.org/rfc/rfc1149.html): David Waitzman, April 1, 1990. Frame Format excerpts about leg length, milligrams and padding (20 words).
 - [RFC 2549](https://www.rfc-editor.org/rfc/rfc2549.html): David Waitzman, April 1, 1999. Queuing and RED-paint excerpts (17 words).
@@ -62,11 +62,11 @@ These are native editable UI reconstructions produced by `build_question_images.
 
 LinkedIn post and Teams reply text are the objects of classification. Blur hides invented identities and drawn avatars. The revised Teams request is an English Q3 aerospace GraphRAG handover: MinerU/DocLing OCR, extraction/normalization, Neo4j entities/relations/ontologies, Microsoft GraphRAG/LightRAG/RAGAnything and vector/text indexing with hybrid retrieval. The response invents flight control, propulsion switching and automatic repair approval. Both messages and the attachment are fictional; the user provided internship topics, not a transcript. No real colleague's use of AI is claimed. The visible PDF filename is `GraphRAG_Q3_Technical_Wrapup.pdf`.
 
-### Common sourced code — sample23.png
+### AI-written data-management SQL — sample23.png
 
-Round 3 uses an exact three-line excerpt from the [official Requests Quickstart, Raw Response Content](https://requests.readthedocs.io/en/latest/user/quickstart/#raw-response-content), accessed October 5, 2026. The context is a document-ingestion job that has already opened a streamed HTTP response `r` and must save it to `filename`. That scenario is original game copy; the classification concerns the unchanged documentation code. No code is generated or renamed for the question. The image recreates a simple documentation block using monospace, four-space indentation, single quotes and light syntax coloring. It is a recreation, not a captured website screenshot; branding and source clues stay out of the question.
+The agent rewrote a common aggregate-query pattern for employee records on October 5, 2026. Its formatting reference is [PostgreSQL's official tutorial, section 2.7 Aggregate Functions](https://www.postgresql.org/docs/current/tutorial-agg.html), accessed the same day. The tutorial's examples use weather observations; the new query uses `employees`, `department`, `annual_salary` and `employment_status`. It filters active employees, groups by department, keeps groups of at least five and sorts by average salary. The use case is implied in the SQL. No real employee data, prose scenario, comments, source branding or origin label appears in the image.
 
-The excerpt is a common reference pattern, not a complete production downloader: response setup, error checks, closing the response and a practical chunk-size choice belong to the surrounding application. Requests project attribution and licensing are available from [its official repository](https://github.com/psf/requests). The current source URL is stored privately in the deck; the reveal remains HUMAN without an additional image caption because this is a code question, not a real photograph.
+The rewrite preserves the reference's uppercase SQL clauses, lowercase identifiers and functions, four-space clause indentation and plain monospace block. The longer select list wraps onto a continuation line. The light block is a local UI recreation, not a website screenshot. This is **AI**, because the displayed SQL is newly authored by the agent rather than copied unchanged from documentation. The styling reference is credited privately in the deck; the game reveal shows only AI.
 
 ### Anonymized social posts — current sample22.png and legacy sample21.png
 
@@ -95,4 +95,4 @@ Keep this answer-key file outside `static/` and your source repository private i
 
 ## Reveal metadata
 
-Rounds 2, 4 and 10 have concise `image_reveal` captions stating the subject, archival/item date and credit. Their existing primary-image source URLs become public source links only with these captions. No caption is configured for social posts. The generated painting remains byte-identical; round 6's `image_highlight` coordinates add a red SVG circle only after the timer. LinkedIn and X writing are unchanged; the Teams messages are replaced with the aerospace GraphRAG exchange. The code card shows its usage scenario before voting; it has no added reveal caption. The Teams PDF is a fictional attachment; its interior is not shown.
+Rounds 2, 4 and 10 have concise `image_reveal` captions stating the subject, archival/item date and credit. Their existing primary-image source URLs become public source links only with these captions. No caption is configured for social posts. The generated painting remains byte-identical; round 6's `image_highlight` coordinates add a red SVG circle only after the timer. LinkedIn and X writing are unchanged; the Teams messages are replaced with the aerospace GraphRAG exchange. The SQL card has no visible scenario paragraph and no added reveal caption. Round 5 has four `reveal_sources` entries with RFC labels, dates and HTTPS links. They appear only after the answer reveal on both presenter and player screens; the original excerpts are unchanged. The Teams PDF is a fictional attachment; its interior is not shown.

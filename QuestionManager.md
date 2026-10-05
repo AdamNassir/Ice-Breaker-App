@@ -167,3 +167,16 @@ Follow **UpdateGuide.md** for the current exact replacement list. In particular 
 
 
 The optional `image_highlight` JSON object is preserved when saving or exporting questions. It holds reveal-only circle coordinates; edit those in `questions.json`, then Reload saved. See HowToAddImages.md for the example and units. Existing decks without either new image field continue to load.
+
+
+## Source links for real text at reveal
+
+Round 5 keeps its four RFC credits in the optional `reveal_sources` list. The manager preserves this list through saving, importing and exporting; edit it in `questions.json`, then choose **Reload saved**. Each entry has `label` and an HTTPS `url`. For example:
+
+```json
+"reveal_sources": [
+  {"label": "RFC 1149 — April 1, 1990", "url": "https://www.rfc-editor.org/rfc/rfc1149.html"}
+]
+```
+
+Up to eight links are allowed. Labels can include source names and publication dates. The game displays this list only for HUMAN text questions after the deadline, on presenter and phones. It is excluded from live question payloads. Leave it empty for social posts and AI text. Private **Source** and **Source link** notes do not automatically become public text credits. For manual edits, keep `Content.py` consistent with the JSON fallback when distributing the starter deck.

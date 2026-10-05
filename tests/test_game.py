@@ -23,13 +23,14 @@ class GameTests(unittest.TestCase):
         managed = parse_deck((root / 'questions.json').read_bytes(), root)
         self.assertEqual(managed, validate_rounds(main.ROUNDS, root))
         self.assertEqual(len(managed), 10)
-        self.assertEqual(sum(q['answer'] == 'AI' for q in managed), 5)
+        self.assertEqual(sum(q['answer'] == 'AI' for q in managed), 6)
         self.assertEqual([q['kind'] for q in managed].count('image'), 8)
         self.assertEqual([q['kind'] for q in managed].count('text'), 2)
         self.assertEqual([q['kind'] for q in managed].count('audio'), 0)
         self.assertEqual([q['kind'] for q in managed].count('video'), 0)
         self.assertGreater(len(managed[4]['body'].split()), 70)
-        self.assertEqual(managed[2]['answer'], 'HUMAN')
+        self.assertEqual(managed[2]['answer'], 'AI')
+        self.assertEqual(len(managed[4]['reveal_sources']), 4)
         self.assertEqual(managed[6]['answer'], 'AI')
         self.assertTrue(all(not q.get('media_url') for q in managed))
 
@@ -106,7 +107,7 @@ class GameTests(unittest.TestCase):
             self.assertEqual(live['question'].get('difficulty'), question.get('difficulty'))
             for private_field in ('answer', 'explanation', 'source', 'source_url',
                                   'technical_note', 'discussion', 'technical_source_url',
-                                  'image_reveal', 'image_highlight'):
+                                  'image_reveal', 'image_highlight', 'reveal_sources'):
                 self.assertNotIn(private_field, live['question'])
             self.assertEqual(self.vote(self.p1, question['answer'], index).status_code, 200)
             wrong = 'HUMAN' if question['answer'] == 'AI' else 'AI'
@@ -119,6 +120,7 @@ class GameTests(unittest.TestCase):
                 self.assertEqual(s['reveal']['answer'], question['answer'])
                 self.assertEqual(s['reveal'].get('image_reveal', ''), question.get('image_reveal', ''))
                 self.assertEqual(s['reveal'].get('image_highlight'), question.get('image_highlight'))
+                self.assertEqual(s['reveal'].get('reveal_sources', []), question.get('reveal_sources', []))
                 self.assertEqual(s['reveal'].get('technical_note', ''), question.get('technical_note', ''))
                 self.assertEqual(s['reveal'].get('discussion'), question.get('discussion'))
                 score = s['me']['score']

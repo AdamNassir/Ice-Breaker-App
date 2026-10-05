@@ -39,23 +39,23 @@ ROUNDS = [{'title': 'My AI agent deleted the roadmap',
   'source_url': 'https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_102-12210,_Fussballspiel_mit_dem_Motorrad.jpg',
   'image_reveal': 'Motorcycle football in Germany — August 1931.\n'
                   'Source: Bundesarchiv, Bild 102-12210 (photographer unrecorded).'},
- {'title': 'The document download',
+ {'title': 'The employee report',
   'kind': 'image',
   'media': '/static/images/sample23.png',
   'image_fit': 'contain',
-  'alt': 'A document-ingestion scenario above a three-line Python download loop.',
+  'alt': 'A SQL query using employee records, employment status and annual salary.',
   'seconds': 25,
-  'answer': 'HUMAN',
-  'context': 'Judge the code, not the scenario or the image rendering.',
-  'explanation': 'The code is an unchanged excerpt from the Requests Quickstart, Raw Response '
-                 'Content section. Its variable names, single quotes and four-space indentation '
-                 'are preserved. The scenario and image layout were created for the game; '
-                 'classification concerns the sourced code.',
-  'source': 'Requests contributors, official Requests Quickstart, Raw Response Content. Exact '
-            'three-line streaming-download excerpt, accessed October 5, 2026. Recreated '
-            'documentation-style code block; no original website branding or authorship clues. The '
-            'added usage scenario is fictional.',
-  'source_url': 'https://requests.readthedocs.io/en/latest/user/quickstart/#raw-response-content',
+  'answer': 'AI',
+  'context': '',
+  'explanation': 'Original AI-written SQL aggregating active employee headcount and average annual '
+                 'salary by department. The scenario is implied by table, column and filter names. '
+                 'Formatting follows the PostgreSQL tutorial, not a literal excerpt.',
+  'source': 'Original AI-written employee-data query, October 5, 2026. Formatting inspiration: '
+            'PostgreSQL official tutorial, section 2.7 Aggregate Functions. Uppercase SQL clauses, '
+            'lowercase identifiers and functions, four-space clause indentation. The source '
+            'example concerns weather observations; the new query concerns active employees. No '
+            'real employee data is used.',
+  'source_url': 'https://www.postgresql.org/docs/current/tutorial-agg.html',
   'discussion': ''},
  {'title': 'Perfectly normal office lighting',
   'kind': 'image',
@@ -108,7 +108,15 @@ ROUNDS = [{'title': 'My AI agent deleted the roadmap',
             'Hinden, 2011), and 2324 (L. Masinter, 1998). All published April 1. Exact English '
             'excerpts, at most 25 words per RFC, with marked omissions. Individual URLs and '
             'excerpt mapping in ContentSources.md.',
-  'source_url': 'https://www.rfc-editor.org/rfc/rfc1149.html'},
+  'source_url': 'https://www.rfc-editor.org/rfc/rfc1149.html',
+  'reveal_sources': [{'label': 'RFC 1149 — IP Datagrams on Avian Carriers — April 1, 1990',
+                      'url': 'https://www.rfc-editor.org/rfc/rfc1149.html'},
+                     {'label': 'RFC 2549 — Avian Carriers with Quality of Service — April 1, 1999',
+                      'url': 'https://www.rfc-editor.org/rfc/rfc2549.html'},
+                     {'label': 'RFC 6214 — Adaptation of RFC 1149 for IPv6 — April 1, 2011',
+                      'url': 'https://www.rfc-editor.org/rfc/rfc6214.html'},
+                     {'label': 'RFC 2324 — Hyper Text Coffee Pot Control Protocol — April 1, 1998',
+                      'url': 'https://www.rfc-editor.org/rfc/rfc2324.html'}]},
  {'title': 'An unexpected guest at the coronation',
   'kind': 'image',
   'seconds': 25,

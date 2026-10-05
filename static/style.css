@@ -91,3 +91,8 @@
 .confetti-piece{position:absolute;width:8px;height:13px;border:1px solid #d6a22988;border-radius:1px;opacity:0;animation:podium-confetti 3.8s ease-out forwards}
 @keyframes podium-confetti{0%{opacity:1;transform:translate(0,0) rotate(0deg)}30%{opacity:1;transform:translate(var(--dx),var(--rise)) rotate(180deg)}100%{opacity:0;transform:translate(var(--dx),450px) rotate(var(--spin))}}
 @media(prefers-reduced-motion:reduce){.confetti-layer{display:none}}
+
+/* Only configured HUMAN text sources are shown, after the server reveal. */
+.text-sources { margin-top: .65rem; font-size: .85rem; line-height: 1.4; }
+.text-sources p { margin: 0 0 .25rem; font-weight: 700; }
+.text-source { display: block; width: fit-content; margin: .15rem auto; color: inherit; overflow-wrap: anywhere; }

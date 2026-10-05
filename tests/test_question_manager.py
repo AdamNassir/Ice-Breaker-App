@@ -50,6 +50,15 @@ class ManagerTests(unittest.TestCase):
         self.assertNotEqual(response.json()['revision'], self.deck['revision'])
         self.assertFalse(list(self.root.glob('.questions-*.tmp')))
 
+    def test_reveal_sources_survive_save_and_reject_unsafe_links(self):
+        sources = [{"label": "RFC 1149 — April 1, 1990", "url": "https://www.rfc-editor.org/rfc/rfc1149.html"}]
+        for bad_url in ('javascript:alert(1)', 'http://example.com', 'https://user:password@example.com'):
+            response = self.save([{**self.starter, 'reveal_sources': [{**sources[0], 'url': bad_url}]}])
+            self.assertEqual(response.status_code, 400)
+        self.assertFalse((self.root / 'questions.json').exists())
+        self.assertEqual(self.save([{**self.starter, 'reveal_sources': sources}]).status_code, 200)
+        self.assertEqual(load_rounds(self.root)[0]['reveal_sources'], sources)
+
     def test_local_token_origin_host_and_vercel_guards(self):
         payload = {"revision": self.deck['revision'], "rounds": [self.starter]}
         self.assertEqual(self.client.put('/api/deck', json=payload).status_code, 403)

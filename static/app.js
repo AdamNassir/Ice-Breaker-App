@@ -267,7 +267,7 @@
     const panel = $('reveal'); panel.hidden = !s.reveal;
     if (!s.reveal) { panel.replaceChildren(); return; }
     const r = s.reveal;
-    const signature = JSON.stringify([s.round_index, r.answer, r.image_reveal, r.source_url]);
+    const signature = JSON.stringify([s.round_index, r.answer, r.image_reveal, r.source_url, r.reveal_sources]);
     if (panel.dataset.signature === signature) return;
     panel.dataset.signature = signature; panel.replaceChildren();
     panel.append(element('h3', '', r.answer));
@@ -278,6 +278,17 @@
         link.href = r.source_url; link.target = '_blank'; link.rel = 'noopener noreferrer';
         panel.append(link);
       }
+    }
+    if (s.question?.kind === 'text' && r.answer === 'HUMAN' && r.reveal_sources?.length) {
+      const sources = element('div', 'text-sources');
+      sources.append(element('p', '', 'Sources'));
+      r.reveal_sources.forEach(source => {
+        if (!source.url?.startsWith('https://')) return;
+        const link = element('a', 'text-source', source.label);
+        link.href = source.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+        sources.append(link);
+      });
+      panel.append(sources);
     }
   }
 

@@ -47,6 +47,29 @@ class ImageHighlight(BaseModel):
     radius: float = Field(gt=0, le=100)
 
 
+class RevealSource(BaseModel):
+    """An explicitly configured source credit, public only after reveal."""
+    model_config = ConfigDict(extra="forbid")
+    label: str = Field(min_length=1, max_length=300)
+    url: str = Field(min_length=1, max_length=2000)
+
+    @model_validator(mode="after")
+    def source_valid(self):
+        self.label = self.label.strip()
+        self.url = self.url.strip()
+        if not self.label or '\x00' in self.label:
+            raise ValueError("Give each reveal source a readable label.")
+        for value in (self.label, self.url):
+            try:
+                value.encode('utf-8')
+            except UnicodeError as error:
+                raise ValueError("Use valid Unicode in reveal sources.") from error
+        parsed = urlsplit(self.url)
+        if parsed.scheme != 'https' or not parsed.hostname or parsed.username or parsed.password:
+            raise ValueError("Reveal source links must be full https:// URLs without credentials.")
+        return self
+
+
 class Question(BaseModel):
     model_config = ConfigDict(extra="forbid")
     title: str = Field(min_length=1, max_length=120)
@@ -65,6 +88,7 @@ class Question(BaseModel):
     image_position: str = Field(default="center", max_length=60)
     image_reveal: str = Field(default="", max_length=1800)
     image_highlight: ImageHighlight | None = None
+    reveal_sources: list[RevealSource] = Field(default_factory=list, max_length=8)
     explanation: str = Field(default="", max_length=6000)
     technical_note: str = Field(default="", max_length=6000)
     discussion: str = Field(default="", max_length=2000)
