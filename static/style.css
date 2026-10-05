@@ -119,3 +119,6 @@
 .brand-intro .brand-logos-hero .logo-totalenergies{width:min(100%,280px);height:auto;max-width:100%}
 .topbar .brand-logos .logo-logiclever{width:165px;height:auto;max-height:64px;object-fit:contain}
 @media(max-width:760px){.brand-intro .brand-logos-hero{gap:22px;padding:18px 12px}.brand-intro .brand-logos-hero .logo-logiclever{width:min(100%,350px)}.brand-intro .brand-logos-hero .logo-totalenergies{width:min(100%,180px)}.topbar .brand-logos .logo-logiclever{width:125px;height:auto;max-height:48px}}
+
+/* Blend the complete white-backed wordmark into its surrounding surface. */
+.logo-logiclever{mix-blend-mode:multiply}

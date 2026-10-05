@@ -184,3 +184,6 @@ Up to eight links are allowed. Labels can include source names and publication d
 ## Titles, introductions and language
 
 **Question title** and **Short introduction shown with the question** now appear above the content on presenter and phones. Keep both neutral and short; sources and origins stay in answer notes. The interface remains English. In the default deck, the articles, Macron post and Teams messages are French; the Teams introduction specifies that only the manager’s reply is judged. Both supplied logos and the blue/red palette also appear in this local editor.
+
+
+The current default deck has nine rounds. The removed moth-logbook image remains available for custom questions. The SQL card is expanded with comments, joins and a pivot-style summary; edit AI_SQL in build_question_images.py to rebuild it. Older bundled news entries lacking the presentation flag are recognized during loading. Explicit plain presentation for other/custom titles remains supported. Keep main.py/question_content.py and all frontend assets from the complete release together.

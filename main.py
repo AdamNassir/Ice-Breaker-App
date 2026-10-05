@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
 from Content import ROUNDS
-from question_content import DeckError, load_rounds
+from question_content import DeckError, load_rounds, text_presentation
 from store import Store
 
 app = FastAPI(title="AI or Human", docs_url=None, redoc_url=None, openapi_url=None)
@@ -140,7 +140,13 @@ def view(state, role, player_id):
         question = state["rounds"][state["index"]]
         result["question"] = {k: question[k] for k in
                               ("title", "kind", "body", "media", "alt", "image_fit", "image_position",
-                               "media_url", "media_start", "media_end", "difficulty", "context") if k in question}
+                               "media_url", "media_start", "media_end", "difficulty", "context", "text_style") if k in question}
+        if question["kind"] == "text":
+            # Resolve presentation for snapshots created before the format field.
+            # Keep the saved room content and private answer fields untouched.
+            result["question"]["text_style"] = text_presentation(question)
+        if result["question"].get("context", "").startswith("Look closely at the people in the painting."):
+            result["question"]["context"] = result["question"]["context"].removeprefix("Look closely at the people in the painting.").strip()
         if state["phase"] == "revealed":
             result["reveal"] = {k: question[k] for k in
                                 ("answer", "explanation", "source", "source_url", "technical_note",
@@ -162,7 +168,7 @@ async def response_headers(request: Request, call_next):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["Referrer-Policy"] = "no-referrer"
     response.headers["X-Frame-Options"] = "DENY"
-    if request.url.path.startswith("/api/"):
+    if request.url.path.startswith("/api/") or response.headers.get("content-type", "").startswith("text/html"):
         response.headers["Cache-Control"] = "no-store"
     return response
 

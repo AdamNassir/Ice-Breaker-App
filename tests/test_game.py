@@ -22,9 +22,9 @@ class GameTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         managed = parse_deck((root / 'questions.json').read_bytes(), root)
         self.assertEqual(managed, validate_rounds(main.ROUNDS, root))
-        self.assertEqual(len(managed), 10)
+        self.assertEqual(len(managed), 9)
         self.assertEqual(sum(q['answer'] == 'AI' for q in managed), 7)
-        self.assertEqual([q['kind'] for q in managed].count('image'), 8)
+        self.assertEqual([q['kind'] for q in managed].count('image'), 7)
         self.assertEqual([q['kind'] for q in managed].count('text'), 2)
         self.assertEqual([q['kind'] for q in managed].count('audio'), 0)
         self.assertEqual([q['kind'] for q in managed].count('video'), 0)
@@ -122,6 +122,43 @@ class GameTests(unittest.TestCase):
         return self.client.post(f'/api/rooms/{self.code}/vote', headers=headers,
                                 json={"answer": answer, "round_index": index})
 
+    def test_legacy_article_layout_and_hint_are_resolved_without_changing_snapshot(self):
+        from question_content import LEGACY_NEWS_HEADLINES
+        for title, headline in LEGACY_NEWS_HEADLINES.items():
+            for flag in (None, "plain"):
+                question = {"title": title, "kind": "text", "answer": "AI",
+                            "body": headline + "\n\nThe saved article body.",
+                            "context": "AI or HUMAN?", "source": "private", "explanation": "private"}
+                if flag is not None:
+                    question["text_style"] = flag
+                parsed = validate_rounds([question])[0]
+                self.assertEqual(parsed["text_style"], "news")
+                with main.store.room(self.code) as room:
+                    room["rounds"] = [question]
+                    room["index"] = 0
+                    room["phase"] = "live"
+                    room["deadline"] = main.time.time() + 60
+                for headers in (self.host, self.p1):
+                    public = self.state(headers)["question"]
+                    self.assertEqual(public["text_style"], "news")
+                    self.assertEqual(public["body"], question["body"])
+                    self.assertNotIn("source", public)
+                    self.assertNotIn("answer", public)
+                with main.store.room(self.code) as room:
+                    self.assertEqual(room["rounds"][0], question)
+        modern = {"title": "News Article About Something", "kind": "text",
+                  "answer": "AI", "body": "A headline\n\nA story"}
+        self.assertEqual(validate_rounds([modern])[0]["text_style"], "news")
+        self.assertEqual(validate_rounds([{**modern, "text_style": "plain"}])[0]["text_style"], "plain")
+        self.assertEqual(validate_rounds([{**modern, "title": "Ordinary text"}])[0]["text_style"], "plain")
+        with main.store.room(self.code) as room:
+            question = dict(main.ROUNDS[5])
+            question["context"] = "Look closely at the people in the painting. AI or HUMAN?"
+            room["rounds"] = [question]
+        self.assertEqual(self.state()["question"]["context"], "AI or HUMAN?")
+        for path in ("/", "/presenter", "/bonus"):
+            self.assertEqual(self.client.get(path).headers["cache-control"], "no-store")
+
     def test_complete_game_streak_scores_and_results(self):
         self.assertEqual(self.control('start').status_code, 200)
         for index, question in enumerate(main.ROUNDS):
@@ -159,9 +196,9 @@ class GameTests(unittest.TestCase):
                 self.assertIsNone(self.state(self.p1)['me']['vote'])
         final = self.state(self.p1)
         self.assertEqual(final['phase'], 'finished')
-        self.assertEqual(final['me']['score'], 1750)
-        self.assertEqual(final['me']['streak'], 10)
-        self.assertEqual(final['me']['correct'], 10)
+        self.assertEqual(final['me']['score'], 1550)
+        self.assertEqual(final['me']['streak'], 9)
+        self.assertEqual(final['me']['correct'], 9)
         self.assertEqual(final['leaderboard'][1]['score'], 0)
         self.assertEqual(self.control('start').status_code, 409)
 
@@ -175,7 +212,7 @@ class GameTests(unittest.TestCase):
         with main.store.room(code) as saved:
             for index, question in enumerate(saved['rounds']):
                 question['seconds'] = 25 if index % 2 else 120
-        for index in range(10):
+        for index in range(len(main.ROUNDS)):
             start = origin + index * 100
             with patch.object(main.time, 'time', return_value=start):
                 state = self.client.get(f'/api/rooms/{code}/state', headers=host).json()

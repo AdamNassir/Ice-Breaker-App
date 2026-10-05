@@ -1,6 +1,6 @@
 # AI or Human? — Ice Breaker Game
 
-A complete browser game for an AI presentation: a presenter opens a room, players join on their phones with pseudonyms, and everyone decides **AI OR HUMAN**. The default deck has **10 rounds**: eight images and two short fictional news articles, seven AI and three HUMAN origins. The interface, titles and short introductions are English; the news articles, Macron post and Teams messages are French. No audio or video rounds. Both logos are prominent on the opening screens, replacing the large title/copy. The complete official LogicLever asset restores its tagline; TotalEnergies is unchanged. The interface uses blue and red. See `UpdateGuide.md` to install the update.
+A complete browser game for an AI presentation: a presenter opens a room, players join on their phones with pseudonyms, and everyone decides **AI OR HUMAN**. The default deck has **9 rounds**: seven images and two short fictional news articles, seven AI and two HUMAN origins. The interface, titles and short introductions are English; the news articles, Macron post and Teams messages are French. No audio or video rounds. Both logos are prominent on the opening screens, replacing the large title/copy. The complete official LogicLever asset preserves its tagline, and CSS blending removes its white rectangular backdrop on tinted surfaces; TotalEnergies is unchanged. The interface uses blue and red. See `UpdateGuide.md` to install the update.
 
 The consolidated upfront specification is [CreationInstructions.md](CreationInstructions.md), written in the style of the original brief and excluding individual question content. [AGENTS.md](AGENTS.md) defines how a running agent reads saved update requests, checks its work and replaces them with completion reports.
 
@@ -12,11 +12,11 @@ Full Windows/macOS/Linux launch commands and the editing/deployment workflow are
 
 For Vercel, commit the saved `questions.json` and uploaded media, redeploy and create a **new room**. The game reads a saved JSON deck before falling back to `Content.py`. Once `questions.json` exists, changes to `Content.py` alone do not replace that managed deck.
 
-**Installing this update:** follow `UpdateGuide.md`. The default deck/media and deployed game requirements are unchanged in this agent update. Add the local agent and bundled development checks listed in UpdateGuide.md; install/login to Codex and development dependencies through AgentSetup.md. No SQL migration is needed.
+**Installing this update:** follow `UpdateGuide.md` and deploy the complete app source, both deck files and the expanded SQL image. Create a new room to use nine rounds. No new production dependency or SQL migration is needed. The optional local agent setup remains documented in AgentSetup.md.
 
 ## Bundled starter deck
 
-The deck includes a fictional LinkedIn post, the full-frame Michael Jordan 1988 free-throw-line dunk, a historical Tesla double exposure, two original AI-written plausible French news articles, Napoleon with a hidden Inspector Gadget, an AI-written employee-data SQL query, a fictional French Macron announcement about hospital AI and a French internship handover on Teams, plus the historical moth logbook. Every round shows a descriptive title and short introduction. Both articles are in French and use a full Le Parisien page reconstruction, including the masthead, French navigation, headline/chapo/byline, article, sidebar, related stories and footer; references and implementation limits are in `LayoutSources.md`; choose **Text presentation → News article** in the manager to edit this style. The SQL use case remains implied in the code. For Teams, players judge only the manager’s reply. Reveals show AI or HUMAN; real photos also show their subject, date and credit, and Inspector Gadget gets a red circle. Social posts get no extra reveal commentary. The news incidents and Macron words are invented for the quiz, not reports or quotations from real publications/accounts.
+The deck includes a fictional LinkedIn post, the full-frame Michael Jordan 1988 free-throw-line dunk, a historical Tesla double exposure, two original AI-written plausible French news articles, Napoleon with a hidden Inspector Gadget, an AI-written commented employee/payroll SQL query with joins and pivot-style columns, a fictional French Macron announcement about hospital AI and a French internship handover on Teams. Every round shows a descriptive title and short introduction. Both articles are in French and use a full Le Parisien page reconstruction, including the masthead, French navigation, headline/chapo/byline, article, sidebar, related stories and footer; references and implementation limits are in `LayoutSources.md`; choose **Text presentation → News article** in the manager to edit this style. The SQL use case remains implied in the code. For Teams, players judge only the manager’s reply. Reveals show AI or HUMAN; real photos also show their subject, date and credit, and Inspector Gadget gets a red circle. Social posts get no extra reveal commentary. The news incidents and Macron words are invented for the quiz, not reports or quotations from real publications/accounts.
 
 **Explain the rule:** AI means generated writing/image/voice/footage. HUMAN includes human-written jokes and human camera tricks. For all social screenshots, judge the post or reply text. Say this rule before opening the room; the short question introductions do not disclose origins. The labels come from documented origins, not a style detector. The LinkedIn founder and Teams identities are fictional. The Macron post uses the actual profile picture supplied by the presenter; its writing is original AI fiction, not a genuine statement or a claim about his writing process.
 
@@ -26,7 +26,7 @@ The ready-to-play `questions.json`, matching `Content.py` fallback and all eight
 
 The two former voice rounds are now tweet-style images with coarsely pixelated profile pictures, names and handles. One reproduces a verified public post; the other is original AI-written satire. No extra April Fools questions were added. Credits and the private answer key identify the real source and the fictional parody.
 
-The presenter’s timer applies to **every round**. Choose 10 seconds and all ten rounds last 10 seconds; stored question-level `seconds` fields are ignored, including older decks.
+The presenter’s timer applies to **every round**. Choose 10 seconds and all nine rounds last 10 seconds; stored question-level `seconds` fields are ignored, including older decks.
 
 ## 1. Necessary downloads and installs
 
@@ -190,7 +190,7 @@ For this branding and content update, use the exact changed-file list in UpdateG
 | 4th | 175 |
 | 5th and beyond | 200 |
 
-An incorrect or missed answer awards 0 and resets the streak. There is no speed bonus, so fast connections do not earn extra points. A perfect ten-round game earns **1,750** points.
+An incorrect or missed answer awards 0 and resets the streak. There is no speed bonus, so fast connections do not earn extra points. A perfect nine-round game earns **1,550** points.
 
 | Change | File / symbol |
 | --- | --- |
@@ -312,3 +312,6 @@ Describe the precise behaviour to change.
 ```
 
 The illustrative sequence is a presentation narrative, not an exact historical transcript. `Verification.md` records actual completed checks separately.
+
+
+The earlier bundled article titles “A very expensive refresh” and “The trophy before the ceremony” now receive the news presentation even when their older saved deck/room lacked the format flag. Explicit plain text for other/custom questions stays supported. Deploy main.py and question_content.py together. The player, presenter and manager load the shared newsarticle.js/newsarticle.css files from the complete archive. HTML responses are not cached; cache keys are refreshed. Create a new room to adopt nine rounds and the expanded SQL image. Existing room snapshots keep their original content/count, although the known layout and painting-hint display fixes apply to them.

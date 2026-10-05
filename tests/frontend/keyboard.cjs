@@ -1,6 +1,7 @@
 const {JSDOM,VirtualConsole}=require('jsdom');
 const fs=require('node:fs'),assert=require('node:assert/strict');
 const fixture=JSON.parse(fs.readFileSync(process.env.QA_FIXTURE));
+const total=fixture.rows.filter(r=>r.phase==='live').length;
 const wait=()=>new Promise(r=>setImmediate(r));
 async function until(fn){for(let i=0;i<100;i++){if(fn())return;await wait();}throw Error('Condition timed out');}
 (async()=>{
@@ -19,7 +20,7 @@ async function until(fn){for(let i=0;i<100;i++){if(fn())return;await wait();}thr
    if(body.action==='start'){assert.equal(current.phase,'lobby');current=fixture.rows[1].host;}
    else {
     assert.equal(current.phase,'revealed');
-    current=current.round_index===9?fixture.rows.at(-1).host:fixture.rows.find(r=>r.phase==='live'&&r.host.round_index===current.round_index+1).host;
+    current=current.round_index===total-1?fixture.rows.at(-1).host:fixture.rows.find(r=>r.phase==='live'&&r.host.round_index===current.round_index+1).host;
     await new Promise(resolve=>{release=resolve;});
    }
   }
@@ -30,9 +31,9 @@ async function until(fn){for(let i=0;i<100;i++){if(fn())return;await wait();}thr
  await until(()=>button.textContent==='Start round 1'&&!button.disabled&&d.getElementById('room-meta').textContent.includes('1 player'));
  enter();assert.equal(requests.length,0);button.click();await until(()=>button.textContent==='Round in progress');
  enter();assert.equal(requests.length,1);
- for(let i=0;i<10;i++){
+ for(let i=0;i<total;i++){
   current=fixture.rows.find(r=>r.phase==='revealed'&&r.host.round_index===i).host;
-  await poll();assert.equal(button.textContent,i===9?'Show final results':'Next round');
+  await poll();assert.equal(button.textContent,i===total-1?'Show final results':'Next round');
   const count=requests.length;
   enter(d.body,{repeat:true});enter(d.body,{ctrlKey:true});enter(d.body,{isComposing:true});
   enter(d.getElementById('game-title'));enter(d.getElementById('copy-link'));
@@ -41,10 +42,10 @@ async function until(fn){for(let i=0;i<100;i++){if(fn())return;await wait();}thr
   if(i===2)button.click();else assert(enter(i===1?button:d.body).defaultPrevented);
   assert.equal(requests.length,count+1);assert.equal(requests.at(-1).action,'next');
   enter();enter(d.body,{repeat:true});button.click();assert.equal(requests.length,count+1);
-  release();await until(()=>i===9?d.body.classList.contains('results-mode'):button.textContent==='Round in progress'&&d.getElementById('round-label').textContent.includes(String(i+2)));
-  if(i<9){assert(button.disabled);assert.equal(d.getElementById('clock').textContent,'10');assert(!d.getElementById('stage').hidden);assert(d.getElementById('qr-lobby').hidden);}
+  release();await until(()=>i===total-1?d.body.classList.contains('results-mode'):button.textContent==='Round in progress'&&d.getElementById('round-label').textContent.includes(String(i+2)));
+  if(i<total-1){assert(button.disabled);assert.equal(d.getElementById('clock').textContent,'10');assert(!d.getElementById('stage').hidden);assert(d.getElementById('qr-lobby').hidden);}
  }
- enter();assert.equal(requests.length,11);assert(button.hidden);assert.deepEqual(errors,[]);
+ enter();assert.equal(requests.length,total+1);assert(button.hidden);assert.deepEqual(errors,[]);
  const player=fs.readFileSync(process.env.QA_PROJECT+'/static/index.html','utf8'),presenter=fs.readFileSync(process.env.QA_PROJECT+'/static/presenter.html','utf8');
  for(const text of ['Posts. Text. Images.',"Who made what you're looking at?",'Streak bonuses','2 choices'])assert(!player.includes(text));
  for(const html of [player,presenter])assert(!html.includes('AI means generated. HUMAN includes'));

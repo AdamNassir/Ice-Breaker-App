@@ -1,4 +1,4 @@
-"""Ten starter rounds: eight images and two short news articles.
+"""Nine starter rounds: seven images and two short news articles.
 
 UI, titles and introductions are English; the news articles, Macron post and Teams messages are French.
 questions.json takes priority. The presenter-selected timer applies to all rounds.
@@ -44,18 +44,20 @@ ROUNDS = [{'title': 'LinkedIn Post by a Manager',
   'kind': 'image',
   'media': '/static/images/sample23.png',
   'image_fit': 'contain',
-  'alt': 'A SQL query using employee records, employment status and annual salary.',
+  'alt': 'A commented SQL query combining employee, payroll, department and certification tables.',
   'seconds': 25,
   'answer': 'AI',
   'context': 'Judge who wrote this SQL query: AI or HUMAN.',
-  'explanation': 'Original AI-written SQL aggregating active employee headcount and average annual '
-                 'salary by department. The scenario is implied by table, column and filter names. '
-                 'Formatting follows the PostgreSQL tutorial, not a literal excerpt.',
-  'source': 'Original AI-written employee-data query, October 5, 2026. Formatting inspiration: '
-            'PostgreSQL official tutorial, section 2.7 Aggregate Functions. Uppercase SQL clauses, '
-            'lowercase identifiers and functions, four-space clause indentation. The source '
-            'example concerns weather observations; the new query concerns active employees. No '
-            'real employee data is used.',
+  'explanation': 'Original AI-written SQL with two common table expressions, four source tables, '
+                 'explanatory comments and a conditional-aggregate pivot. It summarizes a payroll '
+                 'month by department and highest valid certification rank. Pre-aggregation '
+                 'prevents multiplying payroll totals when employees have several certifications.',
+  'source': 'Original AI-written SQL, October 5, 2026. Formatting and SQL feature references: '
+            'PostgreSQL official Aggregate Functions tutorial and WITH Queries documentation. Uses '
+            'monthly_pay and highest_level CTEs, '
+            'employees/payroll/departments/employee_certifications joins, and FILTER aggregates '
+            'for pivot-style columns. The HR use case is implied by identifiers and filters. No '
+            'real employee data; not copied source code.',
   'source_url': 'https://www.postgresql.org/docs/current/tutorial-agg.html',
   'discussion': ''},
  {'title': 'Photograph of Nikola Tesla in His Laboratory',
@@ -105,9 +107,9 @@ ROUNDS = [{'title': 'LinkedIn Post by a Manager',
  {'title': 'Painting of Napoleon’s Coronation',
   'kind': 'image',
   'seconds': 25,
-  'context': 'Look closely at the people in the painting. AI or HUMAN?',
+  'context': 'AI or HUMAN?',
   'media': '/static/images/sample13.jpg',
-  'alt': 'An imperial ceremony painting with ornate robes and a grey-coated guest among the crowd.',
+  'alt': 'A painting of an imperial ceremony with guests in ornate robes.',
   'image_fit': 'contain',
   'answer': 'AI',
   'explanation': 'This is an original AI-generated historical pastiche. Inspector Gadget has '
@@ -182,23 +184,4 @@ ROUNDS = [{'title': 'LinkedIn Post by a Manager',
             'and anonymized identities are fictional; its contents are not displayed. Judge only '
             'the manager’s reply.',
   'discussion': '',
-  'seconds': 25},
- {'title': 'Photograph of a Computer Logbook',
-  'kind': 'image',
-  'media': '/static/images/sample20.jpg',
-  'image_fit': 'contain',
-  'alt': 'A handwritten engineering logbook page with an insect taped beside an entry.',
-  'context': 'Inspect the photograph of this engineering logbook. AI or HUMAN?',
-  'answer': 'HUMAN',
-  'explanation': 'A moth was recorded in the Harvard Mark II logbook on September 9, 1947. This is '
-                 'a human-made photograph of the actual logbook, not generated imagery. The '
-                 'engineering term bug already existed.',
-  'source': 'U.S. Navy / Naval Surface Warfare Center, Dahlgren, photograph of the Harvard Mark II '
-            'logbook. Public-domain U.S. federal government image, resized and re-encoded without '
-            'generative edits. Correct logbook date September 9, 1947; some legacy photo metadata '
-            'incorrectly says 1945.',
-  'source_url': 'https://commons.wikimedia.org/wiki/File:First_Computer_Bug,_1947.jpg',
-  'discussion': '',
-  'seconds': 25,
-  'image_reveal': 'Moth taped into the Harvard Mark II logbook — September 9, 1947.\n'
-                  'Source: U.S. Navy / Naval Surface Warfare Center, Dahlgren.'}]
+  'seconds': 25}]

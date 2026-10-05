@@ -45,7 +45,7 @@ with tempfile.TemporaryDirectory(dir=checks_dir) as tmp:
    deadline=rows[-1]['host']['deadline']
    with patch.object(main.time,'time',return_value=deadline+1):rows.append(states('revealed'))
    control('next')
-  rows.append(states('finished'));assert rows[-1]['player']['me']['score']==1750
+  rows.append(states('finished'));assert rows[-1]['player']['me']['score']==1550
   for path in ['/static/branding/publication.svg','/static/newsarticle.js','/static/newsarticle.css','/static/images/sample26.jpg','/static/images/sample27.png','/static/images/profile-source.png','/static/branding/logiclever-full.jpg','/static/media.js','/static/images/sample13.jpg','/static/images/sample15.jpg','/static/images/sample16.jpg','/static/audio/sample17.mp3','/static/images/sample18.png','/static/images/sample19.png','/static/images/sample20.jpg','/static/images/sample23.png','/static/images/sample24.jpg','/static/images/sample25.png','/static/branding/logiclever.png','/static/branding/totalenergies.png','/bonus','/static/bonus.js']:assert c.get(path).status_code==200,path
   for private in ['/questions.json','/Content.py','/ContentSources.md','/api/deck']:assert c.get(private).status_code==404,private
   qr=c.get(f'/api/rooms/{code}/qr',headers=host).json()
@@ -54,7 +54,7 @@ with tempfile.TemporaryDirectory(dir=checks_dir) as tmp:
   for name,score in [('Ada',1750),('Linus',1600),('Grace',1400),('Alan',1000),('Margaret',1000),('Ken',750)]:
    entrant=c.post(f'/api/rooms/{trophy_code}/join',json={'nickname':name}).json();entrants.append((entrant,score))
   with main.store.room(trophy_code) as saved:
-   saved['phase']='finished';saved['index']=9
+   saved['phase']='finished';saved['index']=len(load_rounds(root))-1
    for entrant,score in entrants:saved['players'][entrant['player_id']]['score']=score
   placements={'host':c.get(f'/api/rooms/{trophy_code}/state',headers=trophy_host).json(),
               'player':c.get(f'/api/rooms/{trophy_code}/state',headers={'Authorization':'Bearer '+entrants[0][0]['token']}).json()}
@@ -68,7 +68,7 @@ with tempfile.TemporaryDirectory(dir=checks_dir) as tmp:
    try:urllib.request.urlopen(base_url+'/api/deck',timeout=1);break
    except OSError:time.sleep(.1)
   else:raise RuntimeError('Local manager did not start.')
-  for filename in ('game.cjs','zoom.cjs','keyboard.cjs','workflow.cjs'):
+  for filename in ('resources.cjs','game.cjs','zoom.cjs','keyboard.cjs','workflow.cjs'):
    subprocess.run([node,str(ROOT/'tests/frontend'/filename)],cwd=ROOT,env=os.environ,check=True)
  finally:
   server.terminate()

@@ -18,6 +18,30 @@ MEDIA_FOLDERS = {"image": "images", "audio": "audio", "video": "videos"}
 MEDIA_EXTENSIONS = {"image": IMAGE_EXTENSIONS, "audio": AUDIO_EXTENSIONS, "video": VIDEO_EXTENSIONS}
 
 
+# These two bundled articles predate text_style; old room snapshots may contain
+# the parser's former default "plain". Limit migration to those known titles
+# and headlines so custom plain text remains an explicit author choice.
+LEGACY_NEWS_HEADLINES = {
+    "A very expensive refresh": "Bitcoin falls 50% after exchange dashboard repeats a decimal error",
+    "The trophy before the ceremony": "Ballon d’Or result briefly appears in trophy delivery tracker",
+}
+
+
+def text_presentation(question):
+    if question.get("kind") != "text":
+        return "plain"
+    selected = question.get("text_style")
+    if selected == "news":
+        return "news"
+    title = str(question.get("title", "")).strip()
+    headline = str(question.get("body", "")).split("\n", 1)[0].strip()
+    if title in LEGACY_NEWS_HEADLINES and headline == LEGACY_NEWS_HEADLINES[title]:
+        return "news"
+    if selected is None and title.startswith("News Article About "):
+        return "news"
+    return "plain"
+
+
 def youtube_id(value):
     parsed = urlsplit(value)
     host = parsed.hostname
@@ -96,6 +120,13 @@ class Question(BaseModel):
     source: str = Field(default="", max_length=3000)
     source_url: str = Field(default="", max_length=2000)
     technical_source_url: str = Field(default="", max_length=2000)
+
+    @model_validator(mode="before")
+    @classmethod
+    def legacy_news_layout(cls, value):
+        if isinstance(value, dict) and text_presentation(value) == "news":
+            value = {**value, "text_style": "news"}
+        return value
 
     @model_validator(mode="after")
     def content_valid(self):

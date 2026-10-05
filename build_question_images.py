@@ -36,13 +36,33 @@ TEAMS_REPLY = (
 )
 # Original AI rewrite of the PostgreSQL aggregate-query pattern.
 # Preserve uppercase clauses, lowercase names and four-space clause indentation.
-AI_SQL = """SELECT department, count(*) AS headcount,
-       round(avg(annual_salary), 2) AS average_salary
-    FROM employees
-    WHERE employment_status = 'active'
-    GROUP BY department
-    HAVING count(*) >= 5
-    ORDER BY average_salary DESC;"""
+AI_SQL = """-- Aggregate payroll before joining optional certification records.
+WITH monthly_pay AS (
+    SELECT e.employee_id, e.department_id, SUM(p.gross_pay) AS gross_pay
+    FROM employees AS e
+    JOIN payroll AS p ON p.employee_id = e.employee_id
+    WHERE e.status = 'active' AND p.pay_month = DATE '2026-09-01'
+    GROUP BY e.employee_id, e.department_id
+), highest_level AS (
+    -- Keep one row per employee to avoid duplicated totals.
+    SELECT employee_id, MAX(level_rank) AS level_rank
+    FROM employee_certifications
+    WHERE valid_until >= DATE '2026-09-30'
+    GROUP BY employee_id
+)
+-- Pivot certification levels into separate department columns.
+SELECT d.department_name, COUNT(*) AS headcount,
+       COUNT(*) FILTER (WHERE c.level_rank = 1) AS foundation,
+       COUNT(*) FILTER (WHERE c.level_rank = 2) AS advanced,
+       COUNT(*) FILTER (WHERE c.level_rank = 3) AS expert,
+       COUNT(*) FILTER (WHERE c.employee_id IS NULL) AS unclassified,
+       ROUND(SUM(p.gross_pay), 2) AS total_pay
+FROM monthly_pay AS p
+JOIN departments AS d ON d.department_id = p.department_id
+LEFT JOIN highest_level AS c ON c.employee_id = p.employee_id
+GROUP BY d.department_name
+HAVING COUNT(*) >= 5
+ORDER BY total_pay DESC;"""
 SQL_STYLE_SOURCE = "https://www.postgresql.org/docs/current/tutorial-agg.html"
 AI_TWEET = (
     "Dès janvier, dix hôpitaux expérimenteront une intelligence artificielle "
@@ -291,22 +311,22 @@ def teams():
 def code_card():
     """Bare SQL, in the clause layout of the PostgreSQL tutorial reference."""
     lines = AI_SQL.splitlines()
-    height = 120 + len(lines) * 58
-    im = Image.new("RGB", (1600, height), "white")
+    height = 100 + len(lines) * 46
+    im = Image.new("RGB", (1800, height), "white")
     d = ImageDraw.Draw(im)
-    d.rectangle((46, 30, 1554, height - 30), fill="#f5f5f5", outline="#dddddd", width=2)
+    d.rectangle((36, 24, 1764, height - 24), fill="#f5f5f5", outline="#dddddd", width=2)
     names = ["DejaVuSansMono.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
              str(Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts" / "consola.ttf"),
              "/System/Library/Fonts/Menlo.ttc"]
     face = None
     for name in names:
-        try: face = ImageFont.truetype(name, 38); break
+        try: face = ImageFont.truetype(name, 34); break
         except OSError: pass
-    if face is None: face = ImageFont.load_default(size=38)
-    # Draw unchanged whitespace and text; no title, scenario, comments or source clues.
+    if face is None: face = ImageFont.load_default(size=34)
+    # Draw the exact code and comments; no separate scenario or origin label.
     for row, line in enumerate(lines):
-        if d.textlength(line, font=face) > 1438: raise ValueError("Code line overflows the card.")
-        d.text((81, 60 + row * 58), line, font=face, fill="#222222")
+        if d.textlength(line, font=face) > 1660: raise ValueError("Code line overflows the card.")
+        d.text((64, 48 + row * 46), line, font=face, fill="#527362" if line.lstrip().startswith("--") else "#222222")
     im.save(ROOT / "sample23.png", optimize=True)
 
 

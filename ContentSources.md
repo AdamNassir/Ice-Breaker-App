@@ -1,25 +1,24 @@
 # Question deck: private answer key and credits
 
-Updated October 5, 2026. Ten rounds: **seven AI and three HUMAN**, eight images and two text articles. No audio/video rounds. The app interface, titles and short introductions are English; the news articles, Macron post and Teams messages are French. Origins come from documented production, not a detector.
+Updated October 5, 2026. Nine rounds: **seven AI and two HUMAN**, seven images and two text articles. No audio/video rounds. The app interface, titles and short introductions are English; the news articles, Macron post and Teams messages are French. Origins come from documented production, not a detector.
 
 Players judge the writing in social posts and only the **manager’s reply** in Teams. For photographs/paintings, judge image production. An authentic double exposure still counts as HUMAN. A plausible invented news story counts as AI because the agent wrote it, not merely because the story is false.
 
 Every round shows its title, short introduction and content. Answer notes, origins, credits and highlight coordinates are withheld from live payloads. Reveals show AI or HUMAN; configured real photographs also show their subject, date and source. Posts have no extra reveal commentary. Inspector Gadget gets a red circle only at reveal.
 
-## Current ten rounds
+## Current nine rounds
 
 | Round | Subject | Origin | Provenance |
 | --- | --- | --- | --- |
 | 1 | LinkedIn roadmap satire | AI | Original AI-written fictional post; unchanged writing and image `sample18.png`. |
 | 2 | Michael Jordan’s free-throw-line dunk | HUMAN | Walter Iooss Jr. / Sports Illustrated, Chicago, February 6, 1988; complete source JPEG `sample26.jpg`. |
-| 3 | Employee-data SQL | AI | Original rewritten aggregate query, formatting reference: official PostgreSQL tutorial. `sample23.png` unchanged. |
+| 3 | Employee-data SQL | AI | Original commented payroll/certification query: two CTEs, four source tables and conditional-aggregate pivot columns. PostgreSQL formatting/feature references; rebuilt `sample23.png`. |
 | 4 | Tesla in his laboratory | HUMAN | Dickenson V. Alley, December 1899; historical double exposure, `sample16.jpg`. |
 | 5 | Bitcoin dashboard incident | AI | Newly authored fictional French article. No genuine exchange notice or market event claimed. |
 | 6 | Napoleon with Inspector Gadget | AI | Original generated imperial painting, `sample13.jpg`; unchanged painting and reveal circle. |
 | 7 | Macron post about AI in hospitals | AI | Original fictional French announcement, reconstructed X layout, visible name/handle and the supplied actual profile picture. `sample27.png`. Not a genuine post. |
 | 8 | Ballon d’Or delivery tracker | AI | Newly authored fictional French sports article. No genuine leaked result, organiser quote or award winner claimed. |
 | 9 | French internship handover on Teams | AI | Classify the manager’s reply only. Both messages and PDF attachment are fictional; simplified document-search request, mismatched aircraft-operations reply. `sample19.png`. |
-| 10 | Moth logbook | HUMAN | U.S. Navy photograph of the Harvard Mark II logbook, September 9, 1947, `sample20.jpg`. |
 
 ## Authentic sports photograph — sample26.jpg
 
@@ -38,7 +37,7 @@ The earlier close-up `sample24.jpg` is retained only for previous rooms/custom d
 
 **Tesla — sample16.jpg.** Dickenson V. Alley, December 1899, Colorado Springs laboratory. The [Commons record](https://commons.wikimedia.org/wiki/File:Tesla_colorado.jpg) identifies a historical double exposure and public-domain U.S. status. Tesla and the arcs were not captured together in one exposure. The bundled copy was resized/re-encoded, without generative additions.
 
-**Moth logbook — sample20.jpg.** Courtesy Naval Surface Warfare Center, Dahlgren; U.S. Navy photograph. [Source and public-domain record](https://commons.wikimedia.org/wiki/File:First_Computer_Bug,_1947.jpg), [Smithsonian object](https://americanhistory.si.edu/collections/object/nmah_334663). The entry is September 9, 1947; older photo metadata sometimes says 1945. The word bug already existed. The bundled copy is 1500 × 1186, resized/re-encoded without generative editing.
+**Legacy moth logbook — sample20.jpg (removed from the active deck).** Courtesy Naval Surface Warfare Center, Dahlgren; U.S. Navy photograph. [Source and public-domain record](https://commons.wikimedia.org/wiki/File:First_Computer_Bug,_1947.jpg), [Smithsonian object](https://americanhistory.si.edu/collections/object/nmah_334663). The entry is September 9, 1947; older photo metadata sometimes says 1945. The word bug already existed. The bundled copy is 1500 × 1186, resized/re-encoded without generative editing.
 
 ## Fictional Macron health-AI post and supplied profile photo — sample27.png
 
@@ -66,17 +65,19 @@ The shared game/manager renderer uses `text_style: "news"`: first paragraph = he
 
 ## SQL formatting reference — sample23.png
 
-The original AI-written employee-data aggregate query uses the clause formatting of [PostgreSQL’s official tutorial: Aggregate Functions](https://www.postgresql.org/docs/current/tutorial-agg.html). Uppercase clauses, lowercase identifiers/functions, four-space clause indentation and a plain monospace block are preserved. It filters active employees, groups by department, keeps groups of at least five and sorts by average salary. The use case stays implied in table/column/filter names. The new neutral introduction asks who wrote the SQL, without narrating a separate scenario. The code image is unchanged and reveals AI only.
+The expanded original AI-written query is in `AI_SQL` inside `build_question_images.py`. It joins employees/payroll/departments/employee_certifications, filters a payroll month and active employees, pre-aggregates pay and the highest valid certification level in two CTEs, and pivots levels into foundation/advanced/expert/unclassified counts using `FILTER`. Comments describe the defensive aggregation. Department groups below five are excluded. The use case remains implied in identifiers and filters; the introduction asks who wrote the code. It reveals AI only.
+
+Formatting/features reference [PostgreSQL’s Aggregate Functions tutorial](https://www.postgresql.org/docs/current/tutorial-agg.html) and [WITH Queries](https://www.postgresql.org/docs/current/queries-with.html). This is an original rewrite, not a copied query. No real employee data is used. The exact source code is rendered into the rebuilt image, with comment color and unchanged whitespace. A SQLite equivalent was exercised against synthetic multi-pay/multi-certification data with only DATE-literal syntax adapted; no PostgreSQL execution is claimed.
 
 ## Supplied logos and theme
 
-The two original embedded PNGs from the user’s `Logos_To_Add.docx` are bundled unchanged: `static/branding/logiclever.png` (189 × 63) and `totalenergies.png` (400 × 225). The LogicLever PNG supplied in that document already clips the bottom of its tagline. The active complete asset is `static/branding/logiclever-full.jpg` (1024 × 385), downloaded unchanged from [LogicLever’s official website](https://logiclever.com/wp-content/uploads/2025/10/LOGO_LOGICLEVER_AVEC-signature_RVB_rogne-1024x385.jpg). The original PNG remains as a legacy original. No logo generation, tracing, recoloring or display cropping. The complete wordmark/tagline and TotalEnergies logo replace the large opening title and copy, with natural dimensions. They appear in the player, presenter, standalone bonus and local manager; the presenter’s final ranking retains its placements-only layout.
+The two original embedded PNGs from the user’s `Logos_To_Add.docx` are bundled unchanged: `static/branding/logiclever.png` (189 × 63) and `totalenergies.png` (400 × 225). The LogicLever PNG supplied in that document already clips the bottom of its tagline. The active complete asset is `static/branding/logiclever-full.jpg` (1024 × 385), downloaded unchanged from [LogicLever’s official website](https://logiclever.com/wp-content/uploads/2025/10/LOGO_LOGICLEVER_AVEC-signature_RVB_rogne-1024x385.jpg). The original PNG remains as a legacy original. No logo generation, tracing or display cropping. The original JPEG bytes remain unchanged; CSS multiply blending removes the white backdrop on tinted app surfaces. The complete wordmark/tagline and TotalEnergies logo replace the large opening title and copy, with natural dimensions. They appear in the player, presenter, standalone bonus and local manager; the presenter’s final ranking retains its placements-only layout.
 
 The game’s blue `#1f2ade` is sampled from LogicLever. The UI red is `#e52330`. White/neutral backgrounds remain; gold/silver/bronze are reserved for medal/podium decoration. Original logo colors are preserved.
 
 ## Retained legacy media
 
-Old assets remain available for older room snapshots/custom decks. They are not active questions. The motorcycle-football JPEG `sample15.jpg` credits **Bundesarchiv, Bild 102-12210 / CC-BY-SA 3.0 Germany**, August 1931; current Commons crop, JPEG re-encoding, no generative editing. [Source](https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_102-12210,_Fussballspiel_mit_dem_Motorrad.jpg), [license](https://creativecommons.org/licenses/by-sa/3.0/de/deed.en). Other retained camera/technical image credits are in `ContentSources_Legacy.md` and `ContentSources_Technical.md`.
+The tenth moth-logbook question has been removed from the current nine-round deck. Its image/credit remain available for older room snapshots/custom decks. Other old assets also remain available for those decks. They are not active questions. The motorcycle-football JPEG `sample15.jpg` credits **Bundesarchiv, Bild 102-12210 / CC-BY-SA 3.0 Germany**, August 1931; current Commons crop, JPEG re-encoding, no generative editing. [Source](https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_102-12210,_Fussballspiel_mit_dem_Motorrad.jpg), [license](https://creativecommons.org/licenses/by-sa/3.0/de/deed.en). Other retained camera/technical image credits are in `ContentSources_Legacy.md` and `ContentSources_Technical.md`.
 
 `sample21.png` retains a reconstructed Trump Truth Social post dated May 16, 2025, [original](https://truthsocial.com/@realDonaldTrump/posts/114517718765768352), [archive](https://www.presidency.ucsb.edu/documents/truth-social-posts-may-16-2025). `sample22.png` retains the original AI-written English Trump-style firewall parody. Both identities were coarsely pixelated. Neither is used by this deck or rebuilt by the current default script. Removed RFC excerpts can still be added as custom HUMAN text with explicit source credits; their source-link feature remains supported.
 

@@ -11,7 +11,7 @@ function shared(w){w.eval(fs.readFileSync(project+'/static/newsarticle.js','utf8
  const editor=dom('manager_assets/index.html',base),w=editor.window,d=w.document,$=id=>d.getElementById(id);
  w.fetch=(path,options)=>fetch(new URL(path,base),options);w.AbortController=global.AbortController;w.confirm=()=>true;
  assert.deepEqual([...d.querySelectorAll('.brand-logos img')].map(n=>n.alt),['LogicLever','TotalEnergies']);shared(w);w.eval(fs.readFileSync(project+'/manager_assets/app.js','utf8'));
- await until(()=>!$('add-image').disabled);assert.equal($('question-count').textContent,'10');assert($('status').hidden);
+ await until(()=>!$('add-image').disabled);assert.equal($('question-count').textContent,'9');assert($('status').hidden);
  d.querySelectorAll('.question-item')[8].click();assert(d.querySelector('#preview img').src.endsWith('/static/images/sample19.png'));
  // News rendering is shared with the live game and survives a manager save/reload.
  d.querySelectorAll('.question-item')[4].click();assert.equal($('text-style').value,'news');
@@ -27,26 +27,26 @@ function shared(w){w.eval(fs.readFileSync(project+'/static/newsarticle.js','utf8
  $('add-video').click();set(w,'title','Linked clip');set(w,'answer','HUMAN');set(w,'media-mode','link','change');set(w,'media-url','https://youtu.be/fn3KWM1kuAw');set(w,'media-start','2');set(w,'media-end','8');
  player=d.querySelector('#preview iframe');assert(player);assert.equal(new URL(player.src).searchParams.get('start'),'2');assert.equal(new URL(player.src).searchParams.get('end'),'8');
  $('save-deck').click();await until(()=>$('status').textContent.startsWith('Deck saved.')&&!$('save-deck').disabled);
- let saved=JSON.parse(fs.readFileSync(project+'/questions.json')).rounds;assert.equal(saved.length,11);assert.equal(saved[5].image_highlight.x,35.5);assert.deepEqual(saved[4].reveal_sources,JSON.parse(fs.readFileSync(process.env.QA_ORIGINAL+'/questions.json')).rounds[4].reveal_sources);assert(saved[1].image_reveal.includes('February 6, 1988'));assert.equal(saved[10].media_start,2);assert.equal(saved[10].media,'');
+ let saved=JSON.parse(fs.readFileSync(project+'/questions.json')).rounds;assert.equal(saved.length,10);assert.equal(saved[5].image_highlight.x,35.5);assert.deepEqual(saved[4].reveal_sources,JSON.parse(fs.readFileSync(process.env.QA_ORIGINAL+'/questions.json')).rounds[4].reveal_sources);assert(saved[1].image_reveal.includes('February 6, 1988'));assert.equal(saved[9].media_start,2);assert.equal(saved[9].media,'');
  // A successful local upload must clear a prior link, and keep the uploaded bytes.
  set(w,'media-mode','local','change');const bytes=fs.readFileSync(project+'/static/audio/sample17.mp3');
  set(w,'kind','audio','change');Object.defineProperty($('media-file'),'files',{configurable:true,value:[new File([bytes],'voice.mp3')]});$('media-file').dispatchEvent(new w.Event('change',{bubbles:true}));
  await until(()=>$('media-path').value.endsWith('.mp3')&&!$('media-file').disabled);assert(fs.readFileSync(project+$('media-path').value).equals(bytes));assert.equal($('media-url').value,'');assert(d.querySelector('#preview audio'));
  $('save-deck').click();await until(()=>$('status').textContent.startsWith('Deck saved.')&&!$('save-deck').disabled);
- saved=JSON.parse(fs.readFileSync(project+'/questions.json')).rounds;assert.equal(saved[10].media_url,'');assert(saved[10].media.endsWith('.mp3'));
+ saved=JSON.parse(fs.readFileSync(project+'/questions.json')).rounds;assert.equal(saved[9].media_url,'');assert(saved[9].media.endsWith('.mp3'));
  // Shared playback boundaries and hostile YouTube host rejection.
  const M=w.IcebreakerMedia;assert.equal(M.youtubeId('https://youtube.com.evil.test/watch?v=fn3KWM1kuAw'),null);assert.equal(M.youtubeId('https://user:secret@youtube.com/watch?v=fn3KWM1kuAw'),null);
  const audio=M.create({kind:'audio',media:'/static/audio/sample17.mp3',media_start:2,media_end:8},'round-audio',()=>{});Object.defineProperty(audio,'duration',{value:10});let pauses=0;audio.pause=()=>pauses++;
  audio.dispatchEvent(new w.Event('loadedmetadata'));assert.equal(audio.currentTime,2);audio.currentTime=9;audio.dispatchEvent(new w.Event('timeupdate'));assert.equal(audio.currentTime,8);assert.equal(pauses,1);audio.dispatchEvent(new w.Event('play'));assert.equal(audio.currentTime,2);
  editor.window.close();
- console.log('PASS manager: ten image/text rounds, French Macron and manager reply, custom YouTube/audio previews, clip boundaries, save/reload, local upload clears link, unchanged bytes, URL guards.');
+ console.log('PASS manager: nine image/text rounds, French Macron and manager reply, custom YouTube/audio previews, clip boundaries, save/reload, local upload clears link, unchanged bytes, URL guards.');
  for(const role of ['host','player']){
   const page=dom('static/'+(role==='host'?'presenter.html':'index.html'),'https://game.example.test/'+(role==='host'?'presenter':'')+'?room='+fixture.room.code);
   const pw=page.window,pd=pw.document;const css=pd.createElement('style');css.textContent=fs.readFileSync(project+'/static/style.css','utf8');pd.head.append(css);const newsCss=pd.createElement('style');newsCss.textContent=fs.readFileSync(project+'/static/newsarticle.css','utf8');pd.head.append(newsCss);let poll,current=fixture.rows[0][role],tick=0;
   pw.AbortController=global.AbortController;pw.setInterval=(fn,ms)=>{if(ms===1500)poll=fn;return 1;};pw.HTMLCanvasElement.prototype.getContext=()=>({fillRect(){},fillStyle:''});
   const storage=role==='host'?pw.sessionStorage:pw.localStorage;storage.setItem('icebreaker:'+role+':'+fixture.room.code,JSON.stringify(role==='host'?fixture.room:fixture.player));
   pw.fetch=async path=>({ok:true,json:async()=>{if(path.endsWith('/qr'))return fixture.qr;const stamp=Date.now()/1000+(++tick)*100;return {...current,server_time:stamp,deadline:current.phase==='live'?stamp+10:current.deadline};}});
-  assert.deepEqual([...pd.querySelectorAll('.topbar .brand-logos img')].map(n=>n.alt),['LogicLever','TotalEnergies']);assert.deepEqual([...pd.querySelectorAll('.brand-logos-hero img')].map(n=>n.alt),['LogicLever','TotalEnergies']);assert(!pd.querySelector('.brand-intro h1,.brand-intro p,.brand-intro .eyebrow'));for(const logo of pd.querySelectorAll('.brand-logos-hero img')){assert.equal(pw.getComputedStyle(logo).height,'auto');assert.equal(pw.getComputedStyle(logo).objectFit,'contain');}assert(pd.querySelector('.brand-intro .logo-logiclever').src.endsWith('/static/branding/logiclever-full.jpg'));assert.equal(pw.getComputedStyle(pd.documentElement).getPropertyValue('--blue'),'#1f2ade');assert.equal(pw.getComputedStyle(pd.documentElement).getPropertyValue('--red'),'#e52330');shared(pw);pw.eval(fs.readFileSync(project+'/static/app.js','utf8'));await sleep(10);
+  assert.deepEqual([...pd.querySelectorAll('.topbar .brand-logos img')].map(n=>n.alt),['LogicLever','TotalEnergies']);assert.deepEqual([...pd.querySelectorAll('.brand-logos-hero img')].map(n=>n.alt),['LogicLever','TotalEnergies']);assert(!pd.querySelector('.brand-intro h1,.brand-intro p,.brand-intro .eyebrow'));for(const logo of pd.querySelectorAll('.brand-logos-hero img')){assert.equal(pw.getComputedStyle(logo).height,'auto');assert.equal(pw.getComputedStyle(logo).objectFit,'contain');if(logo.classList.contains('logo-logiclever'))assert.equal(pw.getComputedStyle(logo).mixBlendMode,'multiply');}assert(pd.querySelector('.brand-intro .logo-logiclever').src.endsWith('/static/branding/logiclever-full.jpg'));assert.equal(pw.getComputedStyle(pd.documentElement).getPropertyValue('--blue'),'#1f2ade');assert.equal(pw.getComputedStyle(pd.documentElement).getPropertyValue('--red'),'#e52330');shared(pw);pw.eval(fs.readFileSync(project+'/static/app.js','utf8'));await sleep(10);
   for(const row of fixture.rows){current=row[role];await poll();const q=current.question;
    if(row.phase==='live'){
     assert(!pd.querySelector('#stage audio,#stage video,#stage iframe'),'default deck has no recording rounds');
@@ -77,7 +77,7 @@ function shared(w){w.eval(fs.readFileSync(project+'/static/newsarticle.js','utf8
     }else assert(!pd.querySelector('.image-highlight'));
     if(role==='player'){assert(pd.getElementById('vote-controls').hidden);assert.equal(pd.getElementById('vote-status').textContent,'');}else assert.equal(pd.getElementById('control-help').textContent,'');}
    else if(row.phase==='lobby'){if(role==='host'){assert(!pd.getElementById('qr-lobby').hidden);assert(pd.getElementById('stage').hidden);assert(!pd.querySelector('#stage img'));assert(!pd.querySelector('.question-heading'));assert(!pd.querySelector('#leaderboard'));assert.equal(pd.getElementById('control-button').textContent,'Start round 1');}}
-   else{assert(pd.querySelector('.confetti-layer'));assert.equal(pd.querySelectorAll('.confetti-piece').length,24);const burst=pd.querySelector('.confetti-layer');await poll();assert.equal(pd.querySelector('.confetti-layer'),burst,'polling preserves one confetti burst');assert(pd.querySelector('.final-standings'));assert.equal(pd.querySelector('.final-name').textContent,'Fun Tester');assert.equal(pd.querySelector('.final-score').textContent,'1750');}
+   else{assert(pd.querySelector('.confetti-layer'));assert.equal(pd.querySelectorAll('.confetti-piece').length,24);const burst=pd.querySelector('.confetti-layer');await poll();assert.equal(pd.querySelector('.confetti-layer'),burst,'polling preserves one confetti burst');assert(pd.querySelector('.final-standings'));assert.equal(pd.querySelector('.final-name').textContent,'Fun Tester');assert.equal(pd.querySelector('.final-score').textContent,'1550');}
   }
   assert(!pd.querySelector('.scoring-note'));assert(!pd.querySelector('.share-url'));assert(!pd.querySelector('.qr-help'));
   if(role==='host'){
