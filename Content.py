@@ -1,6 +1,6 @@
 """Nine starter rounds: seven images and two short news articles.
 
-UI, titles and introductions are English; the news articles, Macron post and Teams messages are French.
+UI, titles and introductions are English; the LinkedIn post, news articles, Macron post and Teams messages are French.
 questions.json takes priority. The presenter-selected timer applies to all rounds.
 For social screenshots, classify only the post text or specified manager reply.
 Sources, fictional status and classifications: ContentSources.md.
@@ -11,14 +11,20 @@ ROUNDS = [{'title': 'LinkedIn Post by a Manager',
   'seconds': 25,
   'context': 'Post text: AI or HUMAN?',
   'answer': 'AI',
-  'explanation': 'The post is an original AI-written satire. The interface is a fictional '
-                 'reconstruction, not a real LinkedIn account.',
+  'explanation': 'Original AI-written French tech-management post for the game, with repeated '
+                 'contrasts, parallel sentences and a three-adjective phrase. The delivery results '
+                 'and account are fictional. Stylistic features are authoring choices, not '
+                 'reliable proof that a real post was written by AI.',
   'discussion': '',
-  'source': 'Original AI-written fictional LinkedIn-style post. Layout drawn in Python with '
-            'Pillow; all names and avatars are fictional and blurred. No real account or public '
-            'figure is depicted.',
+  'source': 'Original AI-written French fictional tech-management post, October 5, 2026. The team, '
+            'rollout and two-versus-five-day delivery anecdote are invented. Wording informed by '
+            'multiple public French tech/AI LinkedIn posts, linked in ContentSources.md; no post '
+            'is quoted or attributed to those authors. Native editable layout copies the geometry '
+            'of presenter-supplied image(4).png, retained in '
+            'layout_sources/linkedin-reference.png. Name/avatar/headline are fictional and '
+            'blurred; decorative counts do not describe a real post.',
   'media': '/static/images/sample18.png',
-  'alt': 'A professional-network post with a blurred profile picture and identity.',
+  'alt': 'A French tech-management LinkedIn post with a blurred profile picture and identity.',
   'image_fit': 'contain'},
  {'title': 'Michael Jordan’s Free-Throw-Line Dunk',
   'kind': 'image',

@@ -1,7 +1,7 @@
 """Rebuild the three social screenshots and code card: python build_question_images.py.
 
 Optional authoring dependency only: python -m pip install Pillow
-Macron and Teams messages are in French; interface labels remain English.
+LinkedIn, Macron and Teams messages are in French; interface labels remain English.
 The deployed game uses the bundled PNGs and does not need Pillow.
 Edit LINKEDIN_POST, TEAMS_REQUEST, TEAMS_REPLY, or AI_TWEET below.
 AI_SQL is original AI-written SQL; SQL_STYLE_SOURCE credits its formatting reference.
@@ -12,16 +12,33 @@ import os
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 ROOT = Path(__file__).resolve().parent / "static" / "images"
-LINKEDIN_POST = (
-    "This morning, I asked our AI agent to prioritize the roadmap.\n\n"
-    "It deleted the backlog.\n\n"
-    "At first, I called it a bug. Then I realized: our customers had never "
-    "asked for a backlog. They asked for outcomes.\n\n"
-    "We now have zero technical debt, zero missed deadlines, and zero features.\n\n"
-    "The board calls it a shutdown. I call it radical focus.\n\n"
-    "What has your AI agent taught you about leadership?\n"
-    "#BuildInPublic #AgenticEverything"
-)
+# EDIT the French post below; keep hashtags in the final paragraph.
+LINKEDIN_POST = """Notre équipe n’avait pas besoin d’un outil de plus.
+Elle avait besoin de retrouver du temps.
+
+La semaine dernière, nous avons connecté un agent IA à nos tickets, notre documentation et nos tests. Une première version livrée en deux jours, contre cinq habituellement.
+
+Trois changements. Un même objectif :
+→ Des tickets mieux cadrés avant de coder.
+→ Des tests proposés dès la première version.
+→ Une documentation mise à jour en continu.
+
+Ce n’est pas une équipe remplacée. C’est une équipe augmentée.
+Ce n’est pas moins de contrôle. C’est du contrôle au bon endroit.
+
+Cette approche est simple, concrète, mesurable.
+Moins de tâches répétitives. Plus de décisions utiles.
+Moins de friction. Plus de livraison.
+
+Le vrai sujet n’est plus « quel modèle choisir ? ».
+C’est « quel problème mérite vraiment d’être automatisé ? ».
+
+La validation reste humaine. La responsabilité aussi.
+L’IA accélère. L’équipe décide.
+
+Et vous, quelle tâche retireriez-vous demain de la semaine de votre équipe ?
+
+#IA #Tech #Productivité"""
 TEAMS_REQUEST = (
     "Bonjour, voici le bilan de mon stage. L'outil permet de poser une question "
     "sur les documents techniques et de retrouver les passages utiles. Le rapport "
@@ -195,35 +212,53 @@ def icon(d, xy, kind, scale=1, color="#656565"):
 
 
 def linkedin():
-    # Cropped post, like the supplied reference: no invented whole-site header.
-    im=Image.new("RGB",(1100,1800),"white");d=ImageDraw.Draw(im)
-    avatar(im,(25,25),96,color="#bdc8d4",blur=8)
-    blurred_label(im,(139,29),"Alexandre Martin",32,330,42,True,radius=5)
-    blurred_label(im,(139,75),"Product & Operations",26,470,38,fill="#666666",radius=5)
+    """Copy the supplied 455px post geometry at 3x, with original French text.
+
+    Reference: layout_sources/linkedin-reference.png (image(4).png).
+    Compact identity, white body, blue hashtags, reactions/comments at the bottom.
+    The reference crop ends at this summary: do not add an action-button row.
+    """
+    scale = 3
+    im=Image.new("RGB",(455*scale,2800),"white");d=ImageDraw.Draw(im)
+    d.line((0,3*scale,454*scale,3*scale),fill="#e4e4e4",width=scale)
+    avatar(im,(8*scale,11*scale),38*scale,color="#bdc8d4",blur=18)
+    blurred_label(im,(54*scale,12*scale),"Julien M.",12*scale,56*scale,16*scale,
+                  radius=7,bg="white")
+    blurred_label(im,(54*scale,28*scale),"Engineering Manager | Software & AI",10*scale,
+                  268*scale,13*scale,radius=6,bg="white",fill="#666666")
     d=ImageDraw.Draw(im)
-    text(d,(484,29),"· 2nd",29,"#666666")
-    text(d,(139,111),"1d ·",25,"#666666")
-    d.ellipse((196,115,217,136),outline="#666666",width=2)
-    d.arc((201,115,212,136),0,360,fill="#666666",width=1)
-    d.line((196,125,217,125),fill="#666666",width=1)
-    text(d,(902,33),"+ Follow",32,"#0a66c2",True)
-    y=paragraph(d,(24,175),LINKEDIN_POST,1052,31,44)
-    footer=y+30
-    for x,c in [(39,"#378fe9"),(65,"#df704d"),(91,"#6d9e80")]:
-        d.ellipse((x-19,footer,x+19,footer+38),fill=c,outline="white",width=2)
-    icon(d,(26,footer+9),"like",.65,"white")
-    text(d,(53,footer+5),"♥",24,"white")
-    text(d,(82,footer+7),"✦",21,"white")
-    text(d,(121,footer+8),"701",25,"#666666")
-    text(d,(697,footer+8),"77 comments · 40 reposts",25,"#666666")
-    d.line((24,footer+62,1076,footer+62),fill="#dedede",width=2)
-    for cx,label,kind in [(143,"Like","like"),(414,"Comment","comment"),
-                           (686,"Repost","repost"),(957,"Send","send")]:
-        icon(d,(cx-19,footer+87),kind,1.3)
-        width=d.textlength(label,font=font(27,True))
-        text(d,(cx-width/2,footer+134),label,27,"#666666",True)
-    height=footer+185
-    im=im.crop((0,0,1100,height));ImageDraw.Draw(im).rounded_rectangle((1,1,1098,height-2),8,outline="#dedede",width=2)
+    # Verification shield and connection degree from the attached compact header.
+    x,y=113*scale,14*scale
+    d.polygon([(x,y),(x+5*scale,y-2*scale),(x+10*scale,y),
+               (x+9*scale,y+6*scale),(x+5*scale,y+9*scale),(x+scale,y+6*scale)],
+              outline="#666666",width=3)
+    d.line((x+2*scale,y+3*scale,x+4*scale,y+5*scale,x+8*scale,y+scale),fill="#666666",width=3)
+    text(d,(128*scale,14*scale),"· 3rd+",10*scale,"#666666")
+    text(d,(54*scale,41*scale),"1w ·",10*scale,"#666666")
+    gx,gy=79*scale,42*scale
+    d.ellipse((gx,gy,gx+10*scale,gy+10*scale),fill="#616161")
+    d.arc((gx+3*scale,gy,gx+7*scale,gy+10*scale),0,360,fill="white",width=2)
+    d.line((gx,gy+5*scale,gx+10*scale,gy+5*scale),fill="white",width=2)
+    text(d,(394*scale,17*scale),"+ Follow",12*scale,"#0a66c2")
+    # Same body margins, normal-weight text and line spacing as the screenshot.
+    body,hashtags=LINKEDIN_POST.rsplit("\n\n",1)
+    y=paragraph(d,(8*scale,63*scale),body,439*scale,12*scale,17*scale)
+    y+=6*scale
+    y=paragraph(d,(8*scale,y),hashtags,439*scale,12*scale,17*scale,fill="#0a66c2")
+    footer=y+9*scale
+    # Small overlapping reaction badges; counts are fictional UI decoration.
+    for x,c in [(15,"#378fe9"),(24,"#df704d"),(33,"#6d9e80")]:
+        d.ellipse(((x-6)*scale,footer,(x+6)*scale,footer+12*scale),fill=c,outline="white",width=2)
+    icon(d,(10*scale,footer+3*scale),"like",.27,"white")
+    text(d,(20*scale,footer+scale),"♥",9*scale,"white")
+    text(d,(29*scale,footer+scale),"✦",8*scale,"white")
+    text(d,(45*scale,footer),"19",11*scale,"#666666")
+    label="8 comments · 1 repost"
+    label_width=d.textlength(label,font=font(11*scale))
+    text(d,(447*scale-label_width,footer),label,11*scale,"#666666")
+    height=footer+17*scale
+    if height>im.height:raise ValueError("LinkedIn post overflows; shorten LINKEDIN_POST or increase canvas.")
+    im=im.crop((0,0,455*scale,height))
     im.save(ROOT/"sample18.png",optimize=True)
 
 

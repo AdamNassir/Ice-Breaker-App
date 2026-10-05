@@ -1,6 +1,6 @@
 # Question deck: private answer key and credits
 
-Updated October 5, 2026. Nine rounds: **seven AI and two HUMAN**, seven images and two text articles. No audio/video rounds. The app interface, titles and short introductions are English; the news articles, Macron post and Teams messages are French. Origins come from documented production, not a detector.
+Updated October 5, 2026. Nine rounds: **seven AI and two HUMAN**, seven images and two text articles. No audio/video rounds. The app interface, titles and short introductions are English; the LinkedIn post, news articles, Macron post and Teams messages are French. Origins come from documented production, not a detector.
 
 Players judge the writing in social posts and only the **manager’s reply** in Teams. For photographs/paintings, judge image production. An authentic double exposure still counts as HUMAN. A plausible invented news story counts as AI because the agent wrote it, not merely because the story is false.
 
@@ -10,7 +10,7 @@ Every round shows its title, classification target and content. The prompt ident
 
 | Round | Subject | Origin | Provenance |
 | --- | --- | --- | --- |
-| 1 | LinkedIn roadmap satire | AI | Original AI-written fictional post; unchanged writing and image `sample18.png`. |
+| 1 | French LinkedIn tech-management post | AI | Original AI-written French rollout post; the new attached post layout is reconstructed in `sample18.png`. |
 | 2 | Michael Jordan’s free-throw-line dunk | HUMAN | Walter Iooss Jr. / Sports Illustrated, Chicago, February 6, 1988; complete source JPEG `sample26.jpg`. |
 | 3 | Employee-data SQL | AI | Original commented payroll/certification query: two CTEs, four source tables and conditional-aggregate pivot columns. PostgreSQL formatting/feature references; rebuilt `sample23.png`. |
 | 4 | Tesla in his laboratory | HUMAN | Dickenson V. Alley, December 1899; historical double exposure, `sample16.jpg`. |
@@ -49,9 +49,21 @@ The exact profile picture was supplied by the presenter in `image(3).png`, a 437
 
 The old `sample25.png` bureaucratic-form parody and `macron-profile-source.jpg` remain only as legacy assets. Their portrait credit: Presidency of Bulgaria / President.bg, December 4, 2017, [source](https://commons.wikimedia.org/wiki/File:Emmanuel_Macron_(04-12-2017).jpg), [CC BY 2.5 Bulgaria](https://creativecommons.org/licenses/by/2.5/bg/deed.en); prior crop `(35, 24, 220, 209)`. The current builder no longer uses that portrait or post.
 
+## French LinkedIn post — writing references
+
+The French post describes an invented team connecting an AI agent to tickets, documentation and tests. The claimed two-day versus five-day delivery result is an original fictional anecdote, not a statistic from a real company. The requested writing devices are intentional: repeated “Ce n’est pas… C’est…”, parallel “Moins… Plus…” phrases, three-item lists, “simple, concrète, mesurable”, a human-validation close and an audience question. These patterns are not proof that any actual author uses AI; this question’s answer comes from known production.
+
+Public writing references read October 5, 2026:
+
+- [Vincent Boucard — IA adoption and transformation](https://fr.linkedin.com/posts/vincent-boucard_ia-transformation-humain-activity-7452244414833463296-sxLy): technology-versus-human reframing, short contrastive statements and a closing audience prompt.
+- [SonIA Cluzet — project validation and human adoption](https://fr.linkedin.com/posts/soniacluzet_le-plus-grand-risque-pour-votre-projet-ia-activity-7486419544123727872-laRK): first-person implementation anecdote and a shift from tooling to human validation.
+- [Youssef EL KHARROUBI — agent IA terminology](https://fr.linkedin.com/posts/youssef-el-kharroubi-66a79892_agent-ia-on-met-les-choses-au-clair-vraiment-activity-7426583980675624960-rzfN): step lists, repeated distinctions and triadic descriptions.
+
+The game text is newly written, not a quotation, collage or factual account from these posts. These authors are not shown as the fictional account. Layout is from the presenter-supplied screenshot, not from their public web guest-page layouts. `LINKEDIN_POST` and `linkedin()` in build_question_images.py are the editable source.
+
 ## LinkedIn and French Teams reconstructions
 
-Both are editable native interface reconstructions, not real account screenshots. LinkedIn writing/layout remain unchanged. Its invented identity/avatar stay blurred. The Teams layout follows [Microsoft’s combined Chat interface](https://support.microsoft.com/en-us/teams/teams-channels/explore-the-new-chat-and-channels-experience-in-microsoft-teams); no Microsoft screenshot pixels or actual employee messages are redistributed.
+Both are editable native interface reconstructions, not real account screenshots. LinkedIn now uses original French tech-management writing and the new attached image(4).png layout. Its invented identity/avatar/headline stay blurred. The Teams layout follows [Microsoft’s combined Chat interface](https://support.microsoft.com/en-us/teams/teams-channels/explore-the-new-chat-and-channels-experience-in-microsoft-teams); no Microsoft screenshot pixels or actual employee messages are redistributed.
 
 The French intern’s message describes a tool for questions over technical documents, useful passages, PDF reading, information organisation and testing. It asks the manager to validate `Bilan_Stage_Recherche_Documents.pdf`. The manager incorrectly interprets document search as monitoring aircraft, deciding repairs and switching propulsion. The messages use less technical vocabulary. Adam Nassir, the supplied sender name, is blurred above the right-aligned light-blue outgoing message and PDF. The fictional manager’s reply is left-aligned in light grey; its identity/avatar remain anonymized. The PDF is an attachment only; no document interior is displayed. The intro states: classify only the manager’s reply. This is fiction inspired by the supplied internship topics, not a record or claim about an actual colleague.
 

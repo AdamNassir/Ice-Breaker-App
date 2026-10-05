@@ -97,7 +97,7 @@ python -m uvicorn main:app --reload
 
 Open **http://127.0.0.1:8000/presenter** and create a new room. Saving a new deck does not alter an existing room. If the local game is already running, a restart is not required for a changed `questions.json`.
 
-If `questions.json` does not exist, the game uses the bundled `Content.py` starter deck. This archive contains `questions.json` (English titles/introductions, French articles/Macron/Teams content); the manager replaces it when you save. Invalid JSON or missing referenced media stops new room creation with a clear error rather than silently substituting another deck.
+If `questions.json` does not exist, the game uses the bundled `Content.py` starter deck. This archive contains `questions.json` (English titles/introductions, French LinkedIn/articles/Macron/Teams content); the manager replaces it when you save. Invalid JSON or missing referenced media stops new room creation with a clear error rather than silently substituting another deck.
 
 ## Use the deck on Vercel
 
@@ -183,7 +183,7 @@ Up to eight links are allowed. Labels can include source names and publication d
 
 ## Titles, introductions and language
 
-**Question title** and **Short introduction shown with the question** now appear above the content on presenter and phones. Keep both neutral and short; sources and origins stay in answer notes. The interface remains English. In the default deck, the articles, Macron post and Teams messages are French; the Teams introduction specifies that only the manager’s reply is judged. Both supplied logos and the blue/red palette also appear in this local editor.
+**Question title** and **Short introduction shown with the question** now appear above the content on presenter and phones. Keep both neutral and short; sources and origins stay in answer notes. The interface remains English. In the default deck, the LinkedIn post, articles, Macron post and Teams messages are French; the Teams introduction specifies that only the manager’s reply is judged. Both supplied logos and the blue/red palette also appear in this local editor.
 
 
 The current default deck has nine rounds. The removed moth-logbook image remains available for custom questions. The SQL card is expanded with comments, joins and a pivot-style summary; edit AI_SQL in build_question_images.py to rebuild it. Older bundled news entries lacking the presentation flag are recognized during loading. Explicit plain presentation for other/custom titles remains supported. Keep main.py/question_content.py and all frontend assets from the complete release together.

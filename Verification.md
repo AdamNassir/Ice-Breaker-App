@@ -2,6 +2,8 @@
 
 ## Current update
 
+- LinkedIn round rebuilt from the newly supplied 455 × 540 screenshot geometry, at 3×, with original French tech-management writing. Compact header, regular body text, blue hashtags and summary-only reactions/footer follow the reference; the extra action row is removed. The output is visually compared with the new supplied reference; fictional name/avatar/headline remain blurred. Writing references and invented delivery-result provenance are recorded privately. JSON/fallback match and unrelated round content/media remain byte-identical to the preceding ZIP.
+
 - The two AI news stories are rewritten more plausibly in French; no private-mail/trophy-delivery story remains. Real neighbouring images from October 2–5 Le Parisien stories replace placeholder thumbnails, loaded locally in manager/player/presenter. Byline names are verified references used only for the fictional presentation.
 - The rebuilt Teams PNG was visually inspected: Adam’s blurred name is above the right-aligned blue request/PDF, and the manager’s incoming response is left-aligned grey. The attachment remains closed; no document interior is shown.
 - HTTP-loaded frontend checks verify all six photograph cards, actual JPEG responses and cover framing, both mock bylines and absence of La rédaction. Existing hostile-text checks allow only known trusted images. The legacy prompt check also covers the standalone “Read the French post.”.

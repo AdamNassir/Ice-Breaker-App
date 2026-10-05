@@ -1,60 +1,43 @@
-# Completed update — news photographs, believable articles and Teams message direction
+# Completed update — French LinkedIn post in the new supplied layout
 
 ## Resulting behavior
 
-- The complete news website now has six photographic neighbour cards: three actual recent Le Parisien photographs, repeated in the sidebar and related row, replacing colour placeholders. The original JPEGs are bundled locally without image edits or remote hotlinks. Source articles, dates, image URLs and observed credits are recorded in LayoutSources.md.
-- Replaced La rédaction with the requested named mock bylines: Sébastien Lernould for the economy article and Dominique Sévérac for the sports article, both verified on their author pages. Decorative publication timestamps complete the arrangement. Neither journalist wrote/published the fictional central story; this is explicit in private provenance.
-- Rewrote both French AI articles more plausibly: a wrong bitcoin price on one platform with a brief suspension/review; a partner’s accidentally published Ballon d’Or webpage, with prepared pages for several candidates as an alternative explanation. No trophy-by-mail, private-mail-access or delivery-tracker premise remains.
-- Teams now shows Adam’s outgoing document submission on the right in light blue and the incoming manager response on the left in light grey. Adam Nassir is the actual supplied sender name and is blurred. The manager remains fictional/anonymized, the messages are fictional and unchanged, and the PDF stays closed.
-- Includes the pending prompt cleanup across all nine questions: only the classification target remains. No read/look/inspect commands appear. The standalone legacy Read the French post prompt is also cleaned when decks or existing room snapshots are displayed. Custom part-specific classification targets remain intact.
-- The deck still has nine rounds with seven AI/two HUMAN; scoring, timer, QR, Next/Enter, phone zoom, final placements/confetti and phone-only bonus are preserved. JSON and Content.py fallback remain equivalent.
+- Round 1 is an original French tech-management LinkedIn post, replacing the English roadmap-deletion satire. It describes a plausible but invented rollout using an agent for tickets/documentation/tests and a fictional delivery anecdote. The requested rhetorical devices appear: repeated Ce n’est pas… C’est…, Moins… Plus…, parallel lists and a three-adjective phrase, followed by an audience question and hashtags.
+- The writing was grounded in three public French LinkedIn tech/AI posts. Exact reference links and the original-fiction provenance are in ContentSources.md. No source post is quoted/copied, attributed to the fictional account or treated as proof of its author using AI.
+- The updated PNG follows the attached image(4).png geometry, reconstructed natively at 3×: compact name/avatar/Follow header, body margins and regular type/line spacing, blue hashtags and reaction/comment summary. Removed the old extra action-button row. Source layout reference bytes are preserved unchanged in layout_sources/linkedin-reference.png, replacing the earlier reference. The name/avatar/headline remain fictional and blurred as requested.
+- LINKEDIN_POST is an easily editable multiline French constant; linkedin() controls its measured layout. The final blank-line-separated paragraph is rendered as blue hashtags. The question title/classification target remain neutral English; answer is AI with no extra public explanation.
+- The eight other question records and all unrelated static assets are identical to the preceding ZIP. Nine rounds, timing, QR, Next/Enter, zoom, rankings/confetti, articles, Teams and bonus remain intact. JSON and Content.py fallback are equivalent.
 
 ## Install / redeploy
 
-1. Replace delivered app source with the complete ZIP, preserving your own .env, virtual environment and secrets.
-2. Redeploy normally and create a NEW room to load the revised article writing. Existing room snapshots intentionally keep their saved content; recognized older viewing instructions are normalized for display.
-3. Include the new static/news directory with all three JPEGs. Updated HTML cache keys load the new shared news JS/CSS on player, presenter and local manager.
-4. Restart/reload the local question manager. No runtime dependency changes. To rebuild the Teams image later, install optional Pillow and run the documented build_question_images.py authoring script; the deployed app only serves its bundled PNG.
+1. Extract the complete ZIP, replacing delivered app source while preserving your own .env, virtual environment and secrets.
+2. Include static/images/sample18.png, questions.json and Content.py together; redeploy manually and create a NEW room for consistent updated metadata/source notes. Restart/reload the local manager.
+3. No new runtime dependency. Optional image authoring uses Pillow as already documented. Edit LINKEDIN_POST and run build_question_images.py to rebuild later; HowToAddImages.md explains the final hashtag paragraph and reference crop.
 
 ## Validation
 
-43 Python tests and the complete check_project.py gate pass. HTTP-loaded player/presenter/manager checks verify six local JPEG cards, actual responses/bytes, cover framing with no inherited minimum height, both named bylines and removal of La rédaction. Hostile question markup remains literal text; only fixed trusted logo/photo assets are created. Legacy prompt normalization preserves custom targets and stored room snapshots. Full nine-round API/frontend checks cover timing, scoring, Next/Enter, zoom, ranking/confetti, bonus/workflow, manager save/reload and upload. The rebuilt Teams PNG and all three downloaded news photographs were visually inspected. JSON/fallback match. Complete archive manifest/bytes are compared with the last delivered ZIP and a fresh extraction passes the same full gate.
+43 Python tests and the full check_project.py gate pass, including actual API states and game/manager asset loading, nine-round advancement/scoring, authoritative ten-second timing, Next/Enter, phone zoom/reveal preservation, final placements/confetti and bonus/workflow. The new 1365 × 1536 PNG was visually compared with the supplied 455 × 540 reference. Reference bytes are identical to the attachment; JSON/fallback match. A byte comparison confirms unchanged other rounds/static assets. Complete archive manifest/bytes and changed paths are verified against the previous ZIP; a fresh extraction passes the same complete gate.
 
 ## Limits
 
-Native Chromium rendering, pixel-identical layout matching, physical phone/projector testing and live Vercel/Supabase deployment are not claimed. The existing viewport/font matching limitation remains documented in LayoutSources.md and Verification.md. Editorial photographs are sourced/credited; no public-domain or Creative Commons licence is claimed. The article bodies, borrowed-name bylines and displayed timestamps are fictional quiz presentation, not reports published by the outlet.
+The supplied geometry is reconstructed with available fonts and new text/blurred fictional identities; no licensed-font or changed-text pixel identity is claimed. Native browser/physical phone/projector and live Vercel/Supabase testing remain unverified as documented. Rhetorical patterns were deliberately authored for this round; they are not a reliable detector of real-world AI writing.
 
-## Modified files since the last delivered complete ZIP
+## Modified files since the previous complete ZIP
 
 - `Content.py`
 - `ContentSources.md`
 - `CreationInstructions.md`
+- `HowToAddImages.md`
 - `LayoutSources.md`
 - `QuestionManager.md`
 - `ReadMe.md`
 - `UpdateGuide.md`
 - `Verification.md`
 - `build_question_images.py`
-- `main.py`
-- `manager_assets/index.html`
-- `question_content.py`
+- `layout_sources/linkedin-reference.png`
 - `questions.json`
-- `static/images/sample19.png`
-- `static/index.html`
-- `static/newsarticle.css`
-- `static/newsarticle.js`
-- `static/presenter.html`
-- `tests/frontend/game.cjs`
-- `tests/frontend/resources.cjs`
-- `tests/run_frontend.py`
-- `tests/test_game.py`
+- `static/images/sample18.png`
 
-## Added files
-
-- `static/news/ai.jpg`
-- `static/news/football.jpg`
-- `static/news/housing.jpg`
-
-## Removed files
+## Added / removed files
 
 None.
