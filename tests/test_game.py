@@ -33,6 +33,16 @@ class GameTests(unittest.TestCase):
         self.assertEqual(managed[6]['answer'], 'AI')
         self.assertTrue(all(not q.get('media_url') for q in managed))
 
+    def test_workflow_asset_and_creation_brief_privacy(self):
+        self.assertEqual(self.client.get('/static/workflow.js').status_code, 200)
+        self.assertIn('/static/workflow.js', self.client.get('/').text)
+        self.assertIn('/static/workflow.js', self.client.get('/bonus').text)
+        for path in ('/CreationInstructions.md', '/AGENTS.md', '/UpdateGuide.md'):
+            self.assertEqual(self.client.get(path).status_code, 404)
+        before = self.state(self.p1)
+        self.client.get('/static/workflow.js')
+        self.assertEqual(self.state(self.p1)['me'], before['me'])
+
     def test_lobby_withholds_first_question_and_bonus_is_unscored(self):
         before = self.state(self.p1)
         self.assertEqual(before['phase'], 'lobby')

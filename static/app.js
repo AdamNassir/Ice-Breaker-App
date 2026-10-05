@@ -206,20 +206,21 @@
     const choices = element('div', 'vote-controls');
     const reveal = element('p', 'bonus-reveal', 'AI');
     reveal.setAttribute('aria-live', 'polite');
+    const workflow = window.IcebreakerWorkflow.create();
     const savedKey = `icebreaker:bonus:${code}`;
     let answered = false;
     try { answered = storage.getItem(savedKey) === 'answered'; } catch {}
-    choices.hidden = answered; reveal.hidden = !answered;
+    choices.hidden = answered; reveal.hidden = !answered; workflow.hidden = !answered;
     for (const answer of ['AI', 'HUMAN']) {
       const button = element('button', `answer ${answer.toLowerCase()}`, answer);
       button.type = 'button';
       button.addEventListener('click', () => {
-        choices.hidden = true; reveal.hidden = false;
+        choices.hidden = true; reveal.hidden = false; workflow.hidden = false;
         try { storage.setItem(savedKey, 'answered'); } catch {}
       });
       choices.append(button);
     }
-    panel.append(choices, reveal);
+    panel.append(choices, reveal, workflow);
     return panel;
   }
 

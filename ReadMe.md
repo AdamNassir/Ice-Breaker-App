@@ -2,6 +2,8 @@
 
 A complete browser game for an AI presentation: a presenter opens a room, players join on their phones with pseudonyms, and everyone decides **AI OR HUMAN**. The bundled **English** deck has **10 rounds**: eight images (including three social screenshots and a sourced code card) and two tech texts; no audio or video rounds, split evenly between AI and human origins. See `UpdateGuide.md` to install this deck in an existing deployment.
 
+The consolidated upfront specification is [CreationInstructions.md](CreationInstructions.md), written in the style of the original brief and excluding individual question content. [AGENTS.md](AGENTS.md) defines how a running agent reads saved update requests, checks its work and replaces them with completion reports.
+
 ## Edit questions with the local manager
 
 Run **`python question_manager.py`** using your virtual environment, then open **http://127.0.0.1:8765**. This is a separate local editor for adding, editing, reordering and previewing text, code, commits, images, audio and video questions. Click **Save deck to game** to write `questions.json`. Uploads are copied into `static/images/`, `static/audio/` or `static/videos/`.
@@ -286,3 +288,22 @@ The hard player cap is 200, but that is an abuse/storage bound, **not a verified
 - Supabase connection modes and transaction pooler: https://supabase.com/docs/guides/database/connecting-to-postgres
 - Supabase psycopg prepared-statement setting: https://supabase.com/docs/guides/troubleshooting/disabling-prepared-statements-qL8lEL
 - Content provenance and licensing: see `ContentSources.md`.
+
+## Agent and human update workflow
+
+The phone bonus reveals AI and then shows an illustrative six-step sequence: one complete instruction file; agent implementation and iterative testing; human code review/testing; question-manager setup with generated-content instructions and real sources; saved UpdateGuide.md requests followed by agent completion reports; human verification and another cycle. The presenter remains on final rankings. The standalone `/bonus` page has the same post-answer explanation.
+
+For a future change, replace the completed report in `UpdateGuide.md` with the desired behaviour and acceptance checks, then save it and hand the file to a running agent session. The agent reads `CreationInstructions.md` and `AGENTS.md`, implements and tests the request, and replaces the pending text with a report that you can review and test. Saving the file alone does not trigger the deployed game or an autonomous agent; no file watcher is included.
+
+Example pending request:
+
+```markdown
+## Requested change
+Describe the precise behaviour to change.
+
+## Acceptance checks
+- Describe what I should observe when testing.
+- State which existing behaviour must remain intact.
+```
+
+The illustrative sequence is a presentation narrative, not an exact historical transcript. `Verification.md` records actual completed checks separately.
