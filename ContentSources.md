@@ -1,6 +1,6 @@
 # Question deck: private answer key and credits
 
-Updated October 5, 2026. Nine rounds: **six AI and three HUMAN**, seven images and two text articles. No audio/video rounds. The app interface, titles and short introductions are English; the LinkedIn post, news articles, Macron post and Teams messages are French. Classifications use documented production/sources, not a style detector. The historical LinkedIn entry is human-attributed and marked HUMAN at the presenter’s request; its private writing process is not independently verified.
+Updated October 5, 2026. Nine rounds: **six AI and three HUMAN**, seven images and two text articles. No audio/video rounds. The app interface, titles and short introductions are English; the LinkedIn post, news articles, Macron post and Teams messages are French. Classifications use documented production/sources, not a style detector. The public LinkedIn entry is human-attributed and marked HUMAN at the presenter’s request; its private writing process is not independently verified.
 
 Players judge the writing in social posts and only the **manager’s reply** in Teams. For photographs/paintings, judge image production. An authentic double exposure still counts as HUMAN. A plausible invented news story counts as AI because the agent wrote it, not merely because the story is false.
 
@@ -10,7 +10,7 @@ Every round shows its title, classification target and content. The prompt ident
 
 | Round | Subject | Origin | Provenance |
 | --- | --- | --- | --- |
-| 1 | French LinkedIn post about UX and AI | HUMAN | Verbatim 21-word opening excerpt from Augustin de Magnitot’s public AB Tasty / VivaTech 2019 post, in `sample18.png`. Historical human attribution; writing workflow unverified. |
+| 1 | French LinkedIn post about AI | HUMAN | Four verbatim paragraphs pasted by the presenter from Anne Genetet’s public post. The supplied real profile photo/name are blurred during voting and clear at reveal. Writing workflow unverified. |
 | 2 | Michael Jordan’s free-throw-line dunk | HUMAN | Walter Iooss Jr. / Sports Illustrated, Chicago, February 6, 1988; complete source JPEG `sample26.jpg`. |
 | 3 | Employee-data SQL | AI | Original commented payroll/certification query: two CTEs, four source tables and conditional-aggregate pivot columns. PostgreSQL formatting/feature references; rebuilt `sample23.png`. |
 | 4 | Motorcycle football | HUMAN | Bundesarchiv, Bild 102-12210 / CC-BY-SA 3.0 Germany, August 1931; unchanged `sample15.jpg`. |
@@ -49,13 +49,15 @@ The exact profile picture was supplied by the presenter in `image(3).png`, a 437
 
 The old `sample25.png` bureaucratic-form parody and `macron-profile-source.jpg` remain only as legacy assets. Their portrait credit: Presidency of Bulgaria / President.bg, December 4, 2017, [source](https://commons.wikimedia.org/wiki/File:Emmanuel_Macron_(04-12-2017).jpg), [CC BY 2.5 Bulgaria](https://creativecommons.org/licenses/by/2.5/bg/deed.en); prior crop `(35, 24, 220, 209)`. The current builder no longer uses that portrait or post.
 
-## Sourced French LinkedIn excerpt — sample18.png
+## Sourced French LinkedIn passage — sample18.png / sample18-reveal.png
 
-The current post displays the exact opening two sentences (21 words, including the original inline hashtags) from [Augustin de Magnitot’s public post about AB Tasty / VivaTech 2019](https://fr.linkedin.com/posts/ademagnitot_ab-tasty-partenaire-du-vivatech-2019-%C3%A0-paris-activity-6531455934907056128-Xf0-), checked October 5, 2026. The rest of the post and linked-article preview are omitted; there is no generated rewrite, invented delivery anecdote or added hashtag paragraph. The post’s human attribution and historical event context support the presenter-requested HUMAN label, but the author’s private writing process is not independently verified. Public publication alone is not a general proof of human authorship.
+The presenter pasted four paragraphs from [Anne Genetet’s public French LinkedIn post about AI and education](https://fr.linkedin.com/posts/anne-genetet_%C3%A0-hangzhou-jai-visit%C3%A9-l%C3%A9cole-primaire-activity-7475549399293620225-Sv7g) on October 5, 2026. The full supplied passage is preserved verbatim, including paragraph boundaries, in `LINKEDIN_POST`. It names no company. The surrounding original post and video remain omitted. This is supplied text, not an AI rewrite.
 
-The UI retains the supplied compact LinkedIn layout with anonymous reconstructed identity/avatar/headline. It shows the source page’s observed 21 reactions and omits a fabricated recent timestamp/comment count. Only the writing is classified, not the reconstructed screenshot. The source URL and caveat stay in private notes; the public reveal remains HUMAN only, as requested for social posts.
+The presenter supplied `image(5).png` as Anne Genetet’s profile photograph. Its bytes are preserved in `static/images/linkedin-profile-source.png`. The renderer uses the square `(72, 10, 406, 344)` enclosing the circular portrait, resized into the LinkedIn avatar; it does not generate a substitute face. `LINKEDIN_NAME` is exactly Anne GENETET. The voting variant blurs the actual portrait and name. The reveal variant shows them clearly; no invented role/employer is displayed.
 
-The former original AI-written rollout satire and its three writing references are superseded in the active deck. The current `LINKEDIN_POST` constant is the sourced excerpt and `LINKEDIN_SOURCE` records its URL. Keep the text verbatim if retaining this HUMAN classification.
+Both PNGs share identical dimensions, paragraph text and footer. Source-page counts remain 118 reactions and 17 comments; no fabricated recent timestamp is added. `reveal_media` and `reveal_alt` are omitted from live room payloads, and included only after the server reveals the answer. The phone preserves zoom and position while switching images. Assets are ordinary bundled static media, not authenticated secret files; the game API does not disclose the reveal path before voting ends.
+
+The HUMAN label is the requested classification based on public human attribution. The author’s private writing process is unverified; publication alone is not proof of absence of writing tools. Only the post writing is classified. The public answer panel remains HUMAN only; the clear identity appears inside the post, with no extra contextual paragraph.
 
 ## Authentic motorcycle-football photograph — sample15.jpg
 
@@ -63,7 +65,7 @@ The restored photograph shows people playing motorcycle football in Germany in *
 
 ## LinkedIn and French Teams reconstructions
 
-Both are editable native interface reconstructions, not real account screenshots. LinkedIn now uses the verbatim sourced French excerpt and the attached image(4).png layout. Its anonymized placeholder identity/avatar/headline stay blurred. The Teams layout follows [Microsoft’s combined Chat interface](https://support.microsoft.com/en-us/teams/teams-channels/explore-the-new-chat-and-channels-experience-in-microsoft-teams); no Microsoft screenshot pixels or actual employee messages are redistributed.
+Both are editable native interface reconstructions, not real account screenshots. LinkedIn now uses the verbatim sourced French excerpt and the attached image(4).png layout. Its real supplied photo and name are blurred during voting and clear at reveal, with no invented role/employer. The Teams layout follows [Microsoft’s combined Chat interface](https://support.microsoft.com/en-us/teams/teams-channels/explore-the-new-chat-and-channels-experience-in-microsoft-teams); no Microsoft screenshot pixels or actual employee messages are redistributed.
 
 The French intern’s message describes a tool for questions over technical documents, useful passages, PDF reading, information organisation and testing. It asks the manager to validate `Bilan_Stage_Recherche_Documents.pdf`. The manager incorrectly interprets document search as monitoring aircraft, deciding repairs and switching propulsion. The messages use less technical vocabulary. Adam Nassir, the supplied sender name, is blurred above the right-aligned light-blue outgoing message and PDF. The fictional manager’s reply is left-aligned in light grey; its identity/avatar remain anonymized. The PDF is an attachment only; no document interior is displayed. The intro states: classify only the manager’s reply. This is fiction inspired by the supplied internship topics, not a record or claim about an actual colleague.
 

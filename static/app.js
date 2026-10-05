@@ -225,7 +225,7 @@
   }
 
   function renderStage(s) {
-    const signature = JSON.stringify([s.code, s.phase, s.round_index, s.question, s.phase === 'finished' ? s.leaderboard : null]);
+    const signature = JSON.stringify([s.code, s.phase, s.round_index, s.question, s.reveal?.reveal_media, s.reveal?.reveal_alt, s.phase === 'finished' ? s.leaderboard : null]);
     if (signature === stageKey) return;
     stageKey = signature;
     const stage = $('stage');
@@ -253,7 +253,10 @@
       if (q.context) heading.append(element('p', 'question-intro', q.context));
       stage.append(heading);
       if (q.kind === 'image') {
-        stage.append(imageFrame(q, s.reveal?.image_highlight, zoomView));
+        // Same round/image key preserves phone zoom when identities are revealed.
+        const revealed = s.phase === 'revealed' && s.reveal?.reveal_media;
+        const image = revealed ? {...q, media: s.reveal.reveal_media, alt: s.reveal.reveal_alt || q.alt} : q;
+        stage.append(imageFrame(image, s.reveal?.image_highlight, zoomView));
       } else if (q.kind === 'audio' || q.kind === 'video') {
         const isVideo = q.kind === 'video';
         const player = window.IcebreakerMedia.create(q, isVideo ? 'round-video' : 'round-audio', message => {

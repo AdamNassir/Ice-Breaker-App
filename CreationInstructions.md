@@ -115,7 +115,7 @@ Appearance and restrictions :
 
 - Players must be able to inspect images on their phone : pinch to zoom, drag while zoomed, double-tap to zoom/reset, and use +, minus and Reset buttons. Support keyboard equivalents where practical. Bound panning and zoom, preserve aspect ratio and keep the reveal circle aligned. Preserve zoom/position on polling and reveal; reset for a new question. Do not block voting or pause the timer. Scrolling outside the image should still move the page.
 
-- Any social UI reconstruction must match its supplied reference rather than using a generic card. Anonymize displayed identities as requested. The French Macron post must show an unblurred name, handle and profile photograph. Keep LinkedIn and Teams identities anonymized. In Teams, show the author’s document submission on the right in blue, using the supplied sender name blurred, and the incoming manager reply on the left in white/grey. When coarse pixelation is required for other content, name and handle must actually become unreadable. Do not use a weak cosmetic blur that leaves the identity visible. These are authoring/layout requirements; individual post wording belongs in the separate content deck.
+- Any social UI reconstruction must match its supplied reference rather than using a generic card. Anonymize displayed identities as requested. The French Macron post must show an unblurred name, handle and profile photograph. Keep social identities anonymized during voting when requested. For a configured identity reveal, show the real supplied photo/name only after the server reveals the answer; Teams stays anonymized. In Teams, show the author’s document submission on the right in blue, using the supplied sender name blurred, and the incoming manager reply on the left in white/grey. When coarse pixelation is required for other content, name and handle must actually become unreadable. Do not use a weak cosmetic blur that leaves the identity visible. These are authoring/layout requirements; individual post wording belongs in the separate content deck.
 
 Question manager :
 
@@ -143,6 +143,8 @@ question = {
     "media": local_media_path,
     "alt": neutral_description,
     "image_fit": "contain",
+    "reveal_media": optional_local_reveal_image,  # image questions; omitted from live payloads
+    "reveal_alt": optional_revealed_description,
     "answer": known_origin,   # exactly AI or HUMAN
     "context": author_context,
     "text_style": "plain",    # text rounds: plain or news; defaults to plain
@@ -153,7 +155,7 @@ question = {
 }
 ```
 
-- Validate saves before replacing the deck. Reject unsupported media, invalid paths, traversal, malformed content and bad highlight coordinates or malformed reveal-source links. Preserve optional reveal-source credits through manager saves. Keep a backup on save, and detect conflicting editor revisions. Allow the manager to open and repair a deck with missing media or malformed JSON instead of trapping the user behind an error.
+- Validate saves before replacing the deck. Reject unsupported media, invalid paths, traversal, malformed content and bad highlight coordinates or malformed reveal-source links. Preserve optional reveal-source credits and image reveal paths/descriptions through manager saves. Validate reveal images as existing local image files inside static/images; omit those fields from live payloads. The editor preview toggle must switch variants; phones preserve zoom/pan during the swap. Keep a backup on save, and detect conflicting editor revisions. Allow the manager to open and repair a deck with missing media or malformed JSON instead of trapping the user behind an error.
 
 - A new game room must take a snapshot of the saved deck. Existing rooms must not silently change questions when the author saves a different deck. Provide clear missing-media/deck errors, a working Reload saved control and exact deployment instructions for new media.
 

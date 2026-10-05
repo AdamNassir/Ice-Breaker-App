@@ -6,29 +6,35 @@ For social screenshots, classify only the post text or specified manager reply.
 Sources, fictional status and classifications: ContentSources.md.
 """
 
-ROUNDS = [{'title': 'LinkedIn Post About UX and AI',
+ROUNDS = [{'title': 'LinkedIn Post About AI',
   'kind': 'image',
   'seconds': 25,
   'context': 'Post text: AI or HUMAN?',
   'answer': 'HUMAN',
-  'explanation': 'Verbatim opening two sentences from a public French LinkedIn post attributed to '
-                 'Augustin de Magnitot about AB Tasty at VivaTech 2019. HUMAN is the '
-                 'presenter-requested classification for this historical human-attributed post; '
-                 'the author’s private writing process is not independently verified. This is a '
-                 'sourced excerpt, not an AI rewrite.',
+  'explanation': 'The presenter supplied this four-paragraph French excerpt from Anne Genetet’s '
+                 'public LinkedIn post about AI and education. It is preserved verbatim and marked '
+                 'HUMAN as requested based on public human attribution; the private writing '
+                 'process is unverified. The real name and supplied profile photo are blurred '
+                 'during voting, then shown clearly at reveal.',
   'discussion': '',
-  'source': 'Augustin de Magnitot, public LinkedIn post about AB Tasty at VivaTech 2019; source '
-            'checked October 5, 2026. Exact opening two sentences, 21 words, including original '
-            'inline hashtags, reproduced without AI rewriting. Human-attributed historical '
-            'publication; no verified declaration about writing tools. The remaining sentence and '
-            'linked-article preview are not reproduced. Account/header/avatar are anonymized '
-            'reconstructed UI; 21 reactions were observed on the accessible source page, with no '
-            'invented comment count or recent timestamp. Layout follows the supplied image(4).png '
-            'geometry.',
+  'source': 'Anne Genetet, public French LinkedIn post about AI and education; source checked '
+            'October 5, 2026. Four paragraphs pasted by the presenter on October 5, 2026, '
+            'preserved verbatim with paragraph breaks. No company names or added hashtags. The '
+            'presenter also supplied image(5).png as the profile photograph; exact original bytes '
+            'are bundled as linkedin-profile-source.png. A circular portrait crop is placed in the '
+            'reconstructed header. Name and photograph are blurred during voting; '
+            'sample18-reveal.png shows Anne GENETET and the photograph clearly after reveal, with '
+            'identical layout/body dimensions. Public human attribution, private writing workflow '
+            'unverified. Observed source counts remain 118 reactions and 17 comments; no recent '
+            'timestamp, role or employer is invented. The remainder of the original post and '
+            'attached video are omitted.',
   'media': '/static/images/sample18.png',
-  'alt': 'An anonymized LinkedIn post excerpt in French about UX, AI and a technology event.',
+  'alt': 'An anonymized French LinkedIn post excerpt about AI, citizenship and critical thinking.',
   'image_fit': 'contain',
-  'source_url': 'https://fr.linkedin.com/posts/ademagnitot_ab-tasty-partenaire-du-vivatech-2019-%C3%A0-paris-activity-6531455934907056128-Xf0-'},
+  'source_url': 'https://fr.linkedin.com/posts/anne-genetet_%C3%A0-hangzhou-jai-visit%C3%A9-l%C3%A9cole-primaire-activity-7475549399293620225-Sv7g',
+  'reveal_media': '/static/images/sample18-reveal.png',
+  'reveal_alt': 'French LinkedIn post about AI and education by Anne GENETET, with her profile '
+                'photograph and name visible.'},
  {'title': 'Michael Jordan’s Free-Throw-Line Dunk',
   'kind': 'image',
   'seconds': 25,

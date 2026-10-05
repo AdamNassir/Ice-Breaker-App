@@ -27,6 +27,8 @@ const wait=()=>new Promise(r=>setImmediate(r));
  pointer('pointerdown',1,150,100);pointer('pointermove',1,195,125);pointer('pointerup',1,195,125);assert.deepEqual(view(),{scale:2,x:45,y:25});
  const old=viewer();await poll();assert.equal(viewer(),old);assert.deepEqual(view(),{scale:2,x:45,y:25});
  current=fixture.rows.find(r=>r.phase==='revealed'&&r.player.round_index===0).player;await poll();await wait();assert.notEqual(viewer(),old);assert.deepEqual(view(),{scale:2,x:45,y:25});assert(disconnections>0);
+ assert(d.querySelector('#stage img').src.endsWith(current.reveal.reveal_media));assert(d.querySelector('#stage img').alt.includes('Anne GENETET'));
+ const revealedViewer=viewer();await poll();assert.equal(viewer(),revealedViewer);assert.deepEqual(view(),{scale:2,x:45,y:25});
  pointer('pointerdown',1,150,100);pointer('pointermove',1,10000,10000);pointer('pointercancel',1,10000,10000);assert.deepEqual(view(),{scale:2,x:150,y:100});
  pointer('pointermove',1,-10000,-10000);assert.deepEqual(view(),{scale:2,x:150,y:100});
  button('Reset image zoom and position').click();

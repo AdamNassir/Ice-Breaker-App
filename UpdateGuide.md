@@ -1,41 +1,59 @@
-# Completed update — three HUMAN rounds
+# Completed update — full supplied LinkedIn passage and identity reveal
 
 ## Resulting behavior
 
-- Nine rounds now contain six AI answers and three HUMAN answers.
-- Round 1 replaces the generated French LinkedIn text with the verbatim 21-word opening of Augustin de Magnitot's publicly attributed AB Tasty / VivaTech 2019 post. The source URL is recorded in the private deck/source notes. It is marked HUMAN as requested, on the basis of historical human attribution; the author's private writing process has not been independently verified.
-- The anonymous LinkedIn layout is retained. Hashtags are blue inline, the observed reaction count is 21, and invented recent timing/comment counts were removed. No explanatory commentary is added to this social-post reveal.
-- Round 4 replaces Tesla with the existing motorcycle-football photograph from Germany, August 1931. It is HUMAN, and the reveal gives its subject, date and Bundesarchiv / CC BY-SA 3.0 Germany credit. The original bundled sample15.jpg bytes are unchanged. Tesla's old asset remains available for custom decks and existing rooms.
-- The other seven question records and all unrelated static assets remain unchanged. JSON and Content.py fallback match. QR lobby, authoritative timer, immediate Next/Enter, phone zoom, final rankings/confetti and bonus behavior remain intact.
+- Round 1 displays all four French paragraphs pasted by the presenter, preserving wording and paragraph boundaries. It remains HUMAN, with no company names. The other eight question records are unchanged; nine rounds remain six AI and three HUMAN.
+- The supplied image(5).png loads correctly. Its original bytes are bundled as linkedin-profile-source.png; the renderer crops the supplied circular portrait rather than generating a substitute face. Anne GENETET's actual name and this photo are blurred while voting and clear after the server reveals the answer, on both presenter and phone.
+- The two 1365 × 1062 post variants have identical body/footer pixels and dimensions. Phone zoom and pan survive the image swap and polling. The public reveal panel remains HUMAN only, with no contextual explanation.
+- Optional reveal_media / reveal_alt fields support a local image variant and accessible revealed description. Shared validation rejects unsafe/non-image/missing paths and prevents symlink escapes. The API omits these fields during live voting. Bundled images remain ordinary static assets, not authenticated secret files.
+- The question manager edits those optional fields, switches its preview with Show answer notes, and preserves them through save/reload. Script versions are updated on shipped pages so the new renderer loads after redeployment. JSON and Content.py fallback match.
 
 ## Install / redeploy
 
-1. Extract the complete ZIP, replacing delivered source while preserving your own .env, virtual environment and secrets.
-2. Redeploy manually and create a NEW room to load the revised deck. Restart/reload the local question manager.
-3. No new dependency. The editable LINKEDIN_POST and linkedin() renderer are in build_question_images.py; retain source wording/provenance when rebuilding sourced excerpts.
+1. Extract the complete ZIP, replacing delivered source while preserving your own .env, secrets and virtual environment.
+2. Include both LinkedIn PNG variants, the profile source, both deck files and the updated server/frontend files. Redeploy manually and create a NEW room; existing rooms retain their original snapshots.
+3. Restart/reload the local manager. No new runtime dependency. Optional image rebuilding continues to use Pillow; LINKEDIN_POST, LINKEDIN_NAME, LINKEDIN_PORTRAIT and LINKEDIN_PORTRAIT_BOX identify the editable content and framing.
 
 ## Validation
 
-43 Python tests and the complete check_project.py frontend/syntax gate pass. The revised LinkedIn image and existing motorcycle-football photograph were visually inspected. JSON/fallback equivalence, unchanged other seven rounds, unchanged unrelated assets, archive manifest/CRC/bytes and exact changed paths were verified against the preceding ZIP. A fresh extraction passes the same complete gate.
+44 Python tests and the complete check_project.py frontend/syntax gate pass in the project and a fresh ZIP extraction. Actual API-backed presenter/player DOM checks verify the live/reveal image paths and accessible descriptions, no live field leakage, authoritative timing and unchanged full-game scoring. Manager checks cover preview toggling/save/reload and invalid/missing reveal paths. Gesture checks preserve zoom/pan and polling stability across the image swap. Both images were visually inspected; same dimensions/body/footer and exact supplied portrait-source bytes were checked. Archive manifest/CRC/bytes and exact changed/added paths are verified against the preceding complete ZIP; the other eight round records and unrelated images are unchanged.
 
 ## Limits
 
-The LinkedIn visual is a reconstructed anonymous layout containing a real excerpt, not an unmodified screenshot of the original author. The HUMAN label reflects the requested historical attribution, not proof that no writing tools were used. Physical phone/projector and live Vercel/Supabase testing remain unverified as documented in Verification.md.
+The post layout is reconstructed around the user-supplied verbatim text and actual supplied photo, not an unmodified original screenshot. HUMAN is the requested public-attribution label; private writing workflow is unverified. Physical phone/projector, native browser and live Vercel/Supabase testing remain unverified as described in Verification.md.
 
 ## Modified files since the previous complete ZIP
 
 - `Content.py`
 - `ContentSources.md`
+- `CreationInstructions.md`
 - `HowToAddImages.md`
 - `LayoutSources.md`
+- `QuestionManager.md`
 - `ReadMe.md`
 - `UpdateGuide.md`
 - `Verification.md`
 - `build_question_images.py`
+- `main.py`
+- `manager_assets/app.js`
+- `manager_assets/index.html`
+- `question_content.py`
 - `questions.json`
+- `static/app.js`
 - `static/images/sample18.png`
+- `static/index.html`
+- `static/presenter.html`
+- `tests/frontend/game.cjs`
+- `tests/frontend/zoom.cjs`
+- `tests/run_frontend.py`
 - `tests/test_game.py`
+- `tests/test_question_manager.py`
 
-## Added / removed files
+## Added files
+
+- `static/images/linkedin-profile-source.png`
+- `static/images/sample18-reveal.png`
+
+## Removed files
 
 None.

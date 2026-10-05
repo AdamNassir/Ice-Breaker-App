@@ -12,6 +12,13 @@ function shared(w){w.eval(fs.readFileSync(project+'/static/newsarticle.js','utf8
  w.fetch=(path,options)=>fetch(new URL(path,base),options);w.AbortController=global.AbortController;w.confirm=()=>true;
  assert.deepEqual([...d.querySelectorAll('.brand-logos img')].map(n=>n.alt),['LogicLever','TotalEnergies']);shared(w);w.eval(fs.readFileSync(project+'/manager_assets/app.js','utf8'));
  await until(()=>!$('add-image').disabled);assert.equal($('question-count').textContent,'9');assert($('status').hidden);
+ assert.equal($('reveal-media').value,'/static/images/sample18-reveal.png');
+ assert(d.querySelector('#preview img').src.endsWith('/static/images/sample18.png'));
+ $('preview-answer').checked=true;$('preview-answer').dispatchEvent(new w.Event('change'));
+ assert(d.querySelector('#preview img').src.endsWith('/static/images/sample18-reveal.png'));
+ assert(d.querySelector('#preview img').alt.includes('Anne GENETET'));
+ $('preview-answer').checked=false;$('preview-answer').dispatchEvent(new w.Event('change'));
+ assert(d.querySelector('#preview img').src.endsWith('/static/images/sample18.png'));
  d.querySelectorAll('.question-item')[8].click();assert(d.querySelector('#preview img').src.endsWith('/static/images/sample19.png'));
  // News rendering is shared with the live game and survives a manager save/reload.
  d.querySelectorAll('.question-item')[4].click();assert.equal($('text-style').value,'news');
@@ -27,7 +34,7 @@ function shared(w){w.eval(fs.readFileSync(project+'/static/newsarticle.js','utf8
  $('add-video').click();set(w,'title','Linked clip');set(w,'answer','HUMAN');set(w,'media-mode','link','change');set(w,'media-url','https://youtu.be/fn3KWM1kuAw');set(w,'media-start','2');set(w,'media-end','8');
  player=d.querySelector('#preview iframe');assert(player);assert.equal(new URL(player.src).searchParams.get('start'),'2');assert.equal(new URL(player.src).searchParams.get('end'),'8');
  $('save-deck').click();await until(()=>$('status').textContent.startsWith('Deck saved.')&&!$('save-deck').disabled);
- let saved=JSON.parse(fs.readFileSync(project+'/questions.json')).rounds;assert.equal(saved.length,10);assert.equal(saved[5].image_highlight.x,35.5);assert.deepEqual(saved[4].reveal_sources,JSON.parse(fs.readFileSync(process.env.QA_ORIGINAL+'/questions.json')).rounds[4].reveal_sources);assert(saved[1].image_reveal.includes('February 6, 1988'));assert.equal(saved[9].media_start,2);assert.equal(saved[9].media,'');
+ let saved=JSON.parse(fs.readFileSync(project+'/questions.json')).rounds;assert.equal(saved.length,10);assert.equal(saved[0].reveal_media,'/static/images/sample18-reveal.png');assert(saved[0].reveal_alt.includes('Anne GENETET'));assert.equal(saved[5].image_highlight.x,35.5);assert.deepEqual(saved[4].reveal_sources,JSON.parse(fs.readFileSync(process.env.QA_ORIGINAL+'/questions.json')).rounds[4].reveal_sources);assert(saved[1].image_reveal.includes('February 6, 1988'));assert.equal(saved[9].media_start,2);assert.equal(saved[9].media,'');
  // A successful local upload must clear a prior link, and keep the uploaded bytes.
  set(w,'media-mode','local','change');const bytes=fs.readFileSync(project+'/static/audio/sample17.mp3');
  set(w,'kind','audio','change');Object.defineProperty($('media-file'),'files',{configurable:true,value:[new File([bytes],'voice.mp3')]});$('media-file').dispatchEvent(new w.Event('change',{bubbles:true}));
@@ -58,6 +65,8 @@ function shared(w){w.eval(fs.readFileSync(project+'/static/newsarticle.js','utf8
     else {const e=pd.querySelector('#stage '+q.kind);assert(e.controls);assert.equal(e.src,q.media_url||'https://game.example.test'+q.media);}
     const existing=pd.querySelector('#stage audio,#stage video,#stage iframe');await poll();if(existing)assert.equal(pd.querySelector('#stage audio,#stage video,#stage iframe'),existing,'polling must preserve playback');
    }else if(row.phase==='revealed'){if(q.kind==='text'&&q.text_style==='news')assert.equal(pd.querySelector('.news-site').scrollTop,123,'reveal preserves article scroll');assert.equal(pd.querySelector('.question-title').textContent,q.title);assert.equal(pd.querySelector('.question-intro').textContent,q.context);assert(!pd.getElementById('reveal').hidden);assert.equal(pd.querySelector('#reveal h3').textContent,current.reveal.answer);
+    if(q.kind==='image')assert(pd.querySelector('#stage img').src.endsWith(current.reveal.reveal_media||q.media));
+    if(current.reveal.reveal_media)assert.equal(pd.querySelector('#stage img').alt,current.reveal.reveal_alt);
     if(current.reveal.image_reveal){
      assert.equal(pd.querySelector('.photo-credit').textContent,current.reveal.image_reveal);
      assert.equal(pd.querySelector('.photo-source').href,current.reveal.source_url);

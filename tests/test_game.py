@@ -189,7 +189,7 @@ class GameTests(unittest.TestCase):
             self.assertEqual(live['question'].get('difficulty'), question.get('difficulty'))
             for private_field in ('answer', 'explanation', 'source', 'source_url',
                                   'technical_note', 'discussion', 'technical_source_url',
-                                  'image_reveal', 'image_highlight', 'reveal_sources'):
+                                  'image_reveal', 'image_highlight', 'reveal_sources', 'reveal_media', 'reveal_alt'):
                 self.assertNotIn(private_field, live['question'])
             self.assertEqual(self.vote(self.p1, question['answer'], index).status_code, 200)
             wrong = 'HUMAN' if question['answer'] == 'AI' else 'AI'
@@ -202,6 +202,8 @@ class GameTests(unittest.TestCase):
                 self.assertEqual(s['reveal']['answer'], question['answer'])
                 self.assertEqual(s['reveal'].get('image_reveal', ''), question.get('image_reveal', ''))
                 self.assertEqual(s['reveal'].get('image_highlight'), question.get('image_highlight'))
+                self.assertEqual(s['reveal'].get('reveal_media', ''), question.get('reveal_media', ''))
+                self.assertEqual(s['reveal'].get('reveal_alt', ''), question.get('reveal_alt', ''))
                 self.assertEqual(s['reveal'].get('reveal_sources', []), question.get('reveal_sources', []))
                 self.assertEqual(s['reveal'].get('technical_note', ''), question.get('technical_note', ''))
                 self.assertEqual(s['reveal'].get('discussion'), question.get('discussion'))

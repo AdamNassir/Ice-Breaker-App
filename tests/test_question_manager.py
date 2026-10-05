@@ -50,6 +50,23 @@ class ManagerTests(unittest.TestCase):
         self.assertNotEqual(response.json()['revision'], self.deck['revision'])
         self.assertFalse(list(self.root.glob('.questions-*.tmp')))
 
+    def test_reveal_image_save_reload_and_invalid_paths(self):
+        live = self.upload(b'\x89PNG\r\n\x1a\nvoting image').json()['media']
+        reveal = self.upload(b'\x89PNG\r\n\x1a\nrevealed image').json()['media']
+        q = {'title': 'Anonymous post', 'kind': 'image', 'answer': 'HUMAN',
+             'media': live, 'reveal_media': reveal, 'reveal_alt': 'Revealed author'}
+        for bad in ('https://example.com/reveal.png', '/static/images/../audio/a.png',
+                    '/static/images/%2e%2e/a.png', '/static/images/a.png?secret=1',
+                    '/static/images/a.html', '/static/images/missing.png'):
+            self.assertEqual(self.save([{**q, 'reveal_media': bad}]).status_code, 400, bad)
+        self.assertEqual(self.save([{**self.starter, 'reveal_media': reveal}]).status_code, 400)
+        self.assertEqual(self.save([q]).status_code, 200)
+        saved = self.client.get('/api/deck').json()['rounds'][0]
+        self.assertEqual(saved['media'], live)
+        self.assertEqual(saved['reveal_media'], reveal)
+        self.assertEqual(saved['reveal_alt'], 'Revealed author')
+        self.assertEqual(load_rounds(self.root)[0]['reveal_media'], reveal)
+
     def test_reveal_sources_survive_save_and_reject_unsafe_links(self):
         sources = [{"label": "RFC 1149 — April 1, 1990", "url": "https://www.rfc-editor.org/rfc/rfc1149.html"}]
         for bad_url in ('javascript:alert(1)', 'http://example.com', 'https://user:password@example.com'):

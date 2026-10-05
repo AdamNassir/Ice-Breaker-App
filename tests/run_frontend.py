@@ -40,13 +40,13 @@ with tempfile.TemporaryDirectory(dir=checks_dir) as tmp:
    rows.append(states('live'));assert rows[-1]['host']['duration']==10
    assert rows[-1]['host']['phase']=='live' and rows[-1]['host']['round_index']==i
    for r in (rows[-1]['host'],rows[-1]['player']):
-    assert not set(r['question']).intersection({'answer','source','source_url','explanation','discussion','image_reveal','image_highlight','reveal_sources'})
+    assert not set(r['question']).intersection({'answer','source','source_url','explanation','discussion','image_reveal','image_highlight','reveal_sources','reveal_media','reveal_alt'})
    vote=c.post(f'/api/rooms/{code}/vote',headers=ph,json={'answer':q['answer'],'round_index':i});assert vote.status_code==200
    deadline=rows[-1]['host']['deadline']
    with patch.object(main.time,'time',return_value=deadline+1):rows.append(states('revealed'))
    control('next')
   rows.append(states('finished'));assert rows[-1]['player']['me']['score']==1550
-  for path in ['/static/news/housing.jpg','/static/news/ai.jpg','/static/news/football.jpg','/static/branding/publication.svg','/static/newsarticle.js','/static/newsarticle.css','/static/images/sample26.jpg','/static/images/sample27.png','/static/images/profile-source.png','/static/branding/logiclever-full.jpg','/static/media.js','/static/images/sample13.jpg','/static/images/sample15.jpg','/static/images/sample16.jpg','/static/audio/sample17.mp3','/static/images/sample18.png','/static/images/sample19.png','/static/images/sample20.jpg','/static/images/sample23.png','/static/images/sample24.jpg','/static/images/sample25.png','/static/branding/logiclever.png','/static/branding/totalenergies.png','/bonus','/static/bonus.js']:assert c.get(path).status_code==200,path
+  for path in ['/static/news/housing.jpg','/static/news/ai.jpg','/static/news/football.jpg','/static/branding/publication.svg','/static/newsarticle.js','/static/newsarticle.css','/static/images/sample26.jpg','/static/images/sample27.png','/static/images/profile-source.png','/static/branding/logiclever-full.jpg','/static/media.js','/static/images/sample13.jpg','/static/images/sample15.jpg','/static/images/sample16.jpg','/static/audio/sample17.mp3','/static/images/sample18.png','/static/images/sample18-reveal.png','/static/images/linkedin-profile-source.png','/static/images/sample19.png','/static/images/sample20.jpg','/static/images/sample23.png','/static/images/sample24.jpg','/static/images/sample25.png','/static/branding/logiclever.png','/static/branding/totalenergies.png','/bonus','/static/bonus.js']:assert c.get(path).status_code==200,path
   for private in ['/questions.json','/Content.py','/ContentSources.md','/api/deck']:assert c.get(private).status_code==404,private
   qr=c.get(f'/api/rooms/{code}/qr',headers=host).json()
   trophy_room=c.post('/api/rooms',json={'seconds':10}).json();trophy_code=trophy_room['code'];trophy_host={'Authorization':'Bearer '+trophy_room['token']}

@@ -12,7 +12,7 @@
   };
   const textFields = {title:'title', context:'context', alt:'alt', explanation:'explanation',
     source:'source', source_url:'source-url', image_reveal:'image-reveal', technical_note:'technical-note',
-    discussion:'discussion', technical_source_url:'technical-url'};
+    discussion:'discussion', technical_source_url:'technical-url', reveal_media:'reveal-media', reveal_alt:'reveal-alt'};
   const toolbar = ['add-question','add-image','add-audio','add-video','empty-add','empty-deck','starter-deck','import-deck','export-deck'];
 
   function node(tag, className, text) {
@@ -58,6 +58,7 @@
       if (['audio','video'].includes(q.kind) && $(id).value !== '') q[key] = Number($(id).value); else delete q[key];
     }
     q.image_fit = $('image-fit').value; q.image_position = $('image-position').value || 'center';
+    if (q.kind !== 'image') { q.reveal_media = ''; q.reveal_alt = ''; }
   }
   function chooseMedia() {
     const q = rounds[selected], picker = $('media-choice'); picker.replaceChildren(new Option('Choose a file', ''));
@@ -115,7 +116,8 @@
     box.append(node('span','preview-type', `${q.kind}${q.difficulty ? ' · Level '+q.difficulty+'/5' : ''}`), node('h3','', q.title || 'Untitled question'));
     if (q.context) box.append(node('p','preview-context',q.context));
     if (q.kind === 'image' && q.media) {
-      const img = node('img'); img.src = q.media; img.alt = q.alt || 'Question image'; img.style.objectFit = q.image_fit || 'contain'; img.style.objectPosition = q.image_position || 'center';
+      const revealed = $('preview-answer').checked && q.reveal_media;
+      const img = node('img'); img.src = revealed ? q.reveal_media : q.media; img.alt = revealed ? q.reveal_alt || q.alt || 'Revealed image' : q.alt || 'Question image'; img.style.objectFit = q.image_fit || 'contain'; img.style.objectPosition = q.image_position || 'center';
       img.addEventListener('error',()=>{if(box.contains(img))box.append(node('p','field-help','This image cannot be previewed. Check the file or upload a PNG/JPG copy.'));});
       box.append(img);
     } else if (['audio','video'].includes(q.kind) && (q.media || q.media_url)) {

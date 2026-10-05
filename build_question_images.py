@@ -12,9 +12,19 @@ import os
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 ROOT = Path(__file__).resolve().parent / "static" / "images"
-# Verbatim 21-word excerpt from the public post; source and origin caveat in ContentSources.md.
-LINKEDIN_POST = """AB Tasty sera présent sur le #Vivatech2019 du 16 au 18 mai. On parlera #UX, #IA et optimisation du parcours utilisateur."""
-LINKEDIN_SOURCE = "https://fr.linkedin.com/posts/ademagnitot_ab-tasty-partenaire-du-vivatech-2019-%C3%A0-paris-activity-6531455934907056128-Xf0-"
+# Four verbatim paragraphs supplied by the presenter; preserve paragraph breaks.
+LINKEDIN_POST = """Notre responsabilité est de préparer nos élèves à comprendre ces technologies, à en maîtriser les usages et à en mesurer les limites. Car l’IA n’est pas seulement un outil technique ; elle soulève aussi des questions de citoyenneté, d’éthique, d’esprit critique et de liberté.
+
+Car le risque, demain, ne sera pas tant d’être remplacé par une intelligence artificielle que d’être dépassé par ceux qui sauront l’utiliser et la maîtriser.
+
+L’intelligence artificielle peut être un formidable levier pour l’éducation : personnaliser certains apprentissages, accompagner les élèves, aider les enseignants dans leurs missions. Mais elle ne remplacera jamais ce qui fait la force de l’École : la transmission des savoirs, la relation humaine, l’attention portée à chaque enfant et l’engagement des professeurs.
+
+Former nos élèves à l’IA, ce n’est pas les préparer à subir le monde qui vient. C’est leur donner les moyens de le comprendre, de l’interroger et d’y prendre toute leur place."""
+LINKEDIN_SOURCE = "https://fr.linkedin.com/posts/anne-genetet_%C3%A0-hangzhou-jai-visit%C3%A9-l%C3%A9cole-primaire-activity-7475549399293620225-Sv7g"
+LINKEDIN_NAME = "Anne GENETET"
+LINKEDIN_PORTRAIT = ROOT / "linkedin-profile-source.png"
+# Square enclosing the circular portrait in the supplied 462 x 365 source.
+LINKEDIN_PORTRAIT_BOX = (72, 10, 406, 344)
 TEAMS_REQUEST = (
     "Bonjour, voici le bilan de mon stage. L'outil permet de poser une question "
     "sur les documents techniques et de retrouver les passages utiles. Le rapport "
@@ -187,7 +197,7 @@ def icon(d, xy, kind, scale=1, color="#656565"):
         d.arc((x+9*scale,y+22*scale,x+18*scale,y+29*scale),0,180,fill=color,width=w)
 
 
-def linkedin():
+def linkedin(reveal=False):
     """Copy the supplied 455px post geometry at 3x, with a sourced French excerpt.
 
     Reference: layout_sources/linkedin-reference.png (image(4).png).
@@ -197,20 +207,21 @@ def linkedin():
     scale = 3
     im=Image.new("RGB",(455*scale,2800),"white");d=ImageDraw.Draw(im)
     d.line((0,3*scale,454*scale,3*scale),fill="#e4e4e4",width=scale)
-    avatar(im,(8*scale,11*scale),38*scale,color="#bdc8d4",blur=18)
-    blurred_label(im,(54*scale,12*scale),"Julien M.",12*scale,56*scale,16*scale,
-                  radius=7,bg="white")
-    blurred_label(im,(54*scale,28*scale),"Engineering Manager | Software & AI",10*scale,
-                  268*scale,13*scale,radius=6,bg="white",fill="#666666")
+    # Use the same real portrait/name in both variants; blur only the voting version.
+    portrait=Image.open(LINKEDIN_PORTRAIT).convert("RGB").crop(LINKEDIN_PORTRAIT_BOX)
+    portrait=portrait.resize((38*scale,38*scale),Image.Resampling.LANCZOS)
+    if not reveal:portrait=portrait.filter(ImageFilter.GaussianBlur(18))
+    mask=Image.new("L",portrait.size,0)
+    ImageDraw.Draw(mask).ellipse((0,0,38*scale-1,38*scale-1),fill=255)
+    im.paste(portrait,(8*scale,11*scale),mask)
+    if reveal:
+        text(d,(54*scale,12*scale),LINKEDIN_NAME,12*scale,"#242424",True)
+    else:
+        blurred_label(im,(54*scale,12*scale),LINKEDIN_NAME,12*scale,105*scale,16*scale,
+                      radius=14,bg="white")
     d=ImageDraw.Draw(im)
-    # Verification shield and connection degree from the attached compact header.
-    x,y=113*scale,14*scale
-    d.polygon([(x,y),(x+5*scale,y-2*scale),(x+10*scale,y),
-               (x+9*scale,y+6*scale),(x+5*scale,y+9*scale),(x+scale,y+6*scale)],
-              outline="#666666",width=3)
-    d.line((x+2*scale,y+3*scale,x+4*scale,y+5*scale,x+8*scale,y+scale),fill="#666666",width=3)
-    text(d,(128*scale,14*scale),"· 3rd+",10*scale,"#666666")
-    
+    text(d,(165*scale,14*scale),"· 3rd+",10*scale,"#666666")
+
     gx,gy=54*scale,42*scale
     d.ellipse((gx,gy,gx+10*scale,gy+10*scale),fill="#616161")
     d.arc((gx+3*scale,gy,gx+7*scale,gy+10*scale),0,360,fill="white",width=2)
@@ -219,25 +230,31 @@ def linkedin():
     # Same body margins, normal-weight text and line spacing as the screenshot.
     # Keep the original inline hashtags blue without changing source wording.
     face=font(12*scale);x0=8*scale;x=x0;y=63*scale
-    for word in LINKEDIN_POST.split():
-        advance=d.textlength(word+" ",font=face)
-        if x>x0 and x+advance>447*scale:
-            x=x0;y+=17*scale
-        d.text((x,y),word,font=face,fill="#0a66c2" if word.startswith("#") else "#242424")
-        x+=advance
-    y+=17*scale
+    for index,paragraph in enumerate(LINKEDIN_POST.split("\n\n")):
+        if index:x=x0;y+=9*scale
+        for word in paragraph.split():
+            advance=d.textlength(word+" ",font=face)
+            if x>x0 and x+advance>447*scale:
+                x=x0;y+=17*scale
+            d.text((x,y),word,font=face,fill="#0a66c2" if word.startswith("#") else "#242424")
+            x+=advance
+        x=x0;y+=17*scale
     footer=y+9*scale
-    # Small overlapping reaction badges; source page reports 21 reactions; no comment count is invented.
+    # Small overlapping reaction badges; source page reports 118 reactions and 17 comments.
     for x,c in [(15,"#378fe9"),(24,"#df704d"),(33,"#6d9e80")]:
         d.ellipse(((x-6)*scale,footer,(x+6)*scale,footer+12*scale),fill=c,outline="white",width=2)
     icon(d,(10*scale,footer+3*scale),"like",.27,"white")
     text(d,(20*scale,footer+scale),"♥",9*scale,"white")
     text(d,(29*scale,footer+scale),"✦",8*scale,"white")
-    text(d,(45*scale,footer),"21",11*scale,"#666666")
+    text(d,(45*scale,footer),"118",11*scale,"#666666")
+    label="17 comments"
+    width=d.textlength(label,font=font(11*scale))
+    text(d,(447*scale-width,footer),label,11*scale,"#666666")
     height=footer+17*scale
     if height>im.height:raise ValueError("LinkedIn post overflows; shorten LINKEDIN_POST or increase canvas.")
     im=im.crop((0,0,455*scale,height))
-    im.save(ROOT/"sample18.png",optimize=True)
+    im.save(ROOT/("sample18-reveal.png" if reveal else "sample18.png"),optimize=True)
+    if not reveal:linkedin(reveal=True)
 
 
 def teams():
