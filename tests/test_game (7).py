@@ -31,12 +31,14 @@ class GameTests(unittest.TestCase):
         self.assertGreater(len(managed[4]['body'].split()), 70)
         self.assertEqual(managed[2]['answer'], 'AI')
         self.assertEqual(managed[4]['answer'], 'AI')
+        self.assertEqual(managed[4]['text_style'], 'news')
+        self.assertEqual(managed[7]['text_style'], 'news')
         self.assertEqual(managed[7]['answer'], 'AI')
         self.assertEqual(managed[4]['reveal_sources'], [])
         self.assertTrue(all(q['title'] and q['context'] for q in managed))
         self.assertIn('manager’s reply', managed[8]['context'])
-        self.assertEqual(managed[1]['media'], '/static/images/sample24.jpg')
-        self.assertEqual(managed[6]['media'], '/static/images/sample25.png')
+        self.assertEqual(managed[1]['media'], '/static/images/sample26.jpg')
+        self.assertEqual(managed[6]['media'], '/static/images/sample27.png')
         self.assertEqual(managed[6]['answer'], 'AI')
         self.assertTrue(all(not q.get('media_url') for q in managed))
 
@@ -46,8 +48,13 @@ class GameTests(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertTrue(response.headers['content-type'].startswith('image/png'))
             self.assertTrue(response.content.startswith(b'\x89PNG\r\n\x1a\n'))
+            used_name = 'logiclever-full.jpg' if name == 'logiclever.png' else name
             for route in ('/', '/presenter', '/bonus'):
-                self.assertIn('/static/branding/' + name, self.client.get(route).text)
+                self.assertIn('/static/branding/' + used_name, self.client.get(route).text)
+        complete = self.client.get('/static/branding/logiclever-full.jpg')
+        self.assertEqual(complete.status_code, 200)
+        self.assertEqual(complete.headers['content-type'], 'image/jpeg')
+        self.assertTrue(complete.content.startswith(b'\xff\xd8'))
 
     def test_workflow_asset_and_creation_brief_privacy(self):
         self.assertEqual(self.client.get('/static/workflow.js').status_code, 200)

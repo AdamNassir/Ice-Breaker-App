@@ -13,7 +13,7 @@ const wait=()=>new Promise(r=>setImmediate(r));
  w.HTMLElement.prototype.setPointerCapture=function(id){this.captured=id;};
  w.localStorage.setItem('icebreaker:player:'+fixture.room.code,JSON.stringify(fixture.player));
  w.fetch=async()=>({ok:true,json:async()=>({...current,server_time:++stamp,deadline:stamp+10})});
- for(const name of ['media.js','imagezoom.js','workflow.js','app.js'])w.eval(fs.readFileSync(process.env.QA_PROJECT+'/static/'+name,'utf8'));
+ for(const name of ['newsarticle.js','media.js','imagezoom.js','workflow.js','app.js'])w.eval(fs.readFileSync(process.env.QA_PROJECT+'/static/'+name,'utf8'));
  await wait();await wait();
  const viewer=()=>d.querySelector('.image-viewer'),viewport=()=>d.querySelector('.image-viewport'),view=()=>({...viewer().getView()});
  const button=label=>d.querySelector(`[aria-label="${label}"]`);

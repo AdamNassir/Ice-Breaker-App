@@ -1,6 +1,6 @@
 # Question deck: private answer key and credits
 
-Updated October 5, 2026. Ten rounds: **seven AI and three HUMAN**, eight images and two text articles. No audio/video rounds. The app interface, titles and short introductions are English; the Macron post and Teams messages are French. Origins come from documented production, not a detector.
+Updated October 5, 2026. Ten rounds: **seven AI and three HUMAN**, eight images and two text articles. No audio/video rounds. The app interface, titles and short introductions are English; the news articles, Macron post and Teams messages are French. Origins come from documented production, not a detector.
 
 Players judge the writing in social posts and only the **manager’s reply** in Teams. For photographs/paintings, judge image production. An authentic double exposure still counts as HUMAN. A plausible invented news story counts as AI because the agent wrote it, not merely because the story is false.
 
@@ -11,25 +11,28 @@ Every round shows its title, short introduction and content. Answer notes, origi
 | Round | Subject | Origin | Provenance |
 | --- | --- | --- | --- |
 | 1 | LinkedIn roadmap satire | AI | Original AI-written fictional post; unchanged writing and image `sample18.png`. |
-| 2 | Michael Jordan airborne | HUMAN | Steve Lipofsky / Basketballphoto.com, 1987–88 NBA season; original high-quality Commons JPEG `sample24.jpg`. |
+| 2 | Michael Jordan’s free-throw-line dunk | HUMAN | Walter Iooss Jr. / Sports Illustrated, Chicago, February 6, 1988; complete source JPEG `sample26.jpg`. |
 | 3 | Employee-data SQL | AI | Original rewritten aggregate query, formatting reference: official PostgreSQL tutorial. `sample23.png` unchanged. |
 | 4 | Tesla in his laboratory | HUMAN | Dickenson V. Alley, December 1899; historical double exposure, `sample16.jpg`. |
-| 5 | Bitcoin dashboard incident | AI | Newly authored fictional English article. No genuine exchange notice or market event claimed. |
+| 5 | Bitcoin dashboard incident | AI | Newly authored fictional French article. No genuine exchange notice or market event claimed. |
 | 6 | Napoleon with Inspector Gadget | AI | Original generated imperial painting, `sample13.jpg`; unchanged painting and reveal circle. |
-| 7 | Macron paperwork post | AI | Newly authored French parody, reconstructed X layout, visible name/handle and real unblurred portrait. `sample25.png`. Not a genuine post. |
-| 8 | Ballon d’Or delivery tracker | AI | Newly authored fictional English sports article. No genuine leaked result, organiser quote or award winner claimed. |
+| 7 | Macron post about AI in hospitals | AI | Original fictional French announcement, reconstructed X layout, visible name/handle and the supplied actual profile picture. `sample27.png`. Not a genuine post. |
+| 8 | Ballon d’Or delivery tracker | AI | Newly authored fictional French sports article. No genuine leaked result, organiser quote or award winner claimed. |
 | 9 | French internship handover on Teams | AI | Classify the manager’s reply only. Both messages and PDF attachment are fictional; simplified document-search request, mismatched aircraft-operations reply. `sample19.png`. |
 | 10 | Moth logbook | HUMAN | U.S. Navy photograph of the Harvard Mark II logbook, September 9, 1947, `sample20.jpg`. |
 
-## Authentic sports photograph — sample24.jpg
+## Authentic sports photograph — sample26.jpg
 
-**Michael Jordan performing a tongue-out slam dunk.** Photographer: Steve Lipofsky / Basketballphoto.com. The source describes the Chicago Bulls, 1987–88, and dates it to the 1987 NBA season; it does not supply a precise match day. The reveal uses the season, not an invented day.
+**Michael Jordan’s free-throw-line dunk at the 1988 NBA Slam Dunk Contest**, Chicago, February 6, 1988. Photographer: **Walter Iooss Jr. / Sports Illustrated**. The full composition keeps Jordan’s entire airborne body, court, hoop and crowd visible. Both image framing and mobile zoom start with the complete frame; no crop or generative alteration is applied. This is the iconic documented dunk, not a claim to have measured Jordan’s biggest-ever jump.
 
-- [Source and high-quality file](https://commons.wikimedia.org/wiki/File:Jordan_by_Lipofsky_16577_(high_quality).jpg)
-- [Original lower-resolution record](https://commons.wikimedia.org/wiki/File:Jordan_by_Lipofsky_16577.jpg)
-- [CC BY-SA 3.0 Unported](https://creativecommons.org/licenses/by-sa/3.0/)
+- [Sports Illustrated gallery and photographer credit](https://www.si.com/nba/2015/02/17/walter-iooss-jr-michael-jordan-1988-nba-dunk-contest-photo), first photograph.
+- [Source JPEG](https://www.si.com/.image/t_share/MTY4MTg2MDIyNzgyODM4MDMz/1988-michael-jordan-001238167_0jpg.jpg).
+- [Getty photographer/date record](https://www.gettyimages.ie/detail/news-photo/slam-dunk-contest-chicago-bulls-michael-jordan-in-action-news-photo/84623150).
+- [NBA historical identification](https://www.nba.com/news/history-top-moments-jordan-wilkins-1988-dunk).
 
-The bundled JPEG retains the downloaded source bytes, 1866 × 2340 pixels, SHA-1 `907435b3ef5832d0c284a9091c7da4bc77d4262f`, matching the source record. No crop, compositing or generative edit is applied. This is an authentic photograph, not a recreation of a sports image. The game shows its credit and source after the deadline.
+Source JPEG bytes are retained unchanged. It is a copyrighted Walter Iooss Jr./Sports Illustrated photograph; it is not labelled Creative Commons or public domain. No new licence was acquired. Credit/source are shown after reveal.
+
+The earlier close-up `sample24.jpg` is retained only for previous rooms/custom decks. Its credit remains Steve Lipofsky / Basketballphoto.com, 1987–88 season, [Commons source](https://commons.wikimedia.org/wiki/File:Jordan_by_Lipofsky_16577_(high_quality).jpg), [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). Original SHA-1: `907435b3ef5832d0c284a9091c7da4bc77d4262f`.
 
 ## Other authentic photographs
 
@@ -37,13 +40,15 @@ The bundled JPEG retains the downloaded source bytes, 1866 × 2340 pixels, SHA-1
 
 **Moth logbook — sample20.jpg.** Courtesy Naval Surface Warfare Center, Dahlgren; U.S. Navy photograph. [Source and public-domain record](https://commons.wikimedia.org/wiki/File:First_Computer_Bug,_1947.jpg), [Smithsonian object](https://americanhistory.si.edu/collections/object/nmah_334663). The entry is September 9, 1947; older photo metadata sometimes says 1945. The word bug already existed. The bundled copy is 1500 × 1186, resized/re-encoded without generative editing.
 
-## Macron parody and portrait — sample25.png
+## Fictional Macron health-AI post and supplied profile photo — sample27.png
 
-The French text is an **original AI-written fictional parody**, created October 5, 2026. It describes a supposedly simplified administrative form that still requires the twelve old forms. Emmanuel Macron did not supply or post these words. It is not a real screenshot, quote, policy announcement or accusation that he used AI.
+This is **original AI-written French fiction**, created October 5, 2026. It announces an invented trial in ten hospitals using French-developed AI and anonymized data to anticipate emergency-department demand. The number of hospitals, January start and programme are invented for the quiz. It is not a verified announcement, real tweet or quotation, and it does not accuse Emmanuel Macron of using AI. The earlier Mbappé idea was superseded and is not used in this post.
 
-The X-style interface is locally drawn by `build_question_images.py`. Name and `@EmmanuelMacron` are deliberately readable; no blur or pixelation is applied. The portrait is a real photograph, not a synthetic face. No invented timestamp or engagement totals are shown. Players classify **post writing**, not portrait origin.
+Style/topic inspiration: [Élysée, AI speech, March 29, 2018](https://www.elysee.fr/emmanuel-macron/2018/03/29/discours-du-president-de-la-republique-sur-lintelligence-artificielle), whose health section discusses innovation and confidentiality. The new post is independently written, not an excerpt or factual paraphrase of an announced trial. Its French phrasing is plausible rather than an overt paperwork gag. Original hashtags: `#Santé #IA #France2030`.
 
-Portrait credit: **Presidency of Bulgaria / President.bg**, December 4, 2017. [Source file](https://commons.wikimedia.org/wiki/File:Emmanuel_Macron_(04-12-2017).jpg), [CC BY 2.5 Bulgaria](https://creativecommons.org/licenses/by/2.5/bg/deed.en). The original 249 × 410 JPEG is bundled as `macron-profile-source.jpg`. The screenshot crops coordinates `(35, 24, 220, 209)` around the face, resizes to 80 × 80, and applies a circular mask. No face-generation or blur. The screenshot incorporates this attributed, licensed photograph alongside independently generated text.
+The exact profile picture was supplied by the presenter in `image(3).png`, a 437 × 402 screenshot, retained as `static/images/profile-source.png`. The native screenshot builder crops `(32, 13, 398, 379)` around the supplied circular photo, resizes to 80 × 80 and masks it to a circle. No generated face, blur or pixelation is used. Name and `@EmmanuelMacron` remain readable. No fabricated posting date or engagement counts. Players classify **writing**, not the profile photograph.
+
+The old `sample25.png` bureaucratic-form parody and `macron-profile-source.jpg` remain only as legacy assets. Their portrait credit: Presidency of Bulgaria / President.bg, December 4, 2017, [source](https://commons.wikimedia.org/wiki/File:Emmanuel_Macron_(04-12-2017).jpg), [CC BY 2.5 Bulgaria](https://creativecommons.org/licenses/by/2.5/bg/deed.en); prior crop `(35, 24, 220, 209)`. The current builder no longer uses that portrait or post.
 
 ## LinkedIn and French Teams reconstructions
 
@@ -53,7 +58,11 @@ The French intern’s message describes a tool for questions over technical docu
 
 ## Two plausible fictional news articles
 
-Rounds 5 and 8 replace the former RFC excerpts and printer incident. Both are original English AI writing created October 5, 2026. They imitate short news reporting without impersonating an actual publication or adding fake source citations. All incidents and quoted snippets are invented. The Bitcoin story is not financial reporting; the Mbappé story is not an award result. Both reveal AI. No outside article is credited because neither is copied from one.
+Rounds 5 and 8 are original AI-written French fiction, updated October 5, 2026. The price-feed error, automated sales, delivery-tracker leak and quoted snippets are invented for the quiz. The Bitcoin story is not financial reporting; the Mbappé story is not an award result. Both reveal AI only. Neither story was published by Le Parisien.
+
+The complete website presentation uses Le Parisien as a French layout reference: actual logo, French navigation, headline/chapo/byline, article column, sidebar, related stories and footer. Sources: [Le Parisien’s article page](https://www.leparisien.fr/economie/le-bitcoin-passe-sous-la-barre-des-70-000-dollars-pour-la-premiere-fois-depuis-lelection-de-donald-trump-05-02-2026-FT7ITOQKI5DETKSOQUDIZPQNRA.php) for structure and labels; [AREA 17’s 2018–2019 design case study](https://area17.com/clients/le-parisien) for the full-page visual reference; [the unchanged Le Parisien logo SVG](https://commons.wikimedia.org/wiki/File:Le_Parisien_logo.svg) for the wordmark. These are layout/branding references only. No actual article body, reporter attribution or unrelated article photograph is reproduced. Generic “La rédaction” is part of the fictional display. Sidebar/related titles are original fictional filler with CSS-drawn decorative thumbnails, not real reports or photographs. The older New York Post screenshot asset is removed.
+
+The shared game/manager renderer uses `text_style: "news"`: first paragraph = headline, next = chapo, remaining paragraphs = body. Text is editable, rendered safely and scrollable. French text is marked `lang="fr"`; the outer app remains English. See LayoutSources.md for copying scope and matching limitations.
 
 ## SQL formatting reference — sample23.png
 
@@ -61,7 +70,7 @@ The original AI-written employee-data aggregate query uses the clause formatting
 
 ## Supplied logos and theme
 
-The two original embedded PNGs from the user’s `Logos_To_Add.docx` are bundled unchanged: `static/branding/logiclever.png` (189 × 63) and `totalenergies.png` (400 × 225). No logo generation, tracing, recoloring or cropping. They appear in the player, presenter, standalone bonus and local manager; the presenter’s final ranking retains its placements-only layout.
+The two original embedded PNGs from the user’s `Logos_To_Add.docx` are bundled unchanged: `static/branding/logiclever.png` (189 × 63) and `totalenergies.png` (400 × 225). The LogicLever PNG supplied in that document already clips the bottom of its tagline. The active complete asset is `static/branding/logiclever-full.jpg` (1024 × 385), downloaded unchanged from [LogicLever’s official website](https://logiclever.com/wp-content/uploads/2025/10/LOGO_LOGICLEVER_AVEC-signature_RVB_rogne-1024x385.jpg). The original PNG remains as a legacy original. No logo generation, tracing, recoloring or display cropping. The complete wordmark/tagline and TotalEnergies logo replace the large opening title and copy, with natural dimensions. They appear in the player, presenter, standalone bonus and local manager; the presenter’s final ranking retains its placements-only layout.
 
 The game’s blue `#1f2ade` is sampled from LogicLever. The UI red is `#e52330`. White/neutral backgrounds remain; gold/silver/bronze are reserved for medal/podium decoration. Original logo colors are preserved.
 

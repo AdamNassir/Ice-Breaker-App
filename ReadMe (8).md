@@ -1,6 +1,6 @@
 # AI or Human? — Ice Breaker Game
 
-A complete browser game for an AI presentation: a presenter opens a room, players join on their phones with pseudonyms, and everyone decides **AI OR HUMAN**. The default deck has **10 rounds**: eight images and two short fictional news articles, seven AI and three HUMAN origins. The interface, titles and short introductions are English; the Macron post and Teams messages are French. No audio or video rounds. Both supplied logos are bundled, and the interface uses blue and red. See `UpdateGuide.md` to install the update.
+A complete browser game for an AI presentation: a presenter opens a room, players join on their phones with pseudonyms, and everyone decides **AI OR HUMAN**. The default deck has **10 rounds**: eight images and two short fictional news articles, seven AI and three HUMAN origins. The interface, titles and short introductions are English; the news articles, Macron post and Teams messages are French. No audio or video rounds. Both logos are prominent on the opening screens, replacing the large title/copy. The complete official LogicLever asset restores its tagline; TotalEnergies is unchanged. The interface uses blue and red. See `UpdateGuide.md` to install the update.
 
 The consolidated upfront specification is [CreationInstructions.md](CreationInstructions.md), written in the style of the original brief and excluding individual question content. [AGENTS.md](AGENTS.md) defines how a running agent reads saved update requests, checks its work and replaces them with completion reports.
 
@@ -16,9 +16,9 @@ For Vercel, commit the saved `questions.json` and uploaded media, redeploy and c
 
 ## Bundled starter deck
 
-The deck includes a fictional LinkedIn post, an authentic Michael Jordan dunk, a historical Tesla double exposure, two original AI-written plausible news articles, Napoleon with a hidden Inspector Gadget, an AI-written employee-data SQL query, a fictional French Macron post and a French internship handover on Teams, plus the historical moth logbook. Every round shows a neutral title and short introduction. The SQL use case remains implied in the code. For Teams, players judge only the manager’s reply. Reveals show AI or HUMAN; real photos also show their subject, date and credit, and Inspector Gadget gets a red circle. Social posts get no extra reveal commentary. The news incidents and Macron words are invented for the quiz, not reports or quotations from real publications/accounts.
+The deck includes a fictional LinkedIn post, the full-frame Michael Jordan 1988 free-throw-line dunk, a historical Tesla double exposure, two original AI-written plausible French news articles, Napoleon with a hidden Inspector Gadget, an AI-written employee-data SQL query, a fictional French Macron announcement about hospital AI and a French internship handover on Teams, plus the historical moth logbook. Every round shows a descriptive title and short introduction. Both articles are in French and use a full Le Parisien page reconstruction, including the masthead, French navigation, headline/chapo/byline, article, sidebar, related stories and footer; references and implementation limits are in `LayoutSources.md`; choose **Text presentation → News article** in the manager to edit this style. The SQL use case remains implied in the code. For Teams, players judge only the manager’s reply. Reveals show AI or HUMAN; real photos also show their subject, date and credit, and Inspector Gadget gets a red circle. Social posts get no extra reveal commentary. The news incidents and Macron words are invented for the quiz, not reports or quotations from real publications/accounts.
 
-**Explain the rule:** AI means generated writing/image/voice/footage. HUMAN includes human-written jokes and human camera tricks. For all social screenshots, judge the post or reply text. Say this rule before opening the room; the short question introductions do not disclose origins. The labels come from documented origins, not a style detector. The LinkedIn founder and Teams identities are fictional. The Macron post is an original AI parody, not a genuine statement or a claim about his writing process.
+**Explain the rule:** AI means generated writing/image/voice/footage. HUMAN includes human-written jokes and human camera tricks. For all social screenshots, judge the post or reply text. Say this rule before opening the room; the short question introductions do not disclose origins. The labels come from documented origins, not a style detector. The LinkedIn founder and Teams identities are fictional. The Macron post uses the actual profile picture supplied by the presenter; its writing is original AI fiction, not a genuine statement or a claim about his writing process.
 
 `ContentSources.md` has the private answer key, credits, source links, changes and full image-generation prompts. `ContentSources_Technical.md` retains credits for the previous deck.
 
@@ -204,7 +204,8 @@ An incorrect or missed answer awards 0 and resets the streak. There is no speed 
 | Point and streak rules | `main.py` → `BASE_POINTS`, `STREAK_STEP`, `MAX_STREAK_BONUS` |
 | Room lifetime / player cap | `main.py` → `ROOM_LIFETIME_HOURS`, `MAX_PLAYERS` |
 | Blue/red palette | `static/style.css` and `manager_assets/style.css` → `:root` variables |
-| Logos | `static/branding/`; `.brand-logos` in both stylesheets |
+| Logos | `static/branding/`; `.brand-logos` and `.brand-logos-hero` in the stylesheets |
+| Newspaper article presentation | `text_style` in the deck; `static/newsarticle.js` and `static/newsarticle.css` |
 | Image size, framing and positioning | `static/imagestyle.css` and per-round fields; see `HowToAddImages.md` |
 | Player interface | `static/index.html` |
 | Presenter interface | `static/presenter.html` |
@@ -226,7 +227,7 @@ Ice_Breaker_Game_App/
   HowToAddImages.md
   build_question_images.py         Optional social screenshot authoring tool
   Content.py                       Bundled fallback starter deck
-  questions.json                   Bundled English deck; edited by manager
+  questions.json                   Bundled deck; edited by manager
   question_content.py              Shared deck loader/validation
   question_manager.py              Separate local editor server
   manager_assets/index.html, app.js, style.css

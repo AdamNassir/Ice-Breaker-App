@@ -25,7 +25,7 @@ async function until(fn){for(let i=0;i<100;i++){if(fn())return;await wait();}thr
   }
   return response();
  };
- w.eval(fs.readFileSync(process.env.QA_PROJECT+'/static/media.js','utf8'));w.eval(fs.readFileSync(process.env.QA_PROJECT+'/static/app.js','utf8'));
+ w.eval(fs.readFileSync(process.env.QA_PROJECT+'/static/newsarticle.js','utf8'));w.eval(fs.readFileSync(process.env.QA_PROJECT+'/static/media.js','utf8'));w.eval(fs.readFileSync(process.env.QA_PROJECT+'/static/app.js','utf8'));
  const enter=(target=d.body,extra={})=>{const event=new w.KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true,...extra});target.dispatchEvent(event);return event;};
  await until(()=>button.textContent==='Start round 1'&&!button.disabled&&d.getElementById('room-meta').textContent.includes('1 player'));
  enter();assert.equal(requests.length,0);button.click();await until(()=>button.textContent==='Round in progress');

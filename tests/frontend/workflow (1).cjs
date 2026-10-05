@@ -17,7 +17,7 @@ const wait=()=>new Promise(r=>setImmediate(r));
   w.localStorage.setItem('icebreaker:player:'+final.code,JSON.stringify(fixture.player));
   if(initial)w.localStorage.setItem('icebreaker:bonus:'+final.code,'answered');
   w.fetch=async(path,options)=>{assert(!options.body);calls++;return {ok:true,json:async()=>({...final,server_time:++stamp})};};
-  load(w,['media.js','imagezoom.js','workflow.js','app.js']);await wait();await wait();
+  load(w,['newsarticle.js','media.js','imagezoom.js','workflow.js','app.js']);await wait();await wait();
   const workflow=d.querySelector('.build-workflow');assert(workflow);assert.equal(workflow.hidden,!initial);
   const scores=[...d.querySelectorAll('.final-score')].map(n=>n.textContent),before=calls;
   if(!initial)d.querySelector('.player-bonus .vote-controls button').click();

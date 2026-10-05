@@ -46,6 +46,7 @@
     const q = rounds[selected];
     Object.entries(textFields).forEach(([key,id]) => q[key] = $(id).value);
     q.kind = $('kind').value; q.answer = $('answer').value;
+    q.text_style = q.kind === 'text' ? $('text-style').value : 'plain';
     q.body = ['audio','video'].includes(q.kind) ? $('audio-body').value : q.kind === 'image' ? '' : $('body').value;
     if ($('seconds').value !== '') q.seconds = Number($('seconds').value); else delete q.seconds;
     if ($('difficulty').value !== '') q.difficulty = Number($('difficulty').value); else delete q.difficulty;
@@ -70,6 +71,7 @@
     if (selected < 0) return;
     const kind = $('kind').value, hasMedia = Boolean(formats[kind]);
     $('text-fields').hidden = hasMedia; $('media-fields').hidden = !hasMedia;
+    $('text-style-field').hidden = kind !== 'text';
     $('image-options').hidden = kind !== 'image'; $('audio-description').hidden = !['audio','video'].includes(kind);
     const canLink = ['audio','video'].includes(kind), linked = canLink && $('media-mode').value === 'link';
     $('media-source-fields').hidden = !canLink; $('clip-fields').hidden = !canLink;
@@ -100,6 +102,7 @@
     $('kind').value = q.kind || 'text'; $('answer').value = q.answer || '';
     $('seconds').value = q.seconds ?? ''; $('difficulty').value = q.difficulty ?? '';
     $('body').value = q.body || ''; $('audio-body').value = q.body || '';
+    $('text-style').value = q.text_style || 'plain';
     $('media-path').value = q.media || ''; $('image-fit').value = q.image_fit || 'contain';
     $('media-url').value = q.media_url || ''; $('media-mode').value = q.media_url ? 'link' : 'local';
     $('media-start').value = q.media_start ?? ''; $('media-end').value = q.media_end ?? '';
@@ -121,6 +124,7 @@
         if(box.contains(player) && !box.querySelector('.media-error'))box.append(node('p','field-help media-error',message));
       }); box.append(player);
     } else if (formats[q.kind]) box.append(node('p','preview-context','Upload a file or choose an existing one.'));
+    else if (q.kind === 'text' && q.text_style === 'news') box.append(window.IcebreakerNews.create(q));
     else box.append(node(q.kind === 'text' ? 'p' : 'pre',q.kind === 'text' ? 'preview-text' : '',q.body || 'Your question content appears here.'));
     const reveal = $('preview-reveal'); reveal.replaceChildren(); reveal.hidden = !$('preview-answer').checked;
     reveal.append(node('h3','',`Answer: ${q.answer || 'choose AI or HUMAN'}`));

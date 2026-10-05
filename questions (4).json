@@ -2,7 +2,7 @@
   "schema_version": 1,
   "rounds": [
     {
-      "title": "The roadmap decision",
+      "title": "LinkedIn Post by a Manager",
       "kind": "image",
       "seconds": 25,
       "context": "Read the post. Who wrote it: AI or HUMAN?",
@@ -15,22 +15,22 @@
       "image_fit": "contain"
     },
     {
-      "title": "Suspended above the court",
+      "title": "Michael Jordan’s Free-Throw-Line Dunk",
       "kind": "image",
       "seconds": 25,
       "context": "Look closely at the jump. Was this photograph made by AI or a human?",
-      "media": "/static/images/sample24.jpg",
-      "alt": "A basketball player suspended in the air beside a basket.",
+      "media": "/static/images/sample26.jpg",
+      "alt": "Michael Jordan airborne during a free-throw-line dunk, with the court, hoop and crowd visible.",
       "image_fit": "contain",
       "answer": "HUMAN",
-      "explanation": "An authentic sports photograph of Michael Jordan performing a tongue-out slam dunk. The player and unusual airborne pose are real. The source dates it to the 1987 NBA season / 1987–88 season, rather than specifying a match day.",
+      "explanation": "Authentic photograph of Michael Jordan’s iconic free-throw-line dunk at the 1988 NBA Slam Dunk Contest. The full image shows his airborne body, the court, hoop and crowd. This identifies a documented dunk; it does not claim a measured greatest-ever jump.",
       "discussion": "",
-      "source": "Steve Lipofsky / Basketballphoto.com, Michael Jordan during the 1987–88 NBA season. Wikimedia Commons high-quality version, original JPEG bytes retained. CC BY-SA 3.0 Unported; no generative editing or app-side crop.",
-      "source_url": "https://commons.wikimedia.org/wiki/File:Jordan_by_Lipofsky_16577_(high_quality).jpg",
-      "image_reveal": "Michael Jordan performing a slam dunk — 1987–88 NBA season.\nPhoto: Steve Lipofsky / Basketballphoto.com · CC BY-SA 3.0."
+      "source": "Walter Iooss Jr. / Sports Illustrated, NBA Slam Dunk Contest, Chicago, February 6, 1988. Full-frame source JPEG retained without cropping or generative editing. Copyrighted sports photograph; no Creative Commons or public-domain licence claimed.",
+      "source_url": "https://www.si.com/nba/2015/02/17/walter-iooss-jr-michael-jordan-1988-nba-dunk-contest-photo",
+      "image_reveal": "Michael Jordan’s free-throw-line dunk — Chicago, February 6, 1988.\nPhoto: Walter Iooss Jr. / Sports Illustrated."
     },
     {
-      "title": "An employee-data query",
+      "title": "SQL Query for Employee Data",
       "kind": "image",
       "media": "/static/images/sample23.png",
       "image_fit": "contain",
@@ -44,7 +44,7 @@
       "discussion": ""
     },
     {
-      "title": "A quiet moment in the laboratory",
+      "title": "Photograph of Nikola Tesla in His Laboratory",
       "kind": "image",
       "seconds": 25,
       "context": "Inspect the photograph. AI or HUMAN?",
@@ -59,19 +59,20 @@
       "image_reveal": "Nikola Tesla in his Colorado Springs laboratory — December 1899.\nSource: Dickenson V. Alley. Historical double exposure."
     },
     {
-      "title": "A very expensive refresh",
-      "context": "Read this short news article. Who wrote it: AI or HUMAN?",
+      "title": "News Article About a Bitcoin Price Drop",
+      "context": "Read the French article. Who wrote it: AI or HUMAN?",
       "kind": "text",
       "answer": "AI",
       "seconds": 25,
-      "body": "Bitcoin falls 50% after exchange dashboard repeats a decimal error\n\nBitcoin briefly appeared to lose half its value on Monday after a software update pushed the wrong reference price to several trading dashboards. The sudden drop triggered automated sell orders before operators corrected the feed.\n\nActual trading prices recovered within minutes, but screenshots of the plunge continued circulating. One exchange asked customers to stop refreshing the app while engineers restored the chart. Users who had spent the morning buying the dip were advised to check whether they had bought anything at all.",
-      "explanation": "Original AI-written fictional news article for the game. The price-feed incident, exchange notice and purported sell orders are invented; this is not a report of a real Bitcoin event.",
-      "source": "Original AI-written English news-style fiction, October 5, 2026. No genuine news outlet, publication date, quote or factual financial report is claimed. The narrative is fictional and does not describe a verified market movement.",
+      "body": "Le bitcoin affiche une chute de 50 % après une erreur dans un flux de cotation\n\nLe bitcoin a brièvement semblé perdre la moitié de sa valeur lundi, après qu’une mise à jour logicielle a transmis un prix erroné à plusieurs applications de trading. La baisse affichée a déclenché des ordres de vente automatiques avant que les opérateurs ne corrigent le flux de données.\n\nLes cours réels sont revenus à leur niveau habituel en quelques minutes, mais les captures d’écran de la chute ont continué à circuler. Une plateforme a demandé à ses clients de ne plus actualiser l’application pendant que ses ingénieurs rétablissaient le graphique. Les utilisateurs qui avaient passé la matinée à « acheter la baisse » ont été invités à vérifier s’ils avaient effectivement acheté quelque chose.",
+      "explanation": "Original AI-written French fiction for the game. The story is invented, not a report or quotation from the publication whose interface is reconstructed.",
+      "source": "Original AI-written French news-style fiction for the quiz, October 5, 2026. All incidents and quoted snippets are invented. Le Parisien supplies the website layout reference only; this is not a published Le Parisien article.",
       "discussion": "",
-      "reveal_sources": []
+      "reveal_sources": [],
+      "text_style": "news"
     },
     {
-      "title": "An unexpected guest",
+      "title": "Painting of Napoleon’s Coronation",
       "kind": "image",
       "seconds": 25,
       "context": "Look closely at the people in the painting. AI or HUMAN?",
@@ -89,32 +90,33 @@
       }
     },
     {
-      "title": "The paperwork breakthrough",
+      "title": "Macron Post About AI in Hospitals",
       "kind": "image",
-      "media": "/static/images/sample25.png",
+      "media": "/static/images/sample27.png",
       "image_fit": "contain",
       "alt": "A French-language X-style post displaying Emmanuel Macron’s name, handle and portrait.",
       "seconds": 25,
       "answer": "AI",
       "context": "Read the French post. Judge the writing, not the account: AI or HUMAN?",
-      "explanation": "AI wrote this fictional bureaucratic-simplification parody. The reconstructed identity is visible as requested, but the words were not posted or said by Emmanuel Macron. Judge the writing rather than the real, licensed portrait.",
-      "source": "Original AI-written French parody created for this game, October 5, 2026. Not a genuine Emmanuel Macron statement or screenshot. Native X-style UI reconstruction with a readable name and @EmmanuelMacron handle. Unblurred real portrait: Presidency of Bulgaria / President.bg, December 4, 2017, CC BY 2.5 Bulgaria, cropped around face and resized. No posting date, fabricated engagement counts or real-policy assertion included.",
+      "explanation": "Original AI-written fictional French post announcing a ten-hospital trial of French-developed AI to anticipate emergency-department demand using anonymized data. Emmanuel Macron did not write, announce or post this invented trial. Players judge the writing, not the real supplied profile photograph.",
+      "source": "Original AI-written French fiction created for this game, October 5, 2026. Not a genuine Macron post or verified government programme. Style reference: public Élysée writing about health and AI; no quotation copied. Native X-style UI with visible name, @EmmanuelMacron and the exact profile picture supplied by the presenter. Hashtags are original. No posting date or fabricated engagement counts. Source picture retained as profile-source.png.",
       "discussion": ""
     },
     {
-      "title": "The trophy before the ceremony",
-      "context": "Read this short news article. Who wrote it: AI or HUMAN?",
+      "title": "News Article About a Ballon d’Or Leak",
+      "context": "Read the French article. Who wrote it: AI or HUMAN?",
       "kind": "text",
       "answer": "AI",
       "seconds": 25,
-      "body": "Ballon d’Or result briefly appears in trophy delivery tracker\n\nKylian Mbappé’s name appeared as the recipient of a gold-plated trophy in a courier tracking page on Tuesday, prompting fans to claim the Ballon d’Or result had leaked ahead of the ceremony. The parcel was marked “signature required” and “do not leave with reception”.\n\nOrganisers said delivery records did not constitute an official announcement and that personalised trophies could be prepared for more than one finalist. The tracking link was removed within an hour, although the package continued to show the status “recipient not available”. Supporters immediately began debating whether this counted as another missed opportunity.",
-      "explanation": "Original AI-written fictional sports-news article. The tracking-page leak, delivery status and organisers’ comment are invented; no real Ballon d’Or winner or leak is asserted.",
-      "source": "Original AI-written English news-style fiction created for the quiz, October 5, 2026. Mbappé is a real public figure, but this delivery-tracker incident and all quoted phrases are invented. No real outlet or article is impersonated.",
+      "body": "Ballon d’or : le nom de Mbappé apparaît dans un suivi de livraison avant la cérémonie\n\nLe nom de Kylian Mbappé est apparu mardi comme destinataire d’un trophée doré sur une page de suivi de livraison. Des supporters y ont vu une fuite du résultat du Ballon d’or avant la cérémonie. Le colis portait les mentions « signature obligatoire » et « ne pas laisser à l’accueil ».\n\nLes organisateurs ont rappelé qu’un suivi de colis ne constituait pas une annonce officielle et que plusieurs trophées personnalisés pouvaient être préparés pour les finalistes. Le lien a disparu en moins d’une heure, alors que le colis affichait toujours le statut « destinataire absent ». Les supporters ont aussitôt débattu pour savoir s’il fallait y voir une nouvelle occasion manquée.",
+      "explanation": "Original AI-written French fiction for the game. The story is invented, not a report or quotation from the publication whose interface is reconstructed.",
+      "source": "Original AI-written French news-style fiction for the quiz, October 5, 2026. All incidents and quoted snippets are invented. Le Parisien supplies the website layout reference only; this is not a published Le Parisien article.",
       "discussion": "",
-      "reveal_sources": []
+      "reveal_sources": [],
+      "text_style": "news"
     },
     {
-      "title": "The internship handover",
+      "title": "Teams Conversation With an Internship Manager",
       "kind": "image",
       "media": "/static/images/sample19.png",
       "image_fit": "contain",
@@ -127,7 +129,7 @@
       "seconds": 25
     },
     {
-      "title": "Evidence in the logbook",
+      "title": "Photograph of a Computer Logbook",
       "kind": "image",
       "media": "/static/images/sample20.jpg",
       "image_fit": "contain",

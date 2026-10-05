@@ -48,7 +48,7 @@ If port 8765 is busy, add `--port 8767` and use the printed link. To suppress au
 
 1. Click **Add question**. Choose **Text**, **Code**, **Commit message**, **Image**, **Voice / audio recording**, or **Video clip**. For media, the visible **+ Image**, **+ Audio**, and **+ Video** buttons add a question and open its upload controls directly.
 2. Enter a title and select the known **AI** or **HUMAN** origin. The tool records your answer key; it does not infer authorship.
-3. Paste/import text, upload an image/audio/video file or select an existing media file. For audio/video you can instead choose **Online link** and paste a direct HTTPS file URL; video also accepts YouTube watch/share links. Optionally enter clip start/end in seconds.
+3. For text questions, choose **Text presentation → Plain text** or **News article**. News presentation uses the first paragraph as the headline, the next as the chapo, and remaining blank-line-separated paragraphs as the body. The complete French Le Parisien page shell (logo, navigation, sidebar, related stories and footer) is generated automatically in the preview and game. Both default articles are French; the controls remain English. Scroll inside the preview to see the whole page. Paste/import text, upload an image/audio/video file or select an existing media file. For audio/video you can instead choose **Online link** and paste a direct HTTPS file URL; video also accepts YouTube watch/share links. Optionally enter clip start/end in seconds.
 4. Add an accessible description, a short neutral introduction and any private difficulty notes. The presenter’s timer applies to every round; stored question timers are ignored. Titles and short introductions appear above the public question content; keep them free of source/answer hints.
 5. Open **Answer notes and source** to keep private explanations, credit/source links, technical details or discussion prompts. The game reveals AI or HUMAN. For a real photograph, fill **Photo reveal: what it is, date and source** to add a concise public caption at reveal; Source link adds the photo-source link. Leave that caption empty for social posts. Other explanation/discussion fields remain editor notes. These are optional.
 6. Inspect **Question preview**. For audio/video, press Play; playback starts when you choose it. Toggle **Show answer notes** to check the reveal.
@@ -97,7 +97,7 @@ python -m uvicorn main:app --reload
 
 Open **http://127.0.0.1:8000/presenter** and create a new room. Saving a new deck does not alter an existing room. If the local game is already running, a restart is not required for a changed `questions.json`.
 
-If `questions.json` does not exist, the game uses the bundled `Content.py` starter deck. This archive contains `questions.json` (English titles/introductions, French Macron/Teams content); the manager replaces it when you save. Invalid JSON or missing referenced media stops new room creation with a clear error rather than silently substituting another deck.
+If `questions.json` does not exist, the game uses the bundled `Content.py` starter deck. This archive contains `questions.json` (English titles/introductions, French articles/Macron/Teams content); the manager replaces it when you save. Invalid JSON or missing referenced media stops new room creation with a clear error rather than silently substituting another deck.
 
 ## Use the deck on Vercel
 
@@ -183,4 +183,4 @@ Up to eight links are allowed. Labels can include source names and publication d
 
 ## Titles, introductions and language
 
-**Question title** and **Short introduction shown with the question** now appear above the content on presenter and phones. Keep both neutral and short; sources and origins stay in answer notes. The interface remains English. In the default deck, Macron and Teams messages are French; the Teams introduction specifies that only the manager’s reply is judged. Both supplied logos and the blue/red palette also appear in this local editor.
+**Question title** and **Short introduction shown with the question** now appear above the content on presenter and phones. Keep both neutral and short; sources and origins stay in answer notes. The interface remains English. In the default deck, the articles, Macron post and Teams messages are French; the Teams introduction specifies that only the manager’s reply is judged. Both supplied logos and the blue/red palette also appear in this local editor.

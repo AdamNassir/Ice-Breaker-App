@@ -77,6 +77,7 @@ class Question(BaseModel):
     answer: Literal["AI", "HUMAN"]
     body: str = Field(default="", max_length=50000)
     context: str = Field(default="", max_length=2000)
+    text_style: Literal["plain", "news"] = "plain"
     seconds: int | None = Field(default=None, ge=5, le=120, strict=True)
     difficulty: int | None = Field(default=None, ge=1, le=5, strict=True)
     media: str = Field(default="", max_length=300)

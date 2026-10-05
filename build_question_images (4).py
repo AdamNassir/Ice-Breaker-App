@@ -45,14 +45,15 @@ AI_SQL = """SELECT department, count(*) AS headcount,
     ORDER BY average_salary DESC;"""
 SQL_STYLE_SOURCE = "https://www.postgresql.org/docs/current/tutorial-agg.html"
 AI_TWEET = (
-    "Nous allons simplifier les démarches administratives. "
-    "Un formulaire unique remplacera les douze formulaires actuels. "
-    "Pour y accéder, il faudra simplement joindre les douze anciens formulaires. "
-    "C'est cela, une France qui avance."
+    "Dès janvier, dix hôpitaux expérimenteront une intelligence artificielle "
+    "développée en France pour anticiper l'affluence aux urgences. "
+    "Elle s'appuiera sur des données anonymisées. "
+    "Mieux prévoir pour mieux soigner, sans jamais remplacer les soignants. "
+    "C'est le sens de notre ambition.\n\n#Santé #IA #France2030"
 )
-# Real, unblurred portrait; only the post text below is an original AI parody.
-# Attribution/licence and crop details: ContentSources.md.
-MACRON_PORTRAIT = ROOT / "macron-profile-source.jpg"
+# Actual profile picture supplied by the presenter; only the post writing is AI fiction.
+# Origin and exact crop details: ContentSources.md. No actual policy is asserted.
+MACRON_PORTRAIT = ROOT / "profile-source.png"
 
 
 def font(size, bold=False):
@@ -322,9 +323,9 @@ def tweet(value, filename, platform="X", macron=False):
     else:
         avatar_y,name_y,handle_y,body_y=20,23,67,174
     if macron:
-        # Crop the supplied licensed photograph around the face; no blur/pixelation.
+        # Extract the circular profile photo from the supplied screenshot; no blur.
         with Image.open(MACRON_PORTRAIT) as portrait:
-            tile = portrait.convert("RGB").crop((35, 24, 220, 209)).resize((80, 80), Image.Resampling.LANCZOS)
+            tile = portrait.convert("RGB").crop((32, 13, 398, 379)).resize((80, 80), Image.Resampling.LANCZOS)
         mask = Image.new("L", (80, 80), 0)
         ImageDraw.Draw(mask).ellipse((0, 0, 79, 79), fill=255)
         im.paste(tile, (31, avatar_y), mask)
@@ -352,7 +353,10 @@ def tweet(value, filename, platform="X", macron=False):
     else:
         d.rounded_rectangle((564,name_y+2,595,name_y+31),6,fill="#101016")
         text(d,(572,name_y+1),"+",25,"white",True)
-    end=paragraph(d,(29,body_y),value,1135,37,49,ink)
+    body, separator, tags = value.partition("\n\n#")
+    end=paragraph(d,(29,body_y),body,1135,37,49,ink)
+    if separator:
+        end=paragraph(d,(29,end+20),"#"+tags,1135,37,49,"#1d9bf0")
     if dark:
         footer=end+35
         d.line((29,footer,1170,footer),fill="#2f3336",width=2)
@@ -373,5 +377,5 @@ if __name__ == "__main__":
     linkedin()
     teams()
     code_card()
-    tweet(AI_TWEET, "sample25.png", macron=True)
-    print("Created static/images/sample18.png, sample19.png, sample23.png and sample25.png")
+    tweet(AI_TWEET, "sample27.png", macron=True)
+    print("Created static/images/sample18.png, sample19.png, sample23.png and sample27.png")

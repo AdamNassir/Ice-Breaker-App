@@ -231,6 +231,10 @@
     const stage = $('stage');
     const imageKey = s.question?.kind === 'image' ? `${s.code}:${s.round_index}:${s.question.media}` : '';
     const zoomView = imageKey && stage.dataset.imageKey === imageKey ? stage.querySelector('.image-viewer')?.getView() : undefined;
+    const newsKey = s.question?.kind === 'text' && s.question.text_style === 'news'
+      ? JSON.stringify([s.code, s.round_index, s.question.body]) : '';
+    const newsScroll = newsKey && stage.dataset.newsKey === newsKey ? stage.querySelector('.news-site')?.scrollTop : 0;
+    stage.dataset.newsKey = newsKey;
     stage.dataset.imageKey = imageKey;
     stage.replaceChildren();
     stage.classList.toggle('text-stage', ['live', 'revealed'].includes(s.phase) && s.question?.kind === 'text');
@@ -257,6 +261,12 @@
         });
         stage.append(player);
       } else if (q.kind === 'text') {
+        if (q.text_style === 'news') {
+          const page = window.IcebreakerNews.create(q);
+          stage.append(page);
+          page.scrollTop = newsScroll || 0;
+          return;
+        }
         const prose = element('div', 'text-content');
         q.body.split('\n\n').forEach((part, index) => {
           if (index) prose.append(document.createTextNode('\n\n'));
