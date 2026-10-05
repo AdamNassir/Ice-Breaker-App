@@ -5,40 +5,16 @@ LinkedIn, Macron and Teams messages are in French; interface labels remain Engli
 The deployed game uses the bundled PNGs and does not need Pillow.
 Edit LINKEDIN_POST, TEAMS_REQUEST, TEAMS_REPLY, or AI_TWEET below.
 AI_SQL is original AI-written SQL; SQL_STYLE_SOURCE credits its formatting reference.
-All interface graphics are reconstructions; the other social texts are fictional.
+All interface graphics are reconstructions. LinkedIn is a sourced excerpt; Macron/Teams writing is fictional.
 """
 from pathlib import Path
 import os
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 ROOT = Path(__file__).resolve().parent / "static" / "images"
-# EDIT the French post below; keep hashtags in the final paragraph.
-LINKEDIN_POST = """Notre équipe n’avait pas besoin d’un outil de plus.
-Elle avait besoin de retrouver du temps.
-
-La semaine dernière, nous avons connecté un agent IA à nos tickets, notre documentation et nos tests. Une première version livrée en deux jours, contre cinq habituellement.
-
-Trois changements. Un même objectif :
-→ Des tickets mieux cadrés avant de coder.
-→ Des tests proposés dès la première version.
-→ Une documentation mise à jour en continu.
-
-Ce n’est pas une équipe remplacée. C’est une équipe augmentée.
-Ce n’est pas moins de contrôle. C’est du contrôle au bon endroit.
-
-Cette approche est simple, concrète, mesurable.
-Moins de tâches répétitives. Plus de décisions utiles.
-Moins de friction. Plus de livraison.
-
-Le vrai sujet n’est plus « quel modèle choisir ? ».
-C’est « quel problème mérite vraiment d’être automatisé ? ».
-
-La validation reste humaine. La responsabilité aussi.
-L’IA accélère. L’équipe décide.
-
-Et vous, quelle tâche retireriez-vous demain de la semaine de votre équipe ?
-
-#IA #Tech #Productivité"""
+# Verbatim 21-word excerpt from the public post; source and origin caveat in ContentSources.md.
+LINKEDIN_POST = """AB Tasty sera présent sur le #Vivatech2019 du 16 au 18 mai. On parlera #UX, #IA et optimisation du parcours utilisateur."""
+LINKEDIN_SOURCE = "https://fr.linkedin.com/posts/ademagnitot_ab-tasty-partenaire-du-vivatech-2019-%C3%A0-paris-activity-6531455934907056128-Xf0-"
 TEAMS_REQUEST = (
     "Bonjour, voici le bilan de mon stage. L'outil permet de poser une question "
     "sur les documents techniques et de retrouver les passages utiles. Le rapport "
@@ -212,7 +188,7 @@ def icon(d, xy, kind, scale=1, color="#656565"):
 
 
 def linkedin():
-    """Copy the supplied 455px post geometry at 3x, with original French text.
+    """Copy the supplied 455px post geometry at 3x, with a sourced French excerpt.
 
     Reference: layout_sources/linkedin-reference.png (image(4).png).
     Compact identity, white body, blue hashtags, reactions/comments at the bottom.
@@ -234,28 +210,30 @@ def linkedin():
               outline="#666666",width=3)
     d.line((x+2*scale,y+3*scale,x+4*scale,y+5*scale,x+8*scale,y+scale),fill="#666666",width=3)
     text(d,(128*scale,14*scale),"· 3rd+",10*scale,"#666666")
-    text(d,(54*scale,41*scale),"1w ·",10*scale,"#666666")
-    gx,gy=79*scale,42*scale
+    
+    gx,gy=54*scale,42*scale
     d.ellipse((gx,gy,gx+10*scale,gy+10*scale),fill="#616161")
     d.arc((gx+3*scale,gy,gx+7*scale,gy+10*scale),0,360,fill="white",width=2)
     d.line((gx,gy+5*scale,gx+10*scale,gy+5*scale),fill="white",width=2)
     text(d,(394*scale,17*scale),"+ Follow",12*scale,"#0a66c2")
     # Same body margins, normal-weight text and line spacing as the screenshot.
-    body,hashtags=LINKEDIN_POST.rsplit("\n\n",1)
-    y=paragraph(d,(8*scale,63*scale),body,439*scale,12*scale,17*scale)
-    y+=6*scale
-    y=paragraph(d,(8*scale,y),hashtags,439*scale,12*scale,17*scale,fill="#0a66c2")
+    # Keep the original inline hashtags blue without changing source wording.
+    face=font(12*scale);x0=8*scale;x=x0;y=63*scale
+    for word in LINKEDIN_POST.split():
+        advance=d.textlength(word+" ",font=face)
+        if x>x0 and x+advance>447*scale:
+            x=x0;y+=17*scale
+        d.text((x,y),word,font=face,fill="#0a66c2" if word.startswith("#") else "#242424")
+        x+=advance
+    y+=17*scale
     footer=y+9*scale
-    # Small overlapping reaction badges; counts are fictional UI decoration.
+    # Small overlapping reaction badges; source page reports 21 reactions; no comment count is invented.
     for x,c in [(15,"#378fe9"),(24,"#df704d"),(33,"#6d9e80")]:
         d.ellipse(((x-6)*scale,footer,(x+6)*scale,footer+12*scale),fill=c,outline="white",width=2)
     icon(d,(10*scale,footer+3*scale),"like",.27,"white")
     text(d,(20*scale,footer+scale),"♥",9*scale,"white")
     text(d,(29*scale,footer+scale),"✦",8*scale,"white")
-    text(d,(45*scale,footer),"19",11*scale,"#666666")
-    label="8 comments · 1 repost"
-    label_width=d.textlength(label,font=font(11*scale))
-    text(d,(447*scale-label_width,footer),label,11*scale,"#666666")
+    text(d,(45*scale,footer),"21",11*scale,"#666666")
     height=footer+17*scale
     if height>im.height:raise ValueError("LinkedIn post overflows; shorten LINKEDIN_POST or increase canvas.")
     im=im.crop((0,0,455*scale,height))

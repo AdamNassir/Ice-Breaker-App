@@ -1,6 +1,6 @@
 # Question deck: private answer key and credits
 
-Updated October 5, 2026. Nine rounds: **seven AI and two HUMAN**, seven images and two text articles. No audio/video rounds. The app interface, titles and short introductions are English; the LinkedIn post, news articles, Macron post and Teams messages are French. Origins come from documented production, not a detector.
+Updated October 5, 2026. Nine rounds: **six AI and three HUMAN**, seven images and two text articles. No audio/video rounds. The app interface, titles and short introductions are English; the LinkedIn post, news articles, Macron post and Teams messages are French. Classifications use documented production/sources, not a style detector. The historical LinkedIn entry is human-attributed and marked HUMAN at the presenter’s request; its private writing process is not independently verified.
 
 Players judge the writing in social posts and only the **manager’s reply** in Teams. For photographs/paintings, judge image production. An authentic double exposure still counts as HUMAN. A plausible invented news story counts as AI because the agent wrote it, not merely because the story is false.
 
@@ -10,10 +10,10 @@ Every round shows its title, classification target and content. The prompt ident
 
 | Round | Subject | Origin | Provenance |
 | --- | --- | --- | --- |
-| 1 | French LinkedIn tech-management post | AI | Original AI-written French rollout post; the new attached post layout is reconstructed in `sample18.png`. |
+| 1 | French LinkedIn post about UX and AI | HUMAN | Verbatim 21-word opening excerpt from Augustin de Magnitot’s public AB Tasty / VivaTech 2019 post, in `sample18.png`. Historical human attribution; writing workflow unverified. |
 | 2 | Michael Jordan’s free-throw-line dunk | HUMAN | Walter Iooss Jr. / Sports Illustrated, Chicago, February 6, 1988; complete source JPEG `sample26.jpg`. |
 | 3 | Employee-data SQL | AI | Original commented payroll/certification query: two CTEs, four source tables and conditional-aggregate pivot columns. PostgreSQL formatting/feature references; rebuilt `sample23.png`. |
-| 4 | Tesla in his laboratory | HUMAN | Dickenson V. Alley, December 1899; historical double exposure, `sample16.jpg`. |
+| 4 | Motorcycle football | HUMAN | Bundesarchiv, Bild 102-12210 / CC-BY-SA 3.0 Germany, August 1931; unchanged `sample15.jpg`. |
 | 5 | Bitcoin dashboard incident | AI | Newly authored fictional French article. No genuine exchange notice or market event claimed. |
 | 6 | Napoleon with Inspector Gadget | AI | Original generated imperial painting, `sample13.jpg`; unchanged painting and reveal circle. |
 | 7 | Macron post about AI in hospitals | AI | Original fictional French announcement, reconstructed X layout, visible name/handle and the supplied actual profile picture. `sample27.png`. Not a genuine post. |
@@ -35,7 +35,7 @@ The earlier close-up `sample24.jpg` is retained only for previous rooms/custom d
 
 ## Other authentic photographs
 
-**Tesla — sample16.jpg.** Dickenson V. Alley, December 1899, Colorado Springs laboratory. The [Commons record](https://commons.wikimedia.org/wiki/File:Tesla_colorado.jpg) identifies a historical double exposure and public-domain U.S. status. Tesla and the arcs were not captured together in one exposure. The bundled copy was resized/re-encoded, without generative additions.
+**Retained legacy Tesla — sample16.jpg (not in the current deck).** Dickenson V. Alley, December 1899, Colorado Springs laboratory. The [Commons record](https://commons.wikimedia.org/wiki/File:Tesla_colorado.jpg) identifies a historical double exposure and public-domain U.S. status. Tesla and the arcs were not captured together in one exposure. The bundled copy was resized/re-encoded, without generative additions.
 
 **Legacy moth logbook — sample20.jpg (removed from the active deck).** Courtesy Naval Surface Warfare Center, Dahlgren; U.S. Navy photograph. [Source and public-domain record](https://commons.wikimedia.org/wiki/File:First_Computer_Bug,_1947.jpg), [Smithsonian object](https://americanhistory.si.edu/collections/object/nmah_334663). The entry is September 9, 1947; older photo metadata sometimes says 1945. The word bug already existed. The bundled copy is 1500 × 1186, resized/re-encoded without generative editing.
 
@@ -49,21 +49,21 @@ The exact profile picture was supplied by the presenter in `image(3).png`, a 437
 
 The old `sample25.png` bureaucratic-form parody and `macron-profile-source.jpg` remain only as legacy assets. Their portrait credit: Presidency of Bulgaria / President.bg, December 4, 2017, [source](https://commons.wikimedia.org/wiki/File:Emmanuel_Macron_(04-12-2017).jpg), [CC BY 2.5 Bulgaria](https://creativecommons.org/licenses/by/2.5/bg/deed.en); prior crop `(35, 24, 220, 209)`. The current builder no longer uses that portrait or post.
 
-## French LinkedIn post — writing references
+## Sourced French LinkedIn excerpt — sample18.png
 
-The French post describes an invented team connecting an AI agent to tickets, documentation and tests. The claimed two-day versus five-day delivery result is an original fictional anecdote, not a statistic from a real company. The requested writing devices are intentional: repeated “Ce n’est pas… C’est…”, parallel “Moins… Plus…” phrases, three-item lists, “simple, concrète, mesurable”, a human-validation close and an audience question. These patterns are not proof that any actual author uses AI; this question’s answer comes from known production.
+The current post displays the exact opening two sentences (21 words, including the original inline hashtags) from [Augustin de Magnitot’s public post about AB Tasty / VivaTech 2019](https://fr.linkedin.com/posts/ademagnitot_ab-tasty-partenaire-du-vivatech-2019-%C3%A0-paris-activity-6531455934907056128-Xf0-), checked October 5, 2026. The rest of the post and linked-article preview are omitted; there is no generated rewrite, invented delivery anecdote or added hashtag paragraph. The post’s human attribution and historical event context support the presenter-requested HUMAN label, but the author’s private writing process is not independently verified. Public publication alone is not a general proof of human authorship.
 
-Public writing references read October 5, 2026:
+The UI retains the supplied compact LinkedIn layout with anonymous reconstructed identity/avatar/headline. It shows the source page’s observed 21 reactions and omits a fabricated recent timestamp/comment count. Only the writing is classified, not the reconstructed screenshot. The source URL and caveat stay in private notes; the public reveal remains HUMAN only, as requested for social posts.
 
-- [Vincent Boucard — IA adoption and transformation](https://fr.linkedin.com/posts/vincent-boucard_ia-transformation-humain-activity-7452244414833463296-sxLy): technology-versus-human reframing, short contrastive statements and a closing audience prompt.
-- [SonIA Cluzet — project validation and human adoption](https://fr.linkedin.com/posts/soniacluzet_le-plus-grand-risque-pour-votre-projet-ia-activity-7486419544123727872-laRK): first-person implementation anecdote and a shift from tooling to human validation.
-- [Youssef EL KHARROUBI — agent IA terminology](https://fr.linkedin.com/posts/youssef-el-kharroubi-66a79892_agent-ia-on-met-les-choses-au-clair-vraiment-activity-7426583980675624960-rzfN): step lists, repeated distinctions and triadic descriptions.
+The former original AI-written rollout satire and its three writing references are superseded in the active deck. The current `LINKEDIN_POST` constant is the sourced excerpt and `LINKEDIN_SOURCE` records its URL. Keep the text verbatim if retaining this HUMAN classification.
 
-The game text is newly written, not a quotation, collage or factual account from these posts. These authors are not shown as the fictional account. Layout is from the presenter-supplied screenshot, not from their public web guest-page layouts. `LINKEDIN_POST` and `linkedin()` in build_question_images.py are the editable source.
+## Authentic motorcycle-football photograph — sample15.jpg
+
+The restored photograph shows people playing motorcycle football in Germany in **August 1931**. Credit: **Bundesarchiv, Bild 102-12210 / CC-BY-SA 3.0 Germany**; photographer unknown. [Commons source](https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_102-12210,_Fussballspiel_mit_dem_Motorrad.jpg), [licence](https://creativecommons.org/licenses/by-sa/3.0/de/deed.en). The existing bundled file retains the Commons crop and prior JPEG re-encoding with no generative edits; this update changes no photo pixels. Attribution, subject/date and source link appear only at reveal. Tesla’s file remains for legacy rooms/custom decks.
 
 ## LinkedIn and French Teams reconstructions
 
-Both are editable native interface reconstructions, not real account screenshots. LinkedIn now uses original French tech-management writing and the new attached image(4).png layout. Its invented identity/avatar/headline stay blurred. The Teams layout follows [Microsoft’s combined Chat interface](https://support.microsoft.com/en-us/teams/teams-channels/explore-the-new-chat-and-channels-experience-in-microsoft-teams); no Microsoft screenshot pixels or actual employee messages are redistributed.
+Both are editable native interface reconstructions, not real account screenshots. LinkedIn now uses the verbatim sourced French excerpt and the attached image(4).png layout. Its anonymized placeholder identity/avatar/headline stay blurred. The Teams layout follows [Microsoft’s combined Chat interface](https://support.microsoft.com/en-us/teams/teams-channels/explore-the-new-chat-and-channels-experience-in-microsoft-teams); no Microsoft screenshot pixels or actual employee messages are redistributed.
 
 The French intern’s message describes a tool for questions over technical documents, useful passages, PDF reading, information organisation and testing. It asks the manager to validate `Bilan_Stage_Recherche_Documents.pdf`. The manager incorrectly interprets document search as monitoring aircraft, deciding repairs and switching propulsion. The messages use less technical vocabulary. Adam Nassir, the supplied sender name, is blurred above the right-aligned light-blue outgoing message and PDF. The fictional manager’s reply is left-aligned in light grey; its identity/avatar remain anonymized. The PDF is an attachment only; no document interior is displayed. The intro states: classify only the manager’s reply. This is fiction inspired by the supplied internship topics, not a record or claim about an actual colleague.
 
@@ -91,7 +91,7 @@ The game’s blue `#1f2ade` is sampled from LogicLever. The UI red is `#e52330`.
 
 ## Retained legacy media
 
-The tenth moth-logbook question has been removed from the current nine-round deck. Its image/credit remain available for older room snapshots/custom decks. Other old assets also remain available for those decks. They are not active questions. The motorcycle-football JPEG `sample15.jpg` credits **Bundesarchiv, Bild 102-12210 / CC-BY-SA 3.0 Germany**, August 1931; current Commons crop, JPEG re-encoding, no generative editing. [Source](https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_102-12210,_Fussballspiel_mit_dem_Motorrad.jpg), [license](https://creativecommons.org/licenses/by-sa/3.0/de/deed.en). Other retained camera/technical image credits are in `ContentSources_Legacy.md` and `ContentSources_Technical.md`.
+The tenth moth-logbook question has been removed from the current nine-round deck. Its image/credit remain available for older room snapshots/custom decks. Other old assets also remain available for those decks. The motorcycle-football JPEG is active again; `sample15.jpg` credits **Bundesarchiv, Bild 102-12210 / CC-BY-SA 3.0 Germany**, August 1931; current Commons crop, JPEG re-encoding, no generative editing. [Source](https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_102-12210,_Fussballspiel_mit_dem_Motorrad.jpg), [license](https://creativecommons.org/licenses/by-sa/3.0/de/deed.en). Other retained camera/technical image credits are in `ContentSources_Legacy.md` and `ContentSources_Technical.md`.
 
 `sample21.png` retains a reconstructed Trump Truth Social post dated May 16, 2025, [original](https://truthsocial.com/@realDonaldTrump/posts/114517718765768352), [archive](https://www.presidency.ucsb.edu/documents/truth-social-posts-may-16-2025). `sample22.png` retains the original AI-written English Trump-style firewall parody. Both identities were coarsely pixelated. Neither is used by this deck or rebuilt by the current default script. Removed RFC excerpts can still be added as custom HUMAN text with explicit source credits; their source-link feature remains supported.
 

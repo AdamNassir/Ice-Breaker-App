@@ -2,17 +2,18 @@
   "schema_version": 1,
   "rounds": [
     {
-      "title": "LinkedIn Post by a Manager",
+      "title": "LinkedIn Post About UX and AI",
       "kind": "image",
       "seconds": 25,
       "context": "Post text: AI or HUMAN?",
-      "answer": "AI",
-      "explanation": "Original AI-written French tech-management post for the game, with repeated contrasts, parallel sentences and a three-adjective phrase. The delivery results and account are fictional. Stylistic features are authoring choices, not reliable proof that a real post was written by AI.",
+      "answer": "HUMAN",
+      "explanation": "Verbatim opening two sentences from a public French LinkedIn post attributed to Augustin de Magnitot about AB Tasty at VivaTech 2019. HUMAN is the presenter-requested classification for this historical human-attributed post; the author’s private writing process is not independently verified. This is a sourced excerpt, not an AI rewrite.",
       "discussion": "",
-      "source": "Original AI-written French fictional tech-management post, October 5, 2026. The team, rollout and two-versus-five-day delivery anecdote are invented. Wording informed by multiple public French tech/AI LinkedIn posts, linked in ContentSources.md; no post is quoted or attributed to those authors. Native editable layout copies the geometry of presenter-supplied image(4).png, retained in layout_sources/linkedin-reference.png. Name/avatar/headline are fictional and blurred; decorative counts do not describe a real post.",
+      "source": "Augustin de Magnitot, public LinkedIn post about AB Tasty at VivaTech 2019; source checked October 5, 2026. Exact opening two sentences, 21 words, including original inline hashtags, reproduced without AI rewriting. Human-attributed historical publication; no verified declaration about writing tools. The remaining sentence and linked-article preview are not reproduced. Account/header/avatar are anonymized reconstructed UI; 21 reactions were observed on the accessible source page, with no invented comment count or recent timestamp. Layout follows the supplied image(4).png geometry.",
       "media": "/static/images/sample18.png",
-      "alt": "A French tech-management LinkedIn post with a blurred profile picture and identity.",
-      "image_fit": "contain"
+      "alt": "An anonymized LinkedIn post excerpt in French about UX, AI and a technology event.",
+      "image_fit": "contain",
+      "source_url": "https://fr.linkedin.com/posts/ademagnitot_ab-tasty-partenaire-du-vivatech-2019-%C3%A0-paris-activity-6531455934907056128-Xf0-"
     },
     {
       "title": "Michael Jordan’s Free-Throw-Line Dunk",
@@ -44,19 +45,19 @@
       "discussion": ""
     },
     {
-      "title": "Photograph of Nikola Tesla in His Laboratory",
+      "title": "Photograph of Motorcycle Football",
       "kind": "image",
       "seconds": 25,
       "context": "Photograph: AI or HUMAN?",
-      "media": "/static/images/sample16.jpg",
-      "alt": "A seated person reading near large electrical equipment and bright arcs in a historical photograph.",
+      "media": "/static/images/sample15.jpg",
+      "alt": "A historical black-and-white photograph of people on motorcycles playing with a football.",
       "image_fit": "contain",
       "answer": "HUMAN",
-      "explanation": "The famous Tesla laboratory publicity photograph dates to December 1899. It is a human-made double exposure: the electrical arcs and Tesla were photographed separately. HUMAN does not mean the scene happened exactly as pictured.",
+      "explanation": "Historical motorcycle-football photograph in Germany, August 1931. The image comes from the German Federal Archives and depicts an actual unusual sport, not generated content.",
       "discussion": "",
-      "source": "Dickenson V. Alley, Tesla laboratory photograph, December 1899; Commons public-domain-US record. Historical double exposure, resized/re-encoded for this app; no generative edits.",
-      "source_url": "https://commons.wikimedia.org/wiki/File:Tesla_colorado.jpg",
-      "image_reveal": "Nikola Tesla in his Colorado Springs laboratory — December 1899.\nSource: Dickenson V. Alley. Historical double exposure."
+      "source": "Bundesarchiv, Bild 102-12210 / CC-BY-SA 3.0 Germany, August 1931. Current Wikimedia Commons crop, JPEG re-encoding in the bundled sample15.jpg; no generative edits. Photographer unknown. Licence: https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_102-12210,_Fussballspiel_mit_dem_Motorrad.jpg",
+      "image_reveal": "Motorcycle football in Germany — August 1931.\nSource: Bundesarchiv, Bild 102-12210 / CC-BY-SA 3.0 Germany."
     },
     {
       "title": "News Article About a Bitcoin Price Drop",
