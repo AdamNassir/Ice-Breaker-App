@@ -26,7 +26,8 @@
       "explanation": "Motorcycle football was real. This photograph is preserved by the German Federal Archives and dated August 1931. Strange inventions existed long before image generators.",
       "discussion": "",
       "source": "Bundesarchiv, Bild 102-12210 / CC-BY-SA 3.0 Germany. Photographer unrecorded; August 1931. Commons version cropped in 2024; app copy re-encoded as JPEG without generative edits. License: https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
-      "source_url": "https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_102-12210,_Fussballspiel_mit_dem_Motorrad.jpg"
+      "source_url": "https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_102-12210,_Fussballspiel_mit_dem_Motorrad.jpg",
+      "image_reveal": "Motorcycle football in Germany — August 1931.\nSource: Bundesarchiv, Bild 102-12210 (photographer unrecorded)."
     },
     {
       "title": "A very scientific pop-culture observation",
@@ -54,7 +55,8 @@
       "explanation": "The famous Tesla laboratory publicity photograph dates to December 1899. It is a human-made double exposure: the electrical arcs and Tesla were photographed separately. HUMAN does not mean the scene happened exactly as pictured.",
       "discussion": "",
       "source": "Dickenson V. Alley, Tesla laboratory photograph, December 1899; Commons public-domain-US record. Historical double exposure, resized/re-encoded for this app; no generative edits.",
-      "source_url": "https://commons.wikimedia.org/wiki/File:Tesla_colorado.jpg"
+      "source_url": "https://commons.wikimedia.org/wiki/File:Tesla_colorado.jpg",
+      "image_reveal": "Nikola Tesla in his Colorado Springs laboratory — December 1899.\nSource: Dickenson V. Alley. Historical double exposure."
     },
     {
       "title": "The protocol committee got creative",
@@ -79,7 +81,12 @@
       "answer": "AI",
       "explanation": "This is an original AI-generated historical pastiche. Inspector Gadget has slipped into the crowd, complete with a mechanical arm. It is not an authentic Napoleon painting, and no museum record is claimed.",
       "discussion": "",
-      "source": "OpenAI built-in image generation, October 4, 2026. Original fictional imperial ceremony; Inspector Gadget cameo. Resized/re-encoded; full prompt in ContentSources.md."
+      "source": "OpenAI built-in image generation, October 4, 2026. Original fictional imperial ceremony; Inspector Gadget cameo. Resized/re-encoded; full prompt in ContentSources.md.",
+      "image_highlight": {
+        "x": 35.5,
+        "y": 43,
+        "radius": 7.5
+      }
     },
     {
       "title": "The firewall procurement plan",
@@ -110,11 +117,11 @@
       "kind": "image",
       "media": "/static/images/sample19.png",
       "image_fit": "contain",
-      "alt": "A work chat with blurred identities, a PDF attachment, a visible document preview, and a reply.",
+      "alt": "A Teams conversation with anonymized participants and a PDF attachment.",
       "context": "Judge the second message in the conversation.",
       "answer": "AI",
-      "explanation": "AI wrote the off-topic validation: a company-wide automated purchasing platform and international rollout are absent from the simple manual coffee-rota document. The people, messages, document and interface are fictional.",
-      "source": "Original AI-written fictional Teams reply and coffee-rota PDF. Native editable UI reconstruction based on Microsoft Support's current combined Chat view, accessed October 4, 2026: https://support.microsoft.com/en-us/teams/teams-channels/explore-the-new-chat-and-channels-experience-in-microsoft-teams . No real account, employee or PDF; drawn profiles and names blurred.",
+      "explanation": "AI wrote the off-topic validation of company-wide automated purchasing and an international rollout. The request describes a manual coffee-rota spreadsheet. The screenshot shows the conversation and PDF attachment only; its interior is not displayed. The people, messages and interface are fictional.",
+      "source": "Original AI-written fictional Teams reply and coffee-rota PDF attachment. Native editable UI reconstruction based on Microsoft Support's current combined Chat view, accessed October 4, 2026: https://support.microsoft.com/en-us/teams/teams-channels/explore-the-new-chat-and-channels-experience-in-microsoft-teams . No real account, employee or PDF; drawn profiles and names blurred.",
       "discussion": "",
       "seconds": 25
     },
@@ -130,7 +137,8 @@
       "source": "U.S. Navy / Naval Surface Warfare Center, Dahlgren, photograph of the Harvard Mark II logbook. Public-domain U.S. federal government image, resized and re-encoded without generative edits. Correct logbook date September 9, 1947; some legacy photo metadata incorrectly says 1945.",
       "source_url": "https://commons.wikimedia.org/wiki/File:First_Computer_Bug,_1947.jpg",
       "discussion": "",
-      "seconds": 25
+      "seconds": 25,
+      "image_reveal": "Moth taped into the Harvard Mark II logbook — September 9, 1947.\nSource: U.S. Navy / Naval Surface Warfare Center, Dahlgren."
     }
   ]
 }

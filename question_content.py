@@ -39,6 +39,14 @@ class DeckError(ValueError):
     pass
 
 
+class ImageHighlight(BaseModel):
+    """Circle position and radius as percentages of the original image width."""
+    model_config = ConfigDict(extra="forbid")
+    x: float = Field(ge=0, le=100)
+    y: float = Field(ge=0, le=100)
+    radius: float = Field(gt=0, le=100)
+
+
 class Question(BaseModel):
     model_config = ConfigDict(extra="forbid")
     title: str = Field(min_length=1, max_length=120)
@@ -55,6 +63,8 @@ class Question(BaseModel):
     alt: str = Field(default="", max_length=1000)
     image_fit: Literal["contain", "cover"] = "contain"
     image_position: str = Field(default="center", max_length=60)
+    image_reveal: str = Field(default="", max_length=1800)
+    image_highlight: ImageHighlight | None = None
     explanation: str = Field(default="", max_length=6000)
     technical_note: str = Field(default="", max_length=6000)
     discussion: str = Field(default="", max_length=2000)

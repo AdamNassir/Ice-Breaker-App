@@ -64,6 +64,9 @@ class ManagerTests(unittest.TestCase):
         bad = [[], [{**self.starter,'title':' '}], [{**self.starter,'answer':'MIXED'}],
                [{**self.starter,'seconds':4}], [{**self.starter,'seconds':5.5}],
                [{**self.starter,'source_url':'javascript:alert(1)'}],
+               [{**self.starter,'image_highlight':{'x':101,'y':43,'radius':7.5}}],
+               [{**self.starter,'image_highlight':{'x':35.5,'y':43,'radius':0}}],
+               [{**self.starter,'image_highlight':{'x':35.5,'radius':7.5}}],
                [{'title':'Image','kind':'image','answer':'HUMAN','media':'/static/images/../audio/x.png'}],
                [{'title':'Image','kind':'image','answer':'HUMAN','media':'/static/images/missing.png'}]]
         for rows in bad:

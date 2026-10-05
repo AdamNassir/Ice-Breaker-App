@@ -131,7 +131,7 @@ Do not set both `media` and `media_url`. Uploaded images use `media` only. URLs 
 
 The bundled sources/English deck and exact install list are in ContentSources.md and UpdateGuide.md. Replace both Content.py and questions.json when adopting the new default; a saved JSON deck takes priority.
 
-The presenter’s timer now applies to every round. Any older question-level seconds value is ignored. In the public game, only text/media content is shown, and the reveal is only AI or HUMAN. Titles, context, explanations and source notes remain available in the editor and these instructions.
+The presenter’s timer now applies to every round. Any older question-level seconds value is ignored. In the public game, only text/media content is shown, and the reveal is AI or HUMAN, with a short caption/source link for configured real photographs and an optional image highlight. Social posts receive no added context. Titles, context, explanations and source notes remain available in the editor and these instructions.
 
 ## Edit the LinkedIn, Teams and tweet screenshots
 
@@ -142,6 +142,21 @@ python -m pip install Pillow
 python build_question_images.py
 ```
 
-Use your existing virtual-environment Python on Windows, macOS or Linux. Edit the clearly named `LINKEDIN_POST`, `TEAMS_REQUEST`, `TEAMS_REPLY`, `PDF_LINES`, and `AI_TWEET` constants in `build_question_images.py`. The `linkedin()`, `teams()`, and `tweet()` functions control positions, dimensions, colors and font sizes. `SOCIAL_NAME_PIXEL_SIZE = 24` and `SOCIAL_AVATAR_PIXEL_SIZE = 20` control coarse pixelation on the two Trump cards: larger blocks hide more detail. `pixelate()` averages away the original details and scales back up with solid nearest-neighbor pixels. `blurred_label()` and `avatar()` accept `pixel_size` for these cards; LinkedIn and Teams retain their existing Gaussian blur. Rebuilding overwrites `static/images/sample18.png`, `sample19.png`, `sample21.png`, and `sample22.png`. Inspect all four for text overflow after editing. `GENUINE_TWEET` preserves a verified May 16, 2025 Truth Social post: keep its wording intact to retain the HUMAN label, or replace it with another verified human-written post and update its source. Edit `AI_TWEET` for the fictional parody; if the text origin changes, update its answer too. Do not change `requirements.txt`; Pillow is optional for this authoring tool only.
+Use your existing virtual-environment Python on Windows, macOS or Linux. Edit the clearly named `LINKEDIN_POST`, `TEAMS_REQUEST`, `TEAMS_REPLY`, and `AI_TWEET` constants in `build_question_images.py`. The `linkedin()`, `teams()`, and `tweet()` functions control positions, dimensions, colors and font sizes. `SOCIAL_NAME_PIXEL_SIZE = 24` and `SOCIAL_AVATAR_PIXEL_SIZE = 20` control coarse pixelation on the two Trump cards: larger blocks hide more detail. `pixelate()` averages away the original details and scales back up with solid nearest-neighbor pixels. `blurred_label()` and `avatar()` accept `pixel_size` for these cards; LinkedIn and Teams retain their existing Gaussian blur. Rebuilding overwrites `static/images/sample18.png`, `sample19.png`, `sample21.png`, and `sample22.png`. Inspect all four for text overflow after editing. `GENUINE_TWEET` preserves a verified May 16, 2025 Truth Social post: keep its wording intact to retain the HUMAN label, or replace it with another verified human-written post and update its source. Edit `AI_TWEET` for the fictional parody; if the text origin changes, update its answer too. Do not change `requirements.txt`; Pillow is optional for this authoring tool only.
 
 To change the displayed size on the projector, edit `.presenter-playing .round-image` at the end of `static/imagestyle.css` (currently `max-height: 72vh`). Phone image sizes retain their own limits. Keep `image_fit` set to `contain` to show the full screenshot. Commit the rebuilt PNGs and any deck changes, redeploy, and create a new room.
+
+
+## Photo credits and reveal circles
+
+For a real photograph, fill **Photo reveal: what it is, date and source** in the local manager's Answer notes and source section. Its JSON field is `image_reveal`. The app shows it only after the deadline, for HUMAN image questions. The existing `source_url` field supplies the View source link. Leave `image_reveal` empty for posts and screenshots so they get no added context.
+
+A circle can be configured in `questions.json` (or in the `Content.py` fallback):
+
+```json
+"image_highlight": {"x": 35.5, "y": 43, "radius": 7.5}
+```
+
+`x` and `y` are center coordinates in percent of image width and height respectively. `radius` is percent of image width, so the overlay is a true circle at every size. Use `image_fit: "contain"` and centered positioning. For the bundled painting these coordinates surround Inspector Gadget. The SVG circle appears only at reveal; its coordinates are withheld from the live question API. No second image file is needed, and the original painting stays unchanged. The manager preserves this optional configuration on save/import/export; edit the coordinates in JSON when moving the highlight or remove the field to disable it.
+
+Text question paragraphs now use shorter spacing and a smaller presenter font. Change `.stage.text-stage`, `.text-content`, `.text-paragraph`, and `.presenter-playing .text-content` in `static/style.css` to adjust compactness. Podium confetti lives in `celebrate()` in `static/app.js` and the `podium-confetti` CSS animation; it is finite and skipped for reduced-motion preferences.

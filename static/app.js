@@ -9,6 +9,7 @@
   let stageKey = '', boardKey = '', clockEnd = 0, noticeTimeout = null, qrAttempt = 0;
   const query = new URLSearchParams(location.search);
   let lastHost = '', playerLink = '';
+  const celebratedRooms = new Set();
   try { if (host) lastHost = sessionStorage.getItem('icebreaker:last-host') || ''; } catch {}
   const initialCode = (query.get('room') || lastHost).toUpperCase();
 
@@ -137,6 +138,66 @@
     return wrap;
   }
 
+  function celebrate(podium, code) {
+    if (!podium || celebratedRooms.has(code)) return;
+    celebratedRooms.add(code);
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const layer = element('div', 'confetti-layer');
+    layer.setAttribute('aria-hidden', 'true');
+    const places = [...podium.querySelectorAll('.podium-place')];
+    const bounds = podium.getBoundingClientRect();
+    places.forEach((place, index) => {
+      const box = place.getBoundingClientRect();
+      const fallback = places.length === 3 ? [50, 16.7, 83.3][index] : (index + .5) / places.length * 100;
+      for (let i = 0; i < 24; i++) {
+        const piece = element('i', 'confetti-piece');
+        piece.style.left = bounds.width ? `${box.left + box.width / 2 - bounds.left}px` : `${fallback}%`;
+        piece.style.top = `${box.top - bounds.top + 12}px`;
+        piece.style.background = ['#bb2632', '#e65b16', '#d6a229', '#ffffff'][i % 4];
+        piece.style.setProperty('--dx', `${(Math.random() - .5) * 420}px`);
+        piece.style.setProperty('--rise', `${-160 - Math.random() * 180}px`);
+        piece.style.setProperty('--spin', `${360 + Math.random() * 900}deg`);
+        piece.style.animationDelay = `${Math.random() * .3}s`;
+        layer.append(piece);
+      }
+    });
+    podium.append(layer);
+    setTimeout(() => layer.remove(), 4300);
+  }
+
+  function imageFrame(q, highlight) {
+    const frame = element('figure', 'image-frame');
+    const img = element('img', 'round-image'); img.src = q.media; img.alt = q.alt || 'Round image';
+    if (['contain', 'cover'].includes(q.image_fit)) img.style.objectFit = q.image_fit;
+    if (q.image_position) img.style.objectPosition = q.image_position;
+    img.addEventListener('error', () => {
+      if (!frame.querySelector('.image-error')) frame.append(element('p', 'image-error', 'Image could not load. Tell the presenter before voting.'));
+    });
+    frame.append(img);
+    if (highlight) {
+      const ns = 'http://www.w3.org/2000/svg';
+      const overlay = document.createElementNS(ns, 'svg');
+      overlay.classList.add('image-highlight'); overlay.setAttribute('aria-hidden', 'true');
+      overlay.style.display = 'none';
+      const circle = document.createElementNS(ns, 'circle');
+      circle.setAttribute('fill', 'none'); circle.setAttribute('stroke', '#ff2020');
+      circle.setAttribute('stroke-width', '5'); circle.setAttribute('vector-effect', 'non-scaling-stroke');
+      overlay.append(circle); frame.append(overlay);
+      const position = () => {
+        if (!img.naturalWidth || !img.naturalHeight) return;
+        overlay.setAttribute('viewBox', `0 0 ${img.naturalWidth} ${img.naturalHeight}`);
+        overlay.setAttribute('preserveAspectRatio', q.image_fit === 'cover' ? 'xMidYMid slice' : 'xMidYMid meet');
+        circle.setAttribute('cx', String(highlight.x / 100 * img.naturalWidth));
+        circle.setAttribute('cy', String(highlight.y / 100 * img.naturalHeight));
+        circle.setAttribute('r', String(highlight.radius / 100 * img.naturalWidth));
+        overlay.style.display = '';
+      };
+      img.addEventListener('load', position);
+      if (img.complete) position();
+    }
+    return frame;
+  }
+
   function playerBonus(code) {
     // Phone-only epilogue. No API request, timer, vote or score change.
     const panel = element('section', 'player-bonus');
@@ -163,10 +224,11 @@
   }
 
   function renderStage(s) {
-    const signature = JSON.stringify([s.phase, s.round_index, s.question, s.phase === 'finished' ? s.leaderboard : null]);
+    const signature = JSON.stringify([s.code, s.phase, s.round_index, s.question, s.phase === 'finished' ? s.leaderboard : null]);
     if (signature === stageKey) return;
     stageKey = signature;
     const stage = $('stage'); stage.replaceChildren();
+    stage.classList.toggle('text-stage', ['live', 'revealed'].includes(s.phase) && s.question?.kind === 'text');
     if (s.phase === 'lobby') {
       if (!host) stage.append(waiting("You're in.", `Welcome, ${s.me.nickname}. Watch this screen for the first round.`));
     } else if (s.phase === 'ready') {
@@ -174,23 +236,25 @@
         'Take a moment, then start the timer when you are ready.' : 'Your presenter will start the next round.'));
     } else if (s.phase === 'finished') {
       stage.append(results(s));
+      celebrate(stage.querySelector('.final-podium'), s.code);
     } else {
       const q = s.question;
       if (q.kind === 'image') {
-        const img = element('img', 'round-image'); img.src = q.media; img.alt = q.alt || 'Round image';
-        if (['contain', 'cover'].includes(q.image_fit)) img.style.objectFit = q.image_fit;
-        if (q.image_position) img.style.objectPosition = q.image_position;
-        img.addEventListener('error', () => {
-          if (!stage.querySelector('.image-error')) stage.append(element('p', 'image-error', 'Image could not load. Tell the presenter before voting.'));
-        });
-        stage.append(img);
+        stage.append(imageFrame(q, s.reveal?.image_highlight));
       } else if (q.kind === 'audio' || q.kind === 'video') {
         const isVideo = q.kind === 'video';
         const player = window.IcebreakerMedia.create(q, isVideo ? 'round-video' : 'round-audio', message => {
           if (!stage.querySelector('.image-error')) stage.append(element('p', 'image-error', message));
         });
         stage.append(player);
-      } else stage.append(element(q.kind === 'text' ? 'p' : 'pre', q.kind === 'text' ? 'text-content' : 'code-block', q.body));
+      } else if (q.kind === 'text') {
+        const prose = element('div', 'text-content');
+        q.body.split('\n\n').forEach((part, index) => {
+          if (index) prose.append(document.createTextNode('\n\n'));
+          prose.append(element('p', 'text-paragraph', part));
+        });
+        stage.append(prose);
+      } else stage.append(element('pre', 'code-block', q.body));
     }
   }
 
@@ -198,10 +262,18 @@
     const panel = $('reveal'); panel.hidden = !s.reveal;
     if (!s.reveal) { panel.replaceChildren(); return; }
     const r = s.reveal;
-    const signature = JSON.stringify([s.round_index, r.answer]);
+    const signature = JSON.stringify([s.round_index, r.answer, r.image_reveal, r.source_url]);
     if (panel.dataset.signature === signature) return;
     panel.dataset.signature = signature; panel.replaceChildren();
     panel.append(element('h3', '', r.answer));
+    if (s.question?.kind === 'image' && r.answer === 'HUMAN' && r.image_reveal) {
+      panel.append(element('p', 'photo-credit', r.image_reveal));
+      if (r.source_url?.startsWith('https://')) {
+        const link = element('a', 'photo-source', 'View source');
+        link.href = r.source_url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+        panel.append(link);
+      }
+    }
   }
 
   function renderBoard(s) {

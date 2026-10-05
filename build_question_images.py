@@ -2,7 +2,7 @@
 
 Optional authoring dependency only: python -m pip install Pillow
 The deployed game uses the bundled PNGs and does not need Pillow.
-Edit LINKEDIN_POST, TEAMS_REQUEST, TEAMS_REPLY, PDF_LINES, or AI_TWEET below.
+Edit LINKEDIN_POST, TEAMS_REQUEST, TEAMS_REPLY, or AI_TWEET below.
 GENUINE_TWEET reproduces a verified public post; preserve it for HUMAN provenance.
 All interface graphics are reconstructions; the other social texts are fictional.
 """
@@ -35,12 +35,6 @@ TEAMS_REPLY = (
     "recommendation is to add a rollout plan for international offices. "
     "Otherwise, ready to launch."
 )
-PDF_LINES = [
-    "Q3 PROJECT WRAP-UP", "Office coffee rota", "Final technical document",
-    "One shared spreadsheet. Three columns:", "Name | Week | Refill beans",
-    "Everyone edits their own row manually.", "Friday: check next week's volunteer.",
-    "Success: no empty coffee machine.", "No servers. No API. No automation.",
-]
 GENUINE_TWEET = 'Has anyone noticed that, since I said "I HATE TAYLOR SWIFT," she\'s no longer "HOT?"'
 GENUINE_TWEET_SOURCE = "https://truthsocial.com/@realDonaldTrump/posts/114517718765768352"
 AI_TWEET = (
@@ -249,68 +243,85 @@ def teams():
     d.line((834,151,881,151),fill="#5b5fc7",width=4)
     text(d,(1624,95),"Call  ∨   ···",23,"#616161")
     d.line((416,155,1800,155),fill="#dedede",width=1)
-    text(d,(732,179),"Today",19,"#616161")
-    # Incoming request + attached PDF. Outgoing validation is the purple bubble.
+    text(d,(1080,179),"Today",19,"#616161")
+    # Expanded chat: attachment only, no open-document panel.
+    def height(value, width):
+        return paragraph(ImageDraw.Draw(Image.new("RGB",(1,1))), (0,0), value,
+                         width, 30, 43)
     avatar(im,(443,230),44,color="#c4ceda",blur=5)
-    blurred_label(im,(503,222),"Alexandre Martin",21,226,34,bg="#f5f5f5",radius=4)
-    d=ImageDraw.Draw(im);text(d,(741,223),"09:41",19,"#616161")
-    d.rounded_rectangle((500,266,1145,483),8,fill="white")
-    end=paragraph(d,(521,283),TEAMS_REQUEST,603,24,34)
-    if end>467:raise ValueError("Teams request overflows; increase its bubble height.")
-    d.rounded_rectangle((500,499,1075,579),7,fill="white",outline="#d8d8d8")
-    d.rounded_rectangle((519,518,562,560),4,fill="#bd302f")
-    text(d,(523,532),"PDF",15,"white",True)
-    text(d,(578,513),"Q3_Final_Technical_Document.pdf",22,bold=True)
-    text(d,(578,548),"84 KB",18,"#616161")
-    blurred_label(im,(802,635),"Camille Bernard",21,245,33,bg="#f5f5f5",radius=4)
-    d=ImageDraw.Draw(im);text(d,(1060,638),"09:42",19,"#616161")
-    d.rounded_rectangle((518,680,1150,1022),8,fill="#e8ebfa")
-    end=paragraph(d,(540,699),TEAMS_REPLY,588,24,34)
-    if end>1007:raise ValueError("Teams reply overflows; increase its bubble height.")
-    # Open document side panel. Its simple contents make the mismatch obvious.
-    d.rectangle((1180,156,1800,1120),fill="white",outline="#dedede")
-    text(d,(1202,177),"Q3_Final_Technical_Document.pdf",22,bold=True)
-    text(d,(1750,176),"×",27,"#616161")
-    d.line((1180,224,1800,224),fill="#dedede")
-    text(d,(1251,245),"‹      1 / 1      ›         −    100%    +",23,"#616161")
-    d.rectangle((1201,304,1778,1040),fill="#fafafa",outline="#d6d6d6")
-    text(d,(1232,340),PDF_LINES[0],25,bold=True)
-    text(d,(1232,392),PDF_LINES[1],31,bold=True)
-    text(d,(1232,447),PDF_LINES[2],23,"#616161")
-    d.line((1232,493,1747,493),fill="#dedede",width=2)
-    yy=525
-    for part in PDF_LINES[3:]:yy=paragraph(d,(1232,yy),part,512,24,35)+23
-    if yy>1020:raise ValueError("PDF overflows; shorten PDF_LINES or adjust panel.")
-    d.rounded_rectangle((467,1046,1150,1102),7,fill="white",outline="#b9b9b9")
-    text(d,(485,1063),"Type a message",22,"#757575")
-    icon(d,(1094,1061),"send",1,"#616161")
+    blurred_label(im,(503,222),"Alexandre Martin",23,245,34,bg="#f5f5f5",radius=4)
+    d=ImageDraw.Draw(im);text(d,(771,223),"09:41",20,"#616161")
+    request_bottom=286+height(TEAMS_REQUEST,1192)+18
+    d.rounded_rectangle((500,266,1738,request_bottom),8,fill="white")
+    paragraph(d,(523,286),TEAMS_REQUEST,1192,30,43)
+    pdf_y=request_bottom+16
+    d.rounded_rectangle((500,pdf_y,1230,pdf_y+88),7,fill="white",outline="#d8d8d8")
+    d.rounded_rectangle((519,pdf_y+21,568,pdf_y+68),4,fill="#bd302f")
+    text(d,(526,pdf_y+35),"PDF",16,"white",True)
+    text(d,(589,pdf_y+17),"Q3_Final_Technical_Document.pdf",28,bold=True)
+    text(d,(589,pdf_y+55),"84 KB",20,"#616161")
+    reply_y=pdf_y+158
+    blurred_label(im,(1338,reply_y-44),"Camille Bernard",23,245,34,bg="#f5f5f5",radius=4)
+    d=ImageDraw.Draw(im);text(d,(1654,reply_y-42),"09:42",20,"#616161")
+    reply_bottom=reply_y+22+height(TEAMS_REPLY,1070)+18
+    d.rounded_rectangle((620,reply_y,1738,reply_bottom),8,fill="#e8ebfa")
+    paragraph(d,(644,reply_y+22),TEAMS_REPLY,1070,30,43)
+    input_y=reply_bottom+38
+    d.rounded_rectangle((467,input_y,1738,input_y+60),7,fill="white",outline="#b9b9b9")
+    text(d,(486,input_y+19),"Type a message",24,"#757575")
+    icon(d,(1681,input_y+17),"send",1.1,"#616161")
+    final_height=max(960,input_y+79)
+    if final_height>1120:raise ValueError("Teams messages overflow; adjust text/size.")
+    im=im.crop((0,0,1800,final_height))
     im.save(ROOT/"sample19.png",optimize=True)
 
 
 def tweet(value, filename, platform="X"):
-    # Cropped post detail, native proportions and outline action icons.
-    im=Image.new("RGB",(1200,1200),"white");d=ImageDraw.Draw(im)
-    text(d,(30,20),"←",36);text(d,(123,23),"Post" if platform=="X" else "Truth",34,bold=True)
-    if platform=="X":
-        d.line((1107,25,1138,59),fill="#0f1419",width=5)
-        d.line((1138,25,1107,59),fill="#0f1419",width=3)
+    # Native UI reconstruction of the two user-supplied post references.
+    dark=platform=="X"
+    bg="#000000" if dark else "#ffffff"
+    ink="#e7e9ea" if dark else "#181818"
+    muted="#71767b" if dark else "#858585"
+    im=Image.new("RGB",(1200,1500),bg);d=ImageDraw.Draw(im)
+    if dark:
+        text(d,(41,27),"←",38,ink);text(d,(151,28),"Post",40,ink,True)
+        avatar_y,name_y,handle_y,body_y=127,130,173,291
     else:
-        text(d,(1030,29),"TRUTH",25,"#4265e8",True)
-    d.line((0,90,1200,90),fill="#eff3f4",width=2)
-    avatar(im,(35,123),100,pixel_size=SOCIAL_AVATAR_PIXEL_SIZE)
-    blurred_label(im,(155,126),"Donald J. Trump",35,410,48,True,
-                  pixel_size=SOCIAL_NAME_PIXEL_SIZE)
-    blurred_label(im,(155,179),"@realDonaldTrump",30,410,43,fill="#536471",
-                  pixel_size=SOCIAL_NAME_PIXEL_SIZE)
-    d=ImageDraw.Draw(im);text(d,(1112,126),"···",35,"#536471")
-    end=paragraph(d,(35,269),value,1128,37,52,fill="#0f1419")
-    footer=end+32
-    d.line((35,footer,1165,footer),fill="#eff3f4",width=2)
-    for x,kind in [(72,"comment"),(384,"repost"),(700,"heart"),(1100,"share")]:
-        icon(d,(x,footer+25),kind,1.4,"#536471")
-    height=footer+100
-    im=im.crop((0,0,1200,height))
-    ImageDraw.Draw(im).rectangle((0,0,1199,height-1),outline="#eff3f4",width=2)
+        avatar_y,name_y,handle_y,body_y=20,23,67,174
+    avatar(im,(31,avatar_y),80,pixel_size=SOCIAL_AVATAR_PIXEL_SIZE)
+    blurred_label(im,(132,name_y),"Donald J. Trump",32,370,44,True,
+                  bg=bg,fill=ink,pixel_size=SOCIAL_NAME_PIXEL_SIZE)
+    blurred_label(im,(132,handle_y),"@realDonaldTrump",29,370,42,
+                  bg=bg,fill=muted,pixel_size=SOCIAL_NAME_PIXEL_SIZE)
+    d=ImageDraw.Draw(im)
+    # Verification badges sit outside the pixelated identity fields.
+    badge_y=name_y+16;badge_color="#829ba9" if dark else "#e8527b"
+    points=[]
+    import math
+    for n in range(24):
+        angle=n*math.pi/12;r=16 if n%2==0 else 13
+        points.append((529+math.cos(angle)*r,badge_y+math.sin(angle)*r))
+    d.polygon(points,fill=badge_color)
+    d.line((521,badge_y,527,badge_y+5,538,badge_y-6),fill=bg,width=3)
+    if dark:
+        text(d,(1132,139),"···",29,muted)
+        text(d,(43,245),"Translate post",25,"#1d9bf0")
+    else:
+        d.rounded_rectangle((564,name_y+2,595,name_y+31),6,fill="#101016")
+        text(d,(572,name_y+1),"+",25,"white",True)
+    end=paragraph(d,(29,body_y),value,1135,37,49,ink)
+    if dark:
+        footer=end+35
+        d.line((29,footer,1170,footer),fill="#2f3336",width=2)
+        for x,kind in [(42,"comment"),(318,"repost"),(596,"heart"),(1101,"share")]:
+            icon(d,(x,footer+28),kind,1.35,muted)
+        # Bookmark outline, matching the supplied dark X screenshot.
+        d.line((875,footer+30,903,footer+30,903,footer+67,889,footer+57,
+                875,footer+67,875,footer+30),fill=muted,width=3)
+        final_height=footer+98
+    else:
+        final_height=end+24
+    im=im.crop((0,0,1200,final_height))
     im.save(ROOT/filename,optimize=True)
 
 

@@ -36,7 +36,9 @@ ROUNDS = [{'title': 'My AI agent deleted the roadmap',
   'source': 'Bundesarchiv, Bild 102-12210 / CC-BY-SA 3.0 Germany. Photographer unrecorded; August '
             '1931. Commons version cropped in 2024; app copy re-encoded as JPEG without generative '
             'edits. License: https://creativecommons.org/licenses/by-sa/3.0/de/deed.en',
-  'source_url': 'https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_102-12210,_Fussballspiel_mit_dem_Motorrad.jpg'},
+  'source_url': 'https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_102-12210,_Fussballspiel_mit_dem_Motorrad.jpg',
+  'image_reveal': 'Motorcycle football in Germany — August 1931.\n'
+                  'Source: Bundesarchiv, Bild 102-12210 (photographer unrecorded).'},
  {'title': 'A very scientific pop-culture observation',
   'kind': 'image',
   'media': '/static/images/sample21.png',
@@ -71,7 +73,9 @@ ROUNDS = [{'title': 'My AI agent deleted the roadmap',
   'source': 'Dickenson V. Alley, Tesla laboratory photograph, December 1899; Commons '
             'public-domain-US record. Historical double exposure, resized/re-encoded for this app; '
             'no generative edits.',
-  'source_url': 'https://commons.wikimedia.org/wiki/File:Tesla_colorado.jpg'},
+  'source_url': 'https://commons.wikimedia.org/wiki/File:Tesla_colorado.jpg',
+  'image_reveal': 'Nikola Tesla in his Colorado Springs laboratory — December 1899.\n'
+                  'Source: Dickenson V. Alley. Historical double exposure.'},
  {'title': 'The protocol committee got creative',
   'kind': 'text',
   'seconds': 25,
@@ -119,7 +123,8 @@ ROUNDS = [{'title': 'My AI agent deleted the roadmap',
   'discussion': '',
   'source': 'OpenAI built-in image generation, October 4, 2026. Original fictional imperial '
             'ceremony; Inspector Gadget cameo. Resized/re-encoded; full prompt in '
-            'ContentSources.md.'},
+            'ContentSources.md.',
+  'image_highlight': {'x': 35.5, 'y': 43, 'radius': 7.5}},
  {'title': 'The firewall procurement plan',
   'kind': 'image',
   'media': '/static/images/sample22.png',
@@ -162,16 +167,16 @@ ROUNDS = [{'title': 'My AI agent deleted the roadmap',
   'kind': 'image',
   'media': '/static/images/sample19.png',
   'image_fit': 'contain',
-  'alt': 'A work chat with blurred identities, a PDF attachment, a visible document preview, and a '
-         'reply.',
+  'alt': 'A Teams conversation with anonymized participants and a PDF attachment.',
   'context': 'Judge the second message in the conversation.',
   'answer': 'AI',
-  'explanation': 'AI wrote the off-topic validation: a company-wide automated purchasing platform '
-                 'and international rollout are absent from the simple manual coffee-rota '
-                 'document. The people, messages, document and interface are fictional.',
-  'source': 'Original AI-written fictional Teams reply and coffee-rota PDF. Native editable UI '
-            "reconstruction based on Microsoft Support's current combined Chat view, accessed "
-            'October 4, 2026: '
+  'explanation': 'AI wrote the off-topic validation of company-wide automated purchasing and an '
+                 'international rollout. The request describes a manual coffee-rota spreadsheet. '
+                 'The screenshot shows the conversation and PDF attachment only; its interior is '
+                 'not displayed. The people, messages and interface are fictional.',
+  'source': 'Original AI-written fictional Teams reply and coffee-rota PDF attachment. Native '
+            "editable UI reconstruction based on Microsoft Support's current combined Chat view, "
+            'accessed October 4, 2026: '
             'https://support.microsoft.com/en-us/teams/teams-channels/explore-the-new-chat-and-channels-experience-in-microsoft-teams '
             '. No real account, employee or PDF; drawn profiles and names blurred.',
   'discussion': '',
@@ -192,4 +197,6 @@ ROUNDS = [{'title': 'My AI agent deleted the roadmap',
             'incorrectly says 1945.',
   'source_url': 'https://commons.wikimedia.org/wiki/File:First_Computer_Bug,_1947.jpg',
   'discussion': '',
-  'seconds': 25}]
+  'seconds': 25,
+  'image_reveal': 'Moth taped into the Harvard Mark II logbook — September 9, 1947.\n'
+                  'Source: U.S. Navy / Naval Surface Warfare Center, Dahlgren.'}]

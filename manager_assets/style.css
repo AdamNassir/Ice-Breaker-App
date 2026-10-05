@@ -4,3 +4,4 @@
 @media(max-width:650px){.topbar{height:72px;padding:0 18px}.brand{font-size:17px}.local-badge{display:none}.page{padding:24px 16px 36px}.heading{align-items:flex-start;flex-direction:column;gap:18px}h1{font-size:35px}.save-box{text-align:left;min-width:0;width:100%}.save-box .primary{width:100%}.workspace{grid-template-columns:1fr}.deck-card{position:static}.question-list{max-height:240px}.preview pre{font-size:12px;padding:14px}.preview-text{font-size:16px}.next-steps{padding:20px}.card-top{align-items:flex-start}.preview-card .card-top{flex-wrap:wrap}}
 
 .media-shortcuts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.media-shortcuts button{flex:1;font-size:12px;padding:10px 8px}.preview video{display:block;width:100%;max-height:420px;margin:15px 0;background:#171215;border-radius:12px}
+.preview .youtube-player{display:block;width:100%;aspect-ratio:16/9;min-height:200px;border:0;border-radius:12px;background:#171215}

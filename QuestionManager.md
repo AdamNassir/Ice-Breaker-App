@@ -49,8 +49,8 @@ If port 8765 is busy, add `--port 8767` and use the printed link. To suppress au
 1. Click **Add question**. Choose **Text**, **Code**, **Commit message**, **Image**, **Voice / audio recording**, or **Video clip**. For media, the visible **+ Image**, **+ Audio**, and **+ Video** buttons add a question and open its upload controls directly.
 2. Enter a title and select the known **AI** or **HUMAN** origin. The tool records your answer key; it does not infer authorship.
 3. Paste/import text, upload an image/audio/video file or select an existing media file. For audio/video you can instead choose **Online link** and paste a direct HTTPS file URL; video also accepts YouTube watch/share links. Optionally enter clip start/end in seconds.
-4. Optionally set the timer (5–120 seconds), difficulty (1–5), accessible description and neutral setup. A blank timer uses the room timer selected by the presenter.
-5. Open **Answer notes and source** to add the reveal explanation, credit/source link, technical detail or discussion prompt. These are optional.
+4. Add an accessible description and any private setup/difficulty notes. The presenter’s timer applies to every round; stored question timers are ignored. Titles and introductions are retained for editing but are hidden in the public game.
+5. Open **Answer notes and source** to keep private explanations, credit/source links, technical details or discussion prompts. The game reveals AI or HUMAN. For a real photograph, fill **Photo reveal: what it is, date and source** to add a concise public caption at reveal; Source link adds the photo-source link. Leave that caption empty for social posts. Other explanation/discussion fields remain editor notes. These are optional.
 6. Inspect **Question preview**. For audio/video, press Play; playback starts when you choose it. Toggle **Show answer notes** to check the reveal.
 7. Click **Save deck to game**. All questions are saved together, in their listed order.
 
@@ -155,7 +155,7 @@ Choose **+ Audio** or **+ Video**, then **Media source → Online link**. Enter:
 
 A YouTube page is not a direct audio file. Use Video for a YouTube lecture/talk; you may tell participants to judge its voice if the framing and answer notes make that clear. This tool does not extract/download YouTube audio. Ordinary webpage URLs are not media files. Uploaded images remain local files.
 
-**Clip start/end** are absolute whole seconds from the recording's beginning. To play 1:10 through 1:20, use start `70`, end `80`. Blank start means zero; blank end means play to the recording's end. End must be after start. Enter a timer that leaves time to listen/watch and vote. Press Play in the preview; playback is manual in both game screens too. For HTML audio/video the player seeks to start and pauses at end; YouTube receives those boundaries as embed parameters. Controls can expose the original recording beyond your excerpt, so use a separately trimmed upload if a strict excerpt is required.
+**Clip start/end** are absolute whole seconds from the recording's beginning. To play 1:10 through 1:20, use start `70`, end `80`. Blank start means zero; blank end means play to the recording's end. End must be after start. Choose the presenter’s game timer to leave time to listen/watch and vote. Press Play in the preview; playback is manual in both game screens too. For HTML audio/video the player seeks to start and pauses at end; YouTube receives those boundaries as embed parameters. Controls can expose the original recording beyond your excerpt, so use a separately trimmed upload if a strict excerpt is required.
 
 Online links remain links in the saved deck; they are not copied to `static/`. Playback comes directly from that host and requires internet. URLs are validated for format, not continuously monitored for availability. External servers, browser codecs and embedding permissions determine playback. Source branding or titles may provide clues. Rehearse before hosting and keep attribution in answer notes.
 
@@ -164,3 +164,6 @@ Switch to **Local file / upload** to use your own recording instead. Uploading a
 ## Install this English fun deck update
 
 Follow **UpdateGuide.md** for the current exact replacement list. In particular copy **static/media.js**, the updated HTML files, both deck files and all five new local assets. Earlier installation sections above describe previous versions; use UpdateGuide.md for this archive. Replace the older questions.json to use the new questions, or back it up and choose Load starter → Save deck to game. Existing rooms keep their previous deck.
+
+
+The optional `image_highlight` JSON object is preserved when saving or exporting questions. It holds reveal-only circle coordinates; edit those in `questions.json`, then Reload saved. See HowToAddImages.md for the example and units. Existing decks without either new image field continue to load.

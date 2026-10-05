@@ -11,7 +11,7 @@
     video:{accept:'.mp4,.webm,.ogv,.mov,.m4v', extensions:['mp4','webm','ogv','mov','m4v'], help:'MP4, WebM, OGV, MOV or M4V · up to 25 MB. For phones, use MP4 with H.264 video and AAC audio. Convert AVI/MKV or incompatible MOV files first.'}
   };
   const textFields = {title:'title', context:'context', alt:'alt', explanation:'explanation',
-    source:'source', source_url:'source-url', technical_note:'technical-note',
+    source:'source', source_url:'source-url', image_reveal:'image-reveal', technical_note:'technical-note',
     discussion:'discussion', technical_source_url:'technical-url'};
   const toolbar = ['add-question','add-image','add-audio','add-video','empty-add','empty-deck','starter-deck','import-deck','export-deck'];
 
@@ -50,6 +50,12 @@
     if ($('seconds').value !== '') q.seconds = Number($('seconds').value); else delete q.seconds;
     if ($('difficulty').value !== '') q.difficulty = Number($('difficulty').value); else delete q.difficulty;
     q.media = formats[q.kind] ? $('media-path').value : '';
+    const linked = ['audio','video'].includes(q.kind) && $('media-mode').value === 'link';
+    q.media_url = linked ? $('media-url').value.trim() : '';
+    if (linked) q.media = '';
+    for(const [key,id] of [['media_start','media-start'],['media_end','media-end']]) {
+      if (['audio','video'].includes(q.kind) && $(id).value !== '') q[key] = Number($(id).value); else delete q[key];
+    }
     q.image_fit = $('image-fit').value; q.image_position = $('image-position').value || 'center';
   }
   function chooseMedia() {
@@ -65,6 +71,9 @@
     const kind = $('kind').value, hasMedia = Boolean(formats[kind]);
     $('text-fields').hidden = hasMedia; $('media-fields').hidden = !hasMedia;
     $('image-options').hidden = kind !== 'image'; $('audio-description').hidden = !['audio','video'].includes(kind);
+    const canLink = ['audio','video'].includes(kind), linked = canLink && $('media-mode').value === 'link';
+    $('media-source-fields').hidden = !canLink; $('clip-fields').hidden = !canLink;
+    $('local-media-fields').hidden = linked; $('media-link-fields').hidden = !linked;
     $('body').classList.toggle('code-editor', kind === 'code' || kind === 'commit');
     $('media-file').accept = formats[kind]?.accept || '';
     $('format-help').textContent = formats[kind]?.help || '';
@@ -92,6 +101,8 @@
     $('seconds').value = q.seconds ?? ''; $('difficulty').value = q.difficulty ?? '';
     $('body').value = q.body || ''; $('audio-body').value = q.body || '';
     $('media-path').value = q.media || ''; $('image-fit').value = q.image_fit || 'contain';
+    $('media-url').value = q.media_url || ''; $('media-mode').value = q.media_url ? 'link' : 'local';
+    $('media-start').value = q.media_start ?? ''; $('media-end').value = q.media_end ?? '';
     $('image-position').value = q.image_position || 'center';
     $('media-file').value = ''; showFields(); chooseMedia(); renderPreview(); updateControls();
   }
@@ -104,16 +115,16 @@
       const img = node('img'); img.src = q.media; img.alt = q.alt || 'Question image'; img.style.objectFit = q.image_fit || 'contain'; img.style.objectPosition = q.image_position || 'center';
       img.addEventListener('error',()=>{if(box.contains(img))box.append(node('p','field-help','This image cannot be previewed. Check the file or upload a PNG/JPG copy.'));});
       box.append(img);
-    } else if (['audio','video'].includes(q.kind) && q.media) {
+    } else if (['audio','video'].includes(q.kind) && (q.media || q.media_url)) {
       if (q.body) box.append(node('p','preview-context',q.body));
-      const player = node(q.kind); player.src = q.media; player.controls = true; player.preload = 'metadata'; player.setAttribute('aria-label',q.alt || 'Question recording');
-      if(q.kind==='video')player.setAttribute('playsinline','');
-      player.addEventListener('error',()=>{if(box.contains(player))box.append(node('p','field-help',q.kind==='video'?'This video cannot be previewed in this browser. Try an MP4 with H.264 video and AAC audio.':'This recording cannot be previewed in this browser. Try an MP3 or WAV copy.'));}); box.append(player);
+      const player = window.IcebreakerMedia.create(q, q.kind === 'video' ? 'round-video' : 'round-audio', message => {
+        if(box.contains(player) && !box.querySelector('.media-error'))box.append(node('p','field-help media-error',message));
+      }); box.append(player);
     } else if (formats[q.kind]) box.append(node('p','preview-context','Upload a file or choose an existing one.'));
     else box.append(node(q.kind === 'text' ? 'p' : 'pre',q.kind === 'text' ? 'preview-text' : '',q.body || 'Your question content appears here.'));
     const reveal = $('preview-reveal'); reveal.replaceChildren(); reveal.hidden = !$('preview-answer').checked;
     reveal.append(node('h3','',`Answer: ${q.answer || 'choose AI or HUMAN'}`));
-    for (const [key,label] of [['explanation','Explanation'],['technical_note','Technical detail'],['discussion','Discuss'],['source','Origin']]) {
+    for (const [key,label] of [['image_reveal','Photo reveal'],['explanation','Explanation'],['technical_note','Technical detail'],['discussion','Discuss'],['source','Origin']]) {
       if (q[key]) reveal.append(node('strong','',label),node('p','',q[key]));
     }
     for (const [key,label] of [['source_url','View source'],['technical_source_url','Technical reference']]) {
@@ -165,6 +176,7 @@
     if(q.media && !q.media.startsWith(`/static/${mediaFolders[q.kind]}/`))q.media='';
     $('media-path').value=q.media||'';showFields();chooseMedia();markDirty();renderList();renderPreview();
   });
+  $('media-mode').addEventListener('change',()=>{readEditor();showFields();markDirty();renderPreview();});
   $('media-choice').addEventListener('change',()=>{
     $('media-path').value=$('media-choice').value;readEditor();markDirty();renderPreview();
   });
@@ -177,7 +189,7 @@
     try {
       const result=await api(`/api/media?kind=${encodeURIComponent(kind)}&extension=${encodeURIComponent(extension)}`,'POST',file,true);
       media[kind].push({path:result.media,name:result.media.split('/').pop()});
-      if(rounds.includes(q)&&q.kind===kind){q.media=result.media;markDirty();if(rounds[selected]===q){$('media-path').value=q.media;chooseMedia();renderPreview();}tell('File added to the question. Save the deck to use it in the game.');}
+      if(rounds.includes(q)&&q.kind===kind){q.media=result.media;q.media_url='';markDirty();if(rounds[selected]===q){$('media-path').value=q.media;$('media-url').value='';$('media-mode').value='local';showFields();chooseMedia();renderPreview();}tell('File added to the question. Save the deck to use it in the game.');}
       else tell('File copied. It is available under existing files.');
     } catch(error){tell(error.message,true);}finally{mediaBusy=false;$('media-file').value='';updateControls();}
   });

@@ -144,7 +144,8 @@ def view(state, role, player_id):
         if state["phase"] == "revealed":
             result["reveal"] = {k: question[k] for k in
                                 ("answer", "explanation", "source", "source_url", "technical_note",
-                                 "discussion", "technical_source_url") if k in question}
+                                 "discussion", "technical_source_url", "image_reveal",
+                                 "image_highlight") if k in question}
             result["reveal"]["distribution"] = {
                 choice: sum(v["answer"] == choice for v in state["votes"].values()) for choice in ("AI", "HUMAN")}
     if player_id:
