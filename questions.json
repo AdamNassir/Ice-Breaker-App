@@ -2,10 +2,10 @@
   "schema_version": 1,
   "rounds": [
     {
-      "title": "My AI agent deleted the roadmap",
+      "title": "The roadmap decision",
       "kind": "image",
       "seconds": 25,
-      "context": "Judge the writing in the post.",
+      "context": "Read the post. Who wrote it: AI or HUMAN?",
       "answer": "AI",
       "explanation": "The post is an original AI-written satire. The interface is a fictional reconstruction, not a real LinkedIn account.",
       "discussion": "",
@@ -15,39 +15,39 @@
       "image_fit": "contain"
     },
     {
-      "title": "The football upgrade nobody asked for",
+      "title": "Suspended above the court",
       "kind": "image",
       "seconds": 25,
-      "context": "Inspect the players and their equipment. Judge the image origin.",
-      "media": "/static/images/sample15.jpg",
-      "alt": "A historical black-and-white photograph of people playing football while riding motorcycles.",
+      "context": "Look closely at the jump. Was this photograph made by AI or a human?",
+      "media": "/static/images/sample24.jpg",
+      "alt": "A basketball player suspended in the air beside a basket.",
       "image_fit": "contain",
       "answer": "HUMAN",
-      "explanation": "Motorcycle football was real. This photograph is preserved by the German Federal Archives and dated August 1931. Strange inventions existed long before image generators.",
+      "explanation": "An authentic sports photograph of Michael Jordan performing a tongue-out slam dunk. The player and unusual airborne pose are real. The source dates it to the 1987 NBA season / 1987–88 season, rather than specifying a match day.",
       "discussion": "",
-      "source": "Bundesarchiv, Bild 102-12210 / CC-BY-SA 3.0 Germany. Photographer unrecorded; August 1931. Commons version cropped in 2024; app copy re-encoded as JPEG without generative edits. License: https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
-      "source_url": "https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_102-12210,_Fussballspiel_mit_dem_Motorrad.jpg",
-      "image_reveal": "Motorcycle football in Germany — August 1931.\nSource: Bundesarchiv, Bild 102-12210 (photographer unrecorded)."
+      "source": "Steve Lipofsky / Basketballphoto.com, Michael Jordan during the 1987–88 NBA season. Wikimedia Commons high-quality version, original JPEG bytes retained. CC BY-SA 3.0 Unported; no generative editing or app-side crop.",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Jordan_by_Lipofsky_16577_(high_quality).jpg",
+      "image_reveal": "Michael Jordan performing a slam dunk — 1987–88 NBA season.\nPhoto: Steve Lipofsky / Basketballphoto.com · CC BY-SA 3.0."
     },
     {
-      "title": "The employee report",
+      "title": "An employee-data query",
       "kind": "image",
       "media": "/static/images/sample23.png",
       "image_fit": "contain",
       "alt": "A SQL query using employee records, employment status and annual salary.",
       "seconds": 25,
       "answer": "AI",
-      "context": "",
+      "context": "Judge who wrote this SQL query: AI or HUMAN.",
       "explanation": "Original AI-written SQL aggregating active employee headcount and average annual salary by department. The scenario is implied by table, column and filter names. Formatting follows the PostgreSQL tutorial, not a literal excerpt.",
       "source": "Original AI-written employee-data query, October 5, 2026. Formatting inspiration: PostgreSQL official tutorial, section 2.7 Aggregate Functions. Uppercase SQL clauses, lowercase identifiers and functions, four-space clause indentation. The source example concerns weather observations; the new query concerns active employees. No real employee data is used.",
       "source_url": "https://www.postgresql.org/docs/current/tutorial-agg.html",
       "discussion": ""
     },
     {
-      "title": "Perfectly normal office lighting",
+      "title": "A quiet moment in the laboratory",
       "kind": "image",
       "seconds": 25,
-      "context": "A person reads beside an electrical experiment. Judge whether AI created this image.",
+      "context": "Inspect the photograph. AI or HUMAN?",
       "media": "/static/images/sample16.jpg",
       "alt": "A seated person reading near large electrical equipment and bright arcs in a historical photograph.",
       "image_fit": "contain",
@@ -59,40 +59,22 @@
       "image_reveal": "Nikola Tesla in his Colorado Springs laboratory — December 1899.\nSource: Dickenson V. Alley. Historical double exposure."
     },
     {
-      "title": "The protocol committee got creative",
+      "title": "A very expensive refresh",
+      "context": "Read this short news article. Who wrote it: AI or HUMAN?",
       "kind": "text",
+      "answer": "AI",
       "seconds": 25,
-      "context": "Excerpts from four networking specifications. Judge the original writing.",
-      "body": "The bandwidth is limited to the leg length. A typical MTU is 256 milligrams. Some datagram padding may be needed.\n\n[...]\n\nThe carriers may sleep while enqueued.\n[...]\nPackets MAY be marked for deletion using RED paint while enqueued.\n\n[...]\n\nThere is evidence that some carriers have a propensity to eat other carriers and then carry the eaten payloads.\n\n[...]\n\nNo options were given for decaffeinated coffee. What's the point?\n[...]\nThe resulting entity body MAY be short and stout.",
-      "answer": "HUMAN",
-      "explanation": "These are unchanged excerpts from four human-written April Fools RFCs: 1149, 2549, 6214 and 2324. Marked omissions separate excerpts; their absurdity is intentional.",
+      "body": "Bitcoin falls 50% after exchange dashboard repeats a decimal error\n\nBitcoin briefly appeared to lose half its value on Monday after a software update pushed the wrong reference price to several trading dashboards. The sudden drop triggered automated sell orders before operators corrected the feed.\n\nActual trading prices recovered within minutes, but screenshots of the plunge continued circulating. One exchange asked customers to stop refreshing the app while engineers restored the chart. Users who had spent the morning buying the dip were advised to check whether they had bought anything at all.",
+      "explanation": "Original AI-written fictional news article for the game. The price-feed incident, exchange notice and purported sell orders are invented; this is not a report of a real Bitcoin event.",
+      "source": "Original AI-written English news-style fiction, October 5, 2026. No genuine news outlet, publication date, quote or factual financial report is claimed. The narrative is fictional and does not describe a verified market movement.",
       "discussion": "",
-      "source": "RFC 1149 (D. Waitzman, 1990), 2549 (D. Waitzman, 1999), 6214 (B. Carpenter and R. Hinden, 2011), and 2324 (L. Masinter, 1998). All published April 1. Exact English excerpts, at most 25 words per RFC, with marked omissions. Individual URLs and excerpt mapping in ContentSources.md.",
-      "source_url": "https://www.rfc-editor.org/rfc/rfc1149.html",
-      "reveal_sources": [
-        {
-          "label": "RFC 1149 — IP Datagrams on Avian Carriers — April 1, 1990",
-          "url": "https://www.rfc-editor.org/rfc/rfc1149.html"
-        },
-        {
-          "label": "RFC 2549 — Avian Carriers with Quality of Service — April 1, 1999",
-          "url": "https://www.rfc-editor.org/rfc/rfc2549.html"
-        },
-        {
-          "label": "RFC 6214 — Adaptation of RFC 1149 for IPv6 — April 1, 2011",
-          "url": "https://www.rfc-editor.org/rfc/rfc6214.html"
-        },
-        {
-          "label": "RFC 2324 — Hyper Text Coffee Pot Control Protocol — April 1, 1998",
-          "url": "https://www.rfc-editor.org/rfc/rfc2324.html"
-        }
-      ]
+      "reveal_sources": []
     },
     {
-      "title": "An unexpected guest at the coronation",
+      "title": "An unexpected guest",
       "kind": "image",
       "seconds": 25,
-      "context": "Inspect the guests in this imperial painting. Then choose AI or HUMAN.",
+      "context": "Look closely at the people in the painting. AI or HUMAN?",
       "media": "/static/images/sample13.jpg",
       "alt": "An imperial ceremony painting with ornate robes and a grey-coated guest among the crowd.",
       "image_fit": "contain",
@@ -107,49 +89,50 @@
       }
     },
     {
-      "title": "The firewall procurement plan",
+      "title": "The paperwork breakthrough",
       "kind": "image",
-      "media": "/static/images/sample22.png",
+      "media": "/static/images/sample25.png",
       "image_fit": "contain",
-      "alt": "A social-network post with the profile picture, name and handle pixelated.",
+      "alt": "A French-language X-style post displaying Emmanuel Macron’s name, handle and portrait.",
       "seconds": 25,
       "answer": "AI",
-      "context": "Judge the writing in the post.",
-      "explanation": "AI wrote this original parody about a giant firewall and CAPS LOCK security. It imitates a bombastic social-media style, but it is not a real Trump statement. Both the post and interface were created for the game.",
-      "source": "Original AI-written fictional tweet-style satire, October 4, 2026. No real person said or posted these words. Native Python/Pillow interface reconstruction, coarsely pixelated drawn placeholder avatar and author fields; no fabricated date or engagement counts.",
+      "context": "Read the French post. Judge the writing, not the account: AI or HUMAN?",
+      "explanation": "AI wrote this fictional bureaucratic-simplification parody. The reconstructed identity is visible as requested, but the words were not posted or said by Emmanuel Macron. Judge the writing rather than the real, licensed portrait.",
+      "source": "Original AI-written French parody created for this game, October 5, 2026. Not a genuine Emmanuel Macron statement or screenshot. Native X-style UI reconstruction with a readable name and @EmmanuelMacron handle. Unblurred real portrait: Presidency of Bulgaria / President.bg, December 4, 2017, CC BY 2.5 Bulgaria, cropped around face and resized. No posting date, fabricated engagement counts or real-policy assertion included.",
       "discussion": ""
     },
     {
-      "title": "The printer has been promoted",
+      "title": "The trophy before the ceremony",
+      "context": "Read this short news article. Who wrote it: AI or HUMAN?",
       "kind": "text",
-      "seconds": 25,
-      "context": "Judge the writing.",
-      "body": "At 09:14, the office printer was elected primary database server after reporting the best uptime in the building.\n\nThe migration initially went well. Every transaction was acknowledged, stapled and placed in the output tray. Unfortunately, our backup strategy depended on someone remembering to buy paper.\n\nAt 10:02, a jam caused the entire finance department to become read-only. The on-call engineer resolved the incident by opening Tray 2 and gently reassuring the printer.\n\nAction items: purchase toner, add a second printer for redundancy, and stop describing the shredder as our data-retention policy.",
       "answer": "AI",
-      "explanation": "Original AI-written comic incident report. It turns ordinary printer problems into a database outage; it is not a real company postmortem.",
+      "seconds": 25,
+      "body": "Ballon d’Or result briefly appears in trophy delivery tracker\n\nKylian Mbappé’s name appeared as the recipient of a gold-plated trophy in a courier tracking page on Tuesday, prompting fans to claim the Ballon d’Or result had leaked ahead of the ceremony. The parcel was marked “signature required” and “do not leave with reception”.\n\nOrganisers said delivery records did not constitute an official announcement and that personalised trophies could be prepared for more than one finalist. The tracking link was removed within an hour, although the package continued to show the status “recipient not available”. Supporters immediately began debating whether this counted as another missed opportunity.",
+      "explanation": "Original AI-written fictional sports-news article. The tracking-page leak, delivery status and organisers’ comment are invented; no real Ballon d’Or winner or leak is asserted.",
+      "source": "Original AI-written English news-style fiction created for the quiz, October 5, 2026. Mbappé is a real public figure, but this delivery-tracker incident and all quoted phrases are invented. No real outlet or article is impersonated.",
       "discussion": "",
-      "source": "Original AI-written English tech satire created for this game, October 4, 2026. No external quotation or real incident claimed."
+      "reveal_sources": []
     },
     {
-      "title": "The aerospace GraphRAG handover",
+      "title": "The internship handover",
       "kind": "image",
       "media": "/static/images/sample19.png",
       "image_fit": "contain",
-      "alt": "An anonymized Teams chat about an aerospace GraphRAG pipeline and a technical PDF attachment.",
-      "context": "Judge the second message in the conversation.",
+      "alt": "An anonymized French Teams conversation: an intern submits a document-search handover PDF and a manager replies.",
+      "context": "A conversation I may or may not have had during my internship. Judge only the manager’s reply: AI or HUMAN.",
       "answer": "AI",
-      "explanation": "AI wrote the incorrect validation reply. The first message describes document processing, a Neo4j knowledge graph and hybrid retrieval for grounded answers. The reply invents aircraft control, propulsion switching and automatic repair approval. This is a fictional English reconstruction inspired by the presenter's internship topics, not a transcript or claim about an actual colleague.",
-      "source": "Original AI-written fictional Teams reply based on the presenter-provided aerospace GraphRAG internship topics. MinerU/DocLing processing, Neo4j entities/relations/ontologies, Microsoft GraphRAG, LightRAG, RAGAnything, vector/text indexing and hybrid retrieval appear in the request. No employer or real employee is depicted; PDF attachment and anonymized profiles are fictional. Existing Microsoft Teams UI reconstruction retained.",
+      "explanation": "AI wrote the manager’s mistaken French validation reply. The first message concerns searching technical documents; the manager imagines flight monitoring, repair decisions and propulsion switching. Both messages and the attachment are fictional, inspired by the supplied internship topics, not a transcript or an allegation about an actual colleague.",
+      "source": "Original AI-written fictional French manager reply inspired by the presenter’s aerospace document-search/GraphRAG internship. Less technical wording requested; reply invents aircraft operations instead of discussing document retrieval. The PDF and anonymized identities are fictional; its contents are not displayed. Judge only the manager’s reply.",
       "discussion": "",
       "seconds": 25
     },
     {
-      "title": "A bug report with physical evidence",
+      "title": "Evidence in the logbook",
       "kind": "image",
       "media": "/static/images/sample20.jpg",
       "image_fit": "contain",
       "alt": "A handwritten engineering logbook page with an insect taped beside an entry.",
-      "context": "Judge the photograph.",
+      "context": "Inspect the photograph of this engineering logbook. AI or HUMAN?",
       "answer": "HUMAN",
       "explanation": "A moth was recorded in the Harvard Mark II logbook on September 9, 1947. This is a human-made photograph of the actual logbook, not generated imagery. The engineering term bug already existed.",
       "source": "U.S. Navy / Naval Surface Warfare Center, Dahlgren, photograph of the Harvard Mark II logbook. Public-domain U.S. federal government image, resized and re-encoded without generative edits. Correct logbook date September 9, 1947; some legacy photo metadata incorrectly says 1945.",

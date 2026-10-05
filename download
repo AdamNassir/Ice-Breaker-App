@@ -7,3 +7,5 @@ __pycache__/
 .pytest_cache/
 .question-manager-backups/
 .questions-*.tmp
+.agent/
+node_modules/

@@ -1,0 +1,12 @@
+{
+  "name": "ice-breaker-agent-checks",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local-only DOM regression checks.",
+  "devDependencies": {
+    "jsdom": "26.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

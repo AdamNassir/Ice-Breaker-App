@@ -1,0 +1,22 @@
+You are the local coding agent for this ice-breaker project.
+Read AGENTS.md, CreationInstructions.md and Verification.md, then implement the saved request below.
+The request snapshot is also in .agent/runs/20261005T120013-7a7089bb/request.md.
+Attempt 1 of 3.
+
+Work only in this repository. Preserve other questions/media and JSON/fallback equivalence.
+Use this Python executable for tests: C:\Users\Adam\Documents\LogicLever_Adam\Ice_Breaker_Game_App\Ice_Breaker_Game_App\.venv\Scripts\python.exe
+Implement, run meaningful relevant checks, fix failures and test again.
+Do not weaken/delete tests or alter agent_watch.py, agent_config.json or check_project.py.
+Do NOT edit UpdateGuide.md: the watcher owns its final report and protects concurrent editor saves.
+Do not read/print .env or credentials. Do not push, publish, deploy or send messages.
+Do not install dependencies automatically; if required tools are missing, report blocked.
+Use installed local tools and the CLI sandbox; never bypass its permissions.
+The watcher runs independent checks after your turn; your status alone does not establish success.
+Return structured JSON matching the supplied schema. Mark blocked for unresolved requirements.
+Clearly distinguish actual tests from anything you could not verify.
+
+SAVED REQUEST:
+Create a folder called "codex_test" and inside it create a file named Hello.md with the text "Hello world" inside it
+
+PREVIOUS CHECK FEEDBACK:
+Initial implementation pass.

@@ -11,7 +11,7 @@
     ['I set up the question manager',
       'I added instructions for AI-generated content and supplied sources for real content, then assembled and checked the questions.'],
     ['UpdateGuide.md became the update loop',
-      'I wrote a requested change and saved the file. The agent read it, changed the code and tested the result, then replaced my request with a report of what it had done.'],
+      'With the local watcher running, I saved a request in UpdateGuide.md. The agent changed the code and tested it. Independent checks fed failures back for another attempt; once they passed, the watcher replaced my request with a report.'],
     ['I verified the report and tested again',
       'I checked the modified files and behaviour. Any further change went back into UpdateGuide.md, and the cycle repeated.']
   ];
@@ -31,7 +31,7 @@
       step.append(node('h4', '', title), node('p', '', body)); list.append(step);
     }
     panel.append(list, node('p', 'workflow-loop', 'Instructions → build → agent checks → human review → update → repeat'));
-    panel.append(node('p', 'workflow-note', 'Saving a file hands off instructions to a running agent workflow; the game itself does not run or watch an agent.'));
+    panel.append(node('p', 'workflow-note', 'The local watcher must be running to react to saved requests. The deployed game stays separate from the agent.'));
     return panel;
   }
   window.IcebreakerWorkflow = {create};

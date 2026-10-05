@@ -1,6 +1,6 @@
 # AI or Human? — Ice Breaker Game
 
-A complete browser game for an AI presentation: a presenter opens a room, players join on their phones with pseudonyms, and everyone decides **AI OR HUMAN**. The bundled **English** deck has **10 rounds**: eight images (including three social screenshots and an AI-written SQL code card) and two tech texts; no audio or video rounds, six AI and four HUMAN origins. See `UpdateGuide.md` to install this deck in an existing deployment.
+A complete browser game for an AI presentation: a presenter opens a room, players join on their phones with pseudonyms, and everyone decides **AI OR HUMAN**. The default deck has **10 rounds**: eight images and two short fictional news articles, seven AI and three HUMAN origins. The interface, titles and short introductions are English; the Macron post and Teams messages are French. No audio or video rounds. Both supplied logos are bundled, and the interface uses blue and red. See `UpdateGuide.md` to install the update.
 
 The consolidated upfront specification is [CreationInstructions.md](CreationInstructions.md), written in the style of the original brief and excluding individual question content. [AGENTS.md](AGENTS.md) defines how a running agent reads saved update requests, checks its work and replaces them with completion reports.
 
@@ -12,13 +12,13 @@ Full Windows/macOS/Linux launch commands and the editing/deployment workflow are
 
 For Vercel, commit the saved `questions.json` and uploaded media, redeploy and create a **new room**. The game reads a saved JSON deck before falling back to `Content.py`. Once `questions.json` exists, changes to `Content.py` alone do not replace that managed deck.
 
-**Installing this update:** follow `UpdateGuide.md`. Copy both the bundled `questions.json` and its local media along with the updated game/editor code. No requirements or SQL changes are needed.
+**Installing this update:** follow `UpdateGuide.md`. The default deck/media and deployed game requirements are unchanged in this agent update. Add the local agent and bundled development checks listed in UpdateGuide.md; install/login to Codex and development dependencies through AgentSetup.md. No SQL migration is needed.
 
 ## Bundled starter deck
 
-The deck includes a fictional LinkedIn screenshot, motorcycle football, a historical Tesla double exposure, longer excerpts from April Fools networking RFCs, Napoleon with a hidden Inspector Gadget, a comic printer/database incident report, an AI-written employee-data SQL query styled after a PostgreSQL tutorial, an original AI-written tech parody, a fictional aerospace GraphRAG internship handover on Teams with a mismatched PDF summary, and the historical moth-in-a-computer logbook. Each default round shows its text or image; the SQL scenario is implied by its table, column and filter names, without an introductory paragraph. Each reveal shows AI or HUMAN. Real photographs additionally show what they depict, their date and source. The Gadget painting gets a red reveal circle. The April Fools text also reveals its four RFC sources and publication dates. Social posts and the SQL card receive no extra context; other explanations remain in the local manager and ContentSources.md. Questions stay AI OR HUMAN; difficult code parsing is no longer the focus.
+The deck includes a fictional LinkedIn post, an authentic Michael Jordan dunk, a historical Tesla double exposure, two original AI-written plausible news articles, Napoleon with a hidden Inspector Gadget, an AI-written employee-data SQL query, a fictional French Macron post and a French internship handover on Teams, plus the historical moth logbook. Every round shows a neutral title and short introduction. The SQL use case remains implied in the code. For Teams, players judge only the manager’s reply. Reveals show AI or HUMAN; real photos also show their subject, date and credit, and Inspector Gadget gets a red circle. Social posts get no extra reveal commentary. The news incidents and Macron words are invented for the quiz, not reports or quotations from real publications/accounts.
 
-**Explain the rule:** AI means generated writing/image/voice/footage. HUMAN includes human-written jokes and human camera tricks. For all social screenshots, judge the post or reply text. Say this rule before opening the room; the question screens contain no extra hints. The labels come from documented origins, not a style detector. The founder is fictional; no real public figure is accused of using AI.
+**Explain the rule:** AI means generated writing/image/voice/footage. HUMAN includes human-written jokes and human camera tricks. For all social screenshots, judge the post or reply text. Say this rule before opening the room; the short question introductions do not disclose origins. The labels come from documented origins, not a style detector. The LinkedIn founder and Teams identities are fictional. The Macron post is an original AI parody, not a genuine statement or a claim about his writing process.
 
 `ContentSources.md` has the private answer key, credits, source links, changes and full image-generation prompts. `ContentSources_Technical.md` retains credits for the previous deck.
 
@@ -41,7 +41,7 @@ The presenter’s timer applies to **every round**. Choose 10 seconds and all te
 | Node.js LTS + Vercel CLI | Not required | Only for the alternative CLI route | https://nodejs.org/ then `npm install -g vercel` |
 | Editor | Recommended | Recommended | VS Code or any text editor |
 
-No Supabase CLI, Docker, local PostgreSQL, Node build system, paid AI API key, or frontend framework is needed. The current question images and legacy audio files are bundled; previous assets remain available for old rooms and backups. Supabase is used as PostgreSQL storage through **server-side psycopg**, so there is no Supabase browser SDK or exposed database key. This project does not use Supabase Auth: pseudonyms and random game tokens are sufficient for an ice breaker.
+No Supabase CLI, Docker, local PostgreSQL, Node build system, paid AI API key, or frontend framework is needed to run the game. The optional local coding agent additionally uses Node.js, an authenticated Codex CLI and the development packages described in AgentSetup.md. The current question images and legacy audio files are bundled; previous assets remain available for old rooms and backups. Supabase is used as PostgreSQL storage through **server-side psycopg**, so there is no Supabase browser SDK or exposed database key. This project does not use Supabase Auth: pseudonyms and random game tokens are sufficient for an ice breaker.
 
 The delivered folder is the project root. Commands below run **inside `Ice_Breaker_Game_App`**. The app works immediately with a local SQLite file; cloud deployment requires your own Supabase and Vercel setup. Credentials are intentionally absent.
 
@@ -166,7 +166,7 @@ Each `env add` prompts for the secret rather than putting it into command histor
 2. The presenter opens on a large, centered QR lobby, with no question or leaderboard. The app generates the QR code automatically. Players scan it with their phone camera, open the link, and choose a unique pseudonym; the room code is already filled in. You can also share the room code or copy the player link. No account or email is required.
 3. Click **Start round 1**. Content appears on both the projector and every phone, and the server deadline begins. The QR disappears, and the projector shows a large centered question without a ranking sidebar. The player has exactly two choices: **AI** or **HUMAN**. On image rounds, players can pinch to zoom, drag the zoomed image, double-tap to zoom/reset, or use **+**, **−** and **Reset** below it. Zoom stays local to each phone and does not pause the timer. It survives the reveal and resets for the next question. Scroll outside the image to move the page.
 4. The first accepted vote is final. The presenter sees the count of answers; individual choices and the correct answer stay hidden during voting.
-5. When the timer reaches zero, the server rejects late answers and shows only **AI** or **HUMAN**. Scores update on phones; the presenter sees rankings only at the end.
+5. When the timer reaches zero, the server rejects late answers and shows **AI** or **HUMAN** (plus configured real-photo credits). Scores update on phones; the presenter sees rankings only at the end.
 6. Click **Next round** or press **Enter** when ready. The next question appears and its full timer starts immediately. Each reveal waits for the presenter to advance; only the first round needs a separate **Start round 1** click. After the final reveal, the same button or Enter shows final results.
 7. After round 10's reveal, click **Show final results**. Both screens show a tournament podium and the remaining placements. Only names, ranks and numeric scores appear; ranks 1–3 have medals. A short confetti burst comes from the podium once per game, respecting reduced-motion preferences. Ties share ranks. The presenter stays on these placements. On phones only, **Was this game made with AI or not ?** appears automatically below the placements. Choosing either answer reveals **AI**; it is unscored, has no timer, and makes no game API request. The answer stays revealed when the page polls or reloads. To host another game, open `/presenter` in a new browser tab.
 
@@ -178,7 +178,7 @@ The room expires **12 hours after creation**. New rooms opportunistically remove
 
 The QR pattern is generated by Python inside this app, using `qrcode==8.2`; no external QR service is contacted. It encodes only the public player link and room code. It regenerates when the presenter tab refreshes, and rooms created before this feature continue to work. For phones on a local network, set `PUBLIC_BASE_URL` to your reachable LAN address before creating the room. For Vercel, use your public production URL and ensure it does not require a Vercel login. The browser draws the generated pattern directly onto a canvas, without waiting for an image to load. If generation fails, an error and Retry QR code button appear; the displayed room code and Copy player link remain available. The QR request times out after 12 seconds.
 
-For this English deck update, use the exact changed-file list in UpdateGuide.md. Afterward, routine question edits only require deploying questions.json, new media and relevant source/license files. Keep your existing environment settings.
+For this branding and content update, use the exact changed-file list in UpdateGuide.md. Afterward, routine question edits only require deploying questions.json, new media and relevant source/license files. Keep your existing environment settings.
 
 ## 6. Scoring and modifications
 
@@ -197,12 +197,14 @@ An incorrect or missed answer awards 0 and resets the streak. There is no speed 
 | Round text, origin, source, image, audio or video | Local question manager → `questions.json`; `Content.py` is the fallback starter |
 | Add/remove/reorder rounds | Add/remove/reorder dictionary entries in `ROUNDS`; UI count updates automatically |
 | Timer for every round | Presenter setup → Seconds per round; question-level seconds are ignored |
-| Editor-only difficulty and neutral setup | Manager / `questions.json` → `difficulty` and `context` |
+| On-screen title and short introduction | Manager / `questions.json` → `title` and `context` |
+| Editor-only difficulty | Manager / `questions.json` → `difficulty` |
 | Private explanation / debate notes | Manager / `questions.json` → `explanation`, `discussion`, `source_url` |
 | Online playback / clip times | Manager / `questions.json` → `media_url`, `media_start`, `media_end`; playback in `static/media.js` |
 | Point and streak rules | `main.py` → `BASE_POINTS`, `STREAK_STEP`, `MAX_STREAK_BONUS` |
 | Room lifetime / player cap | `main.py` → `ROOM_LIFETIME_HOURS`, `MAX_PLAYERS` |
-| Red/orange/white/gold palette | `static/style.css` → `:root` variables |
+| Blue/red palette | `static/style.css` and `manager_assets/style.css` → `:root` variables |
+| Logos | `static/branding/`; `.brand-logos` in both stylesheets |
 | Image size, framing and positioning | `static/imagestyle.css` and per-round fields; see `HowToAddImages.md` |
 | Player interface | `static/index.html` |
 | Presenter interface | `static/presenter.html` |
@@ -293,7 +295,9 @@ The hard player cap is 200, but that is an abuse/storage bound, **not a verified
 
 The phone bonus reveals AI and then shows an illustrative six-step sequence: one complete instruction file; agent implementation and iterative testing; human code review/testing; question-manager setup with generated-content instructions and real sources; saved UpdateGuide.md requests followed by agent completion reports; human verification and another cycle. The presenter remains on final rankings. The standalone `/bonus` page has the same post-answer explanation.
 
-For a future change, replace the completed report in `UpdateGuide.md` with the desired behaviour and acceptance checks, then save it and hand the file to a running agent session. The agent reads `CreationInstructions.md` and `AGENTS.md`, implements and tests the request, and replaces the pending text with a report that you can review and test. Saving the file alone does not trigger the deployed game or an autonomous agent; no file watcher is included.
+An actual local watcher is now included. Follow [AgentSetup.md](AgentSetup.md) to install/login to Codex CLI, install the development checks and run `python agent_watch.py` with the project virtual environment. On Windows, StartAgent.cmd checks the setup and launches it. With that terminal open, replace the completed report in UpdateGuide.md with a request and save. The agent edits/tests, independent checks feed failures back for another attempt, and the watcher replaces successful requests with a reviewable report. You test again and save the next change.
+
+Completed reports and drafts are ignored; identical attempted requests are not rerun automatically. Failed requests and concurrent newer saves remain intact, with a source checkpoint and report under .agent/runs/. Deployment remains manual. The local watcher is separate from FastAPI/Vercel and must be running to react to saves. See AgentRequestTemplate.md for a drafting template and AgentSetup.md for retry/recovery instructions.
 
 Example pending request:
 

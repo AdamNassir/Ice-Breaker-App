@@ -5,14 +5,14 @@
   min-height: 180px;
   object-fit: contain;    /* contain = entire image; cover = crop to fill. */
   object-position: center;
-  background: #f5f3f4;
+  background: #f5f7fc;
   border-radius: 12px;    /* CHANGE corner rounding. */
   display: block;
 }
 .round-audio { width: 100%; margin: 16px 0; }
 .round-video { display: block; width: 100%; max-height: 420px; margin: 16px 0; background: #171215; border-radius: 12px; }
 .youtube-player { width: 100%; aspect-ratio: 16 / 9; min-height: 200px; border: 0; }
-.image-error { color: #981b27; font-size: 14px; }
+.image-error { color: #ba1823; font-size: 14px; }
 @media (max-width: 760px) {
   .round-image { max-height: 300px; min-height: 140px; }
   .round-video { max-height: 300px; }
@@ -23,7 +23,7 @@
 }
 
 /* The presenter has no sidebar; use the available projector area. */
-.presenter-playing .round-image{width:100%;max-height:72vh;min-height:0;background:white}
+.presenter-playing .round-image{width:100%;max-height:64vh;min-height:0;background:white}
 .presenter-playing .round-audio{width:min(900px,100%)}
 
 /* The SVG uses the same contain/cover geometry as the image. Reveal only. */
@@ -33,12 +33,12 @@
 
 /* Phone/player inspection: only the image and its reveal overlay move. */
 .image-viewport{overflow:hidden;position:relative;border-radius:12px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:zoom-in}
-.image-viewport:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
+.image-viewport:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
 .image-viewport .image-frame{transform-origin:center;will-change:transform}
 .image-viewport img{-webkit-user-drag:none}
 .image-viewport.is-zoomed{cursor:grab}
 .image-viewport.is-dragging.is-zoomed{cursor:grabbing}
 .image-zoom-controls{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:10px;line-height:1.2}
 .image-zoom-button{min-width:44px;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--red);font-size:18px;font-weight:700;touch-action:manipulation}
-.image-zoom-button:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.image-zoom-button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 .image-zoom-level{min-width:52px;text-align:center;font-size:14px;color:var(--muted)}

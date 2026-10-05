@@ -78,11 +78,11 @@ state["revision"] += 1
 
 - Add streaks, it is supposed to be ludic after all. Correct answers give 100 points. Add 25 points for each additional consecutive correct answer, capped at 100 bonus points per round. Incorrect or missed answers reset the streak. Keep the formula in editable server constants, but do not display an explanation of the formula in the public game.
 
-- Each normal question should display its content alone. Do not introduce the question with its title, difficulty, category, source, author or a discussion prompt. Text should be compact and easy to read. For code questions, imply the scenario through table, column, variable or filter names. Do not add a prose scenario above the code. Other supplied assets may contain author-requested context; do not add a generic introduction around them.
+- Each normal question must show a neutral title and a short introduction above its content on the presenter and phone. Use the existing title and context fields. Do not reveal its origin, source, difficulty or discussion prompt before voting ends. For a conversation, state exactly which reply players judge. Keep text compact and centered. For code questions, imply the usage scenario through table, column, variable or filter names; the short introduction must not narrate a separate scenario. Show no round title or introduction in the first QR lobby or presenter final rankings.
 
 - On reveal, show AI or HUMAN. Do not display explanation paragraphs, technical notes, suggested discussion questions or text telling the presenter to discuss/continue. Keep those notes available to the author in the manager and private source files.
 
-- For configured real photographs, the reveal may also show a concise caption stating what the image is, its date and its source link. For explicitly configured HUMAN text excerpts, show concise source labels, publication dates and links only after reveal. Do not add discussion or explanation paragraphs. Do not add contextual text to social posts or code cards. For an image with a configured hidden-character highlight, show a red circle only after reveal. Transform and scale the circle together with the image.
+- For configured real photographs, the reveal may also show a concise caption stating what the image is, its date and its source link. For explicitly configured HUMAN text excerpts, show concise source labels, publication dates and links only after reveal. Do not add discussion or explanation paragraphs. Apart from their neutral title and short voting introduction, do not add contextual text to social posts or code cards at reveal. For an image with a configured hidden-character highlight, show a red circle only after reveal. Transform and scale the circle together with the image.
 
 - Do not expose answer keys, explanations, source notes or reveal-only highlight coordinates in a live question payload. Keep Content.py, questions.json and source notes outside static/. Do not create a public API that returns the full saved deck.
 
@@ -103,17 +103,17 @@ state["revision"] += 1
   5. I wrote requested changes in UpdateGuide.md and saved it. The agent read the saved request, made changes and tested, then replaced my request with a report of what it had done.
   6. I verified that report, tested again and repeated the loop for further changes.
 
-  Call the assistant an agent throughout this explanation. Present the sequence as an illustrative reconstruction of the development workflow. Do not claim it is a literal transcript or exact chronology. Do not claim that the deployed game watches files or runs an agent : saving UpdateGuide.md only becomes a handoff when a running agent workflow reads it.
+  Call the assistant an agent throughout this explanation. Present the sequence as an illustrative reconstruction of the development workflow. Do not claim it is a literal transcript or exact chronology. Keep the coding agent separate from the deployed game. Saving UpdateGuide.md triggers it only while the local agent_watch.py process is running. The actual history remains separate from this illustrative sequence.
 
 Appearance and restrictions :
 
-- Use red, orange, white and gold. Keep the interface responsive for phones and a large projector. Make question content centered and use the width freed by removing QR/ranking sidebars. Avoid unnecessary text and visual hints about an answer.
+- Use blue and red with white and neutral backgrounds. Include the supplied LogicLever and TotalEnergies logos without redrawing or recoloring them. Use LogicLever’s blue for the second voting choice, focus indicators and secondary accents; use red for the first choice and primary actions. Metallic medal colors may remain limited to final podium decoration. Keep the interface responsive for phones and a large projector. Make question content centered and use the width freed by removing QR/ranking sidebars. Avoid unnecessary text and visual hints about an answer.
 
 - Do not display the following public passages, or paraphrases that simply put them back : join-on-your-phone prose below the question, scanning/pseudonym instructions under the presenter QR, the points/streak calculation, discussion instructions, player introductory copy about posts/text/images, feature pills about rounds/choices/streak bonuses, or presenter introductory copy about setting the pace and making the call.
 
 - Players must be able to inspect images on their phone : pinch to zoom, drag while zoomed, double-tap to zoom/reset, and use +, minus and Reset buttons. Support keyboard equivalents where practical. Bound panning and zoom, preserve aspect ratio and keep the reveal circle aligned. Preserve zoom/position on polling and reveal; reset for a new question. Do not block voting or pause the timer. Scrolling outside the image should still move the page.
 
-- Any social UI reconstruction must match its supplied reference rather than using a generic card. Anonymize displayed identities as requested. When coarse pixelation is required, name and handle must actually become unreadable. Do not use a weak cosmetic blur that leaves the identity visible. These are authoring/layout requirements; individual post wording belongs in the separate content deck.
+- Any social UI reconstruction must match its supplied reference rather than using a generic card. Anonymize displayed identities as requested. The French Macron post must show an unblurred name, handle and profile photograph. Keep LinkedIn and Teams identities anonymized. When coarse pixelation is required for other content, name and handle must actually become unreadable. Do not use a weak cosmetic blur that leaves the identity visible. These are authoring/layout requirements; individual post wording belongs in the separate content deck.
 
 Question manager :
 
@@ -121,7 +121,7 @@ Question manager :
 
 - The user should be able to add text, code/commit snippets, images, audio and video. Image/audio/video questions need working file-upload controls, not just a text field. Support documented HTTPS recording/video links and supported YouTube clips, including start/end offsets, for custom questions.
 
-- The default event deck should have ten English image/text questions. Do not include audio or video in that default deck. Media support remains available in the manager for custom decks. The actual ten questions and their origins are supplied separately; do not reproduce or invent them in this creation brief.
+- The default event deck should have ten image/text questions. Keep the app interface, question titles and short introductions in English; the Macron post and Teams messages are explicitly in French. Replace default prose excerpts with plausible, amusing AI-written fictional news articles, include an unusual authentic sports photograph, and make the Teams manager reply less technical and clearly the object of classification. Store provenance and fictional status privately; never claim invented news or a parody post is an authentic external source. Do not include audio or video in that default deck. Media support remains available in the manager for custom decks. The actual ten questions and their origins are supplied separately; do not reproduce or invent them in this creation brief.
 
 - Save the managed deck as questions.json, keep a matching Content.py fallback and read the saved JSON first. Both files must be included in the complete ZIP. Upload media into the correct static subfolder and keep original source files outside the public app where appropriate.
 
@@ -154,7 +154,7 @@ question = {
 
 - A new game room must take a snapshot of the saved deck. Existing rooms must not silently change questions when the author saves a different deck. Provide clear missing-media/deck errors, a working Reload saved control and exact deployment instructions for new media.
 
-- Write HowToAddImages.md and QuestionManager.md. Clearly identify which paths, CSS rules, image-fit/position fields and authoring constants should be edited. All question text, visible UI and user-facing documentation should be in English.
+- Write HowToAddImages.md and QuestionManager.md. Clearly identify which paths, CSS rules, image-fit/position fields and authoring constants should be edited. Visible UI and user-facing documentation must be in English, with the specified French question-content exceptions. Title and short introduction are public; explanation and source notes remain private until an authorized reveal.
 
 Supabase and Vercel :
 
@@ -191,14 +191,18 @@ request = read_saved_request("UpdateGuide.md")
 implement(request)
 while failures := run_relevant_checks():
     fix(failures)
-write_completed_report("UpdateGuide.md")
+write_completed_report_if_request_unchanged("UpdateGuide.md")
 ```
 
 - Cover game timing, full scoring, duplicate/stale/late votes and controls, authentication, QR creation, source secrecy, deck/media consistency, question-manager upload/save/repair and room snapshots. Check player image gestures, keyboard advancement, final placements, bonus persistence and workflow visibility. Visually inspect created media and changed layouts when possible. Clearly state any browser, deployment or load-test limitation.
 
 - Never describe the app as error-free merely because tests passed. Report what was actually tested. Do not claim a live Supabase/Vercel deployment, an active file watcher or physical-phone testing unless it was actually performed.
 
-- For requested changes, read the saved UpdateGuide.md in a running agent session. Complete the implementation and validation, then replace the pending request with a clear report : resulting behaviour, exact modified/added/removed files, checks and install/redeploy steps. If something is unfinished, leave its pending requirement visible.
+- Include a real local agent_watch.py process using authenticated Codex CLI. Watch UpdateGuide.md saves with a debounce; ignore completed reports, drafts, blank files and identical already-attempted requests. Keep one watcher per repo. Use workspace-write permissions, no bypass flags, argument lists and stdin rather than shell interpolation. Add native Windows startup/login instructions and a StartAgent.cmd launcher. The deployed game must not start this process.
+
+- Snapshot each request and source checkpoint before editing, excluding credentials, dependencies and runtime files. Give the agent the creation brief, AGENTS.md and request; it may implement/test/fix locally but must not edit UpdateGuide.md or the protected watcher/config/check gate. Run independent Python and frontend checks afterward, feeding failures back for a bounded maximum of three attempts. Preserve incomplete requests, logs and checkpoints on failure; allow an explicit retry. Stop launched processes on timeout or Ctrl+C.
+
+- When agent work and independent checks succeed, the watcher replaces the pending request with a report containing resulting behaviour, exact actual modified/added/removed files and validation. If the author saved newer request text during the run, preserve it and put the old report in the run directory instead. Keep deployment manual. Document actual authenticated-model, Windows, browser and deployment testing limits separately from the presentation narrative.
 
 - The human author must be able to inspect the report, review the code and test again. Keep the update loop easy to repeat. AGENTS.md should tell future agents to read this creation brief and UpdateGuide.md before editing.
 
@@ -210,7 +214,11 @@ Folder structure :
   - CreationInstructions.md : this complete creation brief, with no individual question content.
   - AGENTS.md : repository working instructions for the agent.
   - ReadMe.md : install, local operation, Supabase and Vercel instructions for all three operating systems.
-  - UpdateGuide.md : pending human change requests, subsequently replaced by the agent's completion report.
+  - UpdateGuide.md : pending human change requests, subsequently replaced by the validated completion report.
+  - agent_watch.py, agent_config.json and StartAgent.cmd : local watcher, configuration and Windows launcher.
+  - AgentSetup.md and AgentRequestTemplate.md : installation/login, operation, retry/recovery and drafting template.
+  - check_project.py and tests/frontend/ : independent Python/DOM check gate, scripts and development-only npm dependencies.
+  - .agent/ : ignored local run requests, checkpoints, logs, lock and reports; never deliver this runtime folder.
   - Verification.md : actual checks and limitations.
   - HowToAddImages.md and QuestionManager.md : authoring instructions.
   - Content.py and questions.json : separate default/fallback and managed decks.
@@ -222,6 +230,7 @@ Folder structure :
   - static/app.js, static/media.js and static/imagezoom.js : game, playback and image inspection.
   - static/bonus.html, static/bonus.js and static/workflow.js : unscored reveal and development sequence.
   - static/style.css and static/imagestyle.css : clearly editable presentation rules.
+  - static/branding/ : the original supplied logos.
   - static/images/, static/audio/ and static/videos/ : published media.
   - tests/ : meaningful regression checks.
 

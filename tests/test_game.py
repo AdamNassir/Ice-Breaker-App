@@ -23,22 +23,39 @@ class GameTests(unittest.TestCase):
         managed = parse_deck((root / 'questions.json').read_bytes(), root)
         self.assertEqual(managed, validate_rounds(main.ROUNDS, root))
         self.assertEqual(len(managed), 10)
-        self.assertEqual(sum(q['answer'] == 'AI' for q in managed), 6)
+        self.assertEqual(sum(q['answer'] == 'AI' for q in managed), 7)
         self.assertEqual([q['kind'] for q in managed].count('image'), 8)
         self.assertEqual([q['kind'] for q in managed].count('text'), 2)
         self.assertEqual([q['kind'] for q in managed].count('audio'), 0)
         self.assertEqual([q['kind'] for q in managed].count('video'), 0)
         self.assertGreater(len(managed[4]['body'].split()), 70)
         self.assertEqual(managed[2]['answer'], 'AI')
-        self.assertEqual(len(managed[4]['reveal_sources']), 4)
+        self.assertEqual(managed[4]['answer'], 'AI')
+        self.assertEqual(managed[7]['answer'], 'AI')
+        self.assertEqual(managed[4]['reveal_sources'], [])
+        self.assertTrue(all(q['title'] and q['context'] for q in managed))
+        self.assertIn('manager’s reply', managed[8]['context'])
+        self.assertEqual(managed[1]['media'], '/static/images/sample24.jpg')
+        self.assertEqual(managed[6]['media'], '/static/images/sample25.png')
         self.assertEqual(managed[6]['answer'], 'AI')
         self.assertTrue(all(not q.get('media_url') for q in managed))
+
+    def test_supplied_logos_are_served_on_all_entry_views(self):
+        for name in ('logiclever.png', 'totalenergies.png'):
+            response = self.client.get('/static/branding/' + name)
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(response.headers['content-type'].startswith('image/png'))
+            self.assertTrue(response.content.startswith(b'\x89PNG\r\n\x1a\n'))
+            for route in ('/', '/presenter', '/bonus'):
+                self.assertIn('/static/branding/' + name, self.client.get(route).text)
 
     def test_workflow_asset_and_creation_brief_privacy(self):
         self.assertEqual(self.client.get('/static/workflow.js').status_code, 200)
         self.assertIn('/static/workflow.js', self.client.get('/').text)
         self.assertIn('/static/workflow.js', self.client.get('/bonus').text)
-        for path in ('/CreationInstructions.md', '/AGENTS.md', '/UpdateGuide.md'):
+        for path in ('/CreationInstructions.md', '/AGENTS.md', '/UpdateGuide.md',
+                     '/agent_watch.py', '/agent_config.json', '/AgentSetup.md',
+                     '/check_project.py', '/.agent/state.json', '/tests/frontend/game.cjs'):
             self.assertEqual(self.client.get(path).status_code, 404)
         before = self.state(self.p1)
         self.client.get('/static/workflow.js')

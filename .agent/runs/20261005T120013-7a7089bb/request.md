@@ -1,0 +1,1 @@
+Create a folder called "codex_test" and inside it create a file named Hello.md with the text "Hello world" inside it

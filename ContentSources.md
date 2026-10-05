@@ -1,38 +1,75 @@
-# English fun deck: private answer key and credits
+# Question deck: private answer key and credits
 
-Updated October 5, 2026. Ten rounds: six AI and four HUMAN; eight images and two texts; no audio or video rounds. All prompts, questions and reveals are in English. These are known-origin examples, not detector verdicts. The previous technical deck's sources remain in `ContentSources_Technical.md`; older credits remain in `ContentSources_Legacy.md`.
+Updated October 5, 2026. Ten rounds: **seven AI and three HUMAN**, eight images and two text articles. No audio/video rounds. The app interface, titles and short introductions are English; the Macron post and Teams messages are French. Origins come from documented production, not a detector.
 
-## Explain the rule before play
+Players judge the writing in social posts and only the **manager’s reply** in Teams. For photographs/paintings, judge image production. An authentic double exposure still counts as HUMAN. A plausible invented news story counts as AI because the agent wrote it, not merely because the story is false.
 
-AI means the writing, image, voice or footage was generated. HUMAN means people wrote, painted, photographed or recorded it. A human-made joke, staged photo or double exposure still counts as HUMAN. For the social screenshots, judge the **post or reply text**. Explain this rule before opening the room; the projected content contains no additional hints. This definition is about production, not whether a depicted event is plausible.
+Every round shows its title, short introduction and content. Answer notes, origins, credits and highlight coordinates are withheld from live payloads. Reveals show AI or HUMAN; configured real photographs also show their subject, date and source. Posts have no extra reveal commentary. Inspector Gadget gets a red circle only at reveal.
 
-The public game reveals AI or HUMAN. The three real photographs additionally show what they depict, their date and source; the April Fools text additionally shows its four RFC source links and dates. Social posts and other text questions show no added context. The AI painting gets a red circle around Inspector Gadget at reveal. Other notes are retained here and in the local manager. Strangeness is a decoy: human originals can be ridiculous, and generated originals can look ordinary. There is no claim of a measured difficulty curve.
+## Current ten rounds
 
-## Rounds and provenance
-
-| # | Title | Origin | Evidence and changes |
+| Round | Subject | Origin | Provenance |
 | --- | --- | --- | --- |
-| 1 | My AI agent deleted the roadmap | AI | Original AI-written post inside a fictional LinkedIn-style screenshot (`sample18.png`). All identities are fictional and blurred. Classification concerns the post text, not the interface renderer. |
-| 2 | The football upgrade nobody asked for | HUMAN | German Federal Archives photograph, August 1931; motorbike football. `sample15.jpg`: current Commons crop, re-encoded as JPEG without generative editing. |
-| 3 | The employee report | AI | Original AI-written SQL aggregating active employee headcount and average annual salary by department. `sample23.png` contains only code. Formatting follows the official PostgreSQL aggregate-query tutorial; no literal source excerpt or scenario paragraph. |
-| 4 | Perfectly normal office lighting | HUMAN | Dickenson V. Alley's Tesla laboratory photograph, December 1899. Historical double exposure; resized/re-encoded, no generative editing. `sample16.jpg`. |
-| 5 | The protocol committee got creative | HUMAN | Exact English excerpts from RFCs 1149, 2549, 6214 and 2324, all published April 1. Visible omission markers separate nonadjacent selections and documents. No paraphrasing or translation. |
-| 6 | An unexpected guest at the coronation | AI | Original generated imperial ceremony with an Inspector Gadget cameo, October 4, 2026. Historical pastiche, not an altered museum original. `sample13.jpg`. |
-| 7 | The firewall procurement plan | AI | Original AI-written parody about a huge firewall and CAPS LOCK (`sample22.png`). This is fictional, not a real Trump post. It uses the dark X post layout from the user-supplied screenshot layout; profile picture, name and handle are coarsely pixelated. |
-| 8 | The printer has been promoted | AI | Original AI-written comic incident report about promoting the office printer to primary database server. No quotation or real incident claimed. Text replaces the removed cat photo. |
-| 9 | The aerospace GraphRAG handover | AI | Fictional Teams-style screenshot (`sample19.png`), inspired by the presenter's internship topics. The reply invents aircraft control, propulsion switching and automatic repair approval rather than reviewing the document-processing/retrieval pipeline. Classification concerns the AI-written reply; identities are blurred. |
-| 10 | A bug report with physical evidence | HUMAN | U.S. Navy photograph of the Harvard Mark II logbook, September 9, 1947 (`sample20.jpg`). Public-domain federal-government image; resized/re-encoded without generative editing. The moth is real. |
+| 1 | LinkedIn roadmap satire | AI | Original AI-written fictional post; unchanged writing and image `sample18.png`. |
+| 2 | Michael Jordan airborne | HUMAN | Steve Lipofsky / Basketballphoto.com, 1987–88 NBA season; original high-quality Commons JPEG `sample24.jpg`. |
+| 3 | Employee-data SQL | AI | Original rewritten aggregate query, formatting reference: official PostgreSQL tutorial. `sample23.png` unchanged. |
+| 4 | Tesla in his laboratory | HUMAN | Dickenson V. Alley, December 1899; historical double exposure, `sample16.jpg`. |
+| 5 | Bitcoin dashboard incident | AI | Newly authored fictional English article. No genuine exchange notice or market event claimed. |
+| 6 | Napoleon with Inspector Gadget | AI | Original generated imperial painting, `sample13.jpg`; unchanged painting and reveal circle. |
+| 7 | Macron paperwork post | AI | Newly authored French parody, reconstructed X layout, visible name/handle and real unblurred portrait. `sample25.png`. Not a genuine post. |
+| 8 | Ballon d’Or delivery tracker | AI | Newly authored fictional English sports article. No genuine leaked result, organiser quote or award winner claimed. |
+| 9 | French internship handover on Teams | AI | Classify the manager’s reply only. Both messages and PDF attachment are fictional; simplified document-search request, mismatched aircraft-operations reply. `sample19.png`. |
+| 10 | Moth logbook | HUMAN | U.S. Navy photograph of the Harvard Mark II logbook, September 9, 1947, `sample20.jpg`. |
 
-### Historical photos: credit and licenses
+## Authentic sports photograph — sample24.jpg
 
-**Motorcycle football — sample15.jpg.** Credit: Bundesarchiv, Bild 102-12210 / CC-BY-SA 3.0 Germany. Photographer not recorded. Date: August 1931. The current Commons upload has a small crop documented in its file history; the app copy is re-encoded as JPEG. This derivative remains under the same license.
+**Michael Jordan performing a tongue-out slam dunk.** Photographer: Steve Lipofsky / Basketballphoto.com. The source describes the Chicago Bulls, 1987–88, and dates it to the 1987 NBA season; it does not supply a precise match day. The reveal uses the season, not an invented day.
 
-- [Archive image and file history](https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_102-12210,_Fussballspiel_mit_dem_Motorrad.jpg)
-- [CC BY-SA 3.0 Germany, English deed](https://creativecommons.org/licenses/by-sa/3.0/de/deed.en)
+- [Source and high-quality file](https://commons.wikimedia.org/wiki/File:Jordan_by_Lipofsky_16577_(high_quality).jpg)
+- [Original lower-resolution record](https://commons.wikimedia.org/wiki/File:Jordan_by_Lipofsky_16577.jpg)
+- [CC BY-SA 3.0 Unported](https://creativecommons.org/licenses/by-sa/3.0/)
 
-**Tesla — sample16.jpg.** Credit: Dickenson V. Alley, December 1899, Tesla's Colorado Springs laboratory. The Commons record identifies this as a double exposure and public domain in the United States. The two exposures do not show Tesla sitting beside active arcs in one instant. The app copy is resized/re-encoded; no new characters or arcs were added.
+The bundled JPEG retains the downloaded source bytes, 1866 × 2340 pixels, SHA-1 `907435b3ef5832d0c284a9091c7da4bc77d4262f`, matching the source record. No crop, compositing or generative edit is applied. This is an authentic photograph, not a recreation of a sports image. The game shows its credit and source after the deadline.
 
-- [Source, explanation and public-domain record](https://commons.wikimedia.org/wiki/File:Tesla_colorado.jpg)
+## Other authentic photographs
+
+**Tesla — sample16.jpg.** Dickenson V. Alley, December 1899, Colorado Springs laboratory. The [Commons record](https://commons.wikimedia.org/wiki/File:Tesla_colorado.jpg) identifies a historical double exposure and public-domain U.S. status. Tesla and the arcs were not captured together in one exposure. The bundled copy was resized/re-encoded, without generative additions.
+
+**Moth logbook — sample20.jpg.** Courtesy Naval Surface Warfare Center, Dahlgren; U.S. Navy photograph. [Source and public-domain record](https://commons.wikimedia.org/wiki/File:First_Computer_Bug,_1947.jpg), [Smithsonian object](https://americanhistory.si.edu/collections/object/nmah_334663). The entry is September 9, 1947; older photo metadata sometimes says 1945. The word bug already existed. The bundled copy is 1500 × 1186, resized/re-encoded without generative editing.
+
+## Macron parody and portrait — sample25.png
+
+The French text is an **original AI-written fictional parody**, created October 5, 2026. It describes a supposedly simplified administrative form that still requires the twelve old forms. Emmanuel Macron did not supply or post these words. It is not a real screenshot, quote, policy announcement or accusation that he used AI.
+
+The X-style interface is locally drawn by `build_question_images.py`. Name and `@EmmanuelMacron` are deliberately readable; no blur or pixelation is applied. The portrait is a real photograph, not a synthetic face. No invented timestamp or engagement totals are shown. Players classify **post writing**, not portrait origin.
+
+Portrait credit: **Presidency of Bulgaria / President.bg**, December 4, 2017. [Source file](https://commons.wikimedia.org/wiki/File:Emmanuel_Macron_(04-12-2017).jpg), [CC BY 2.5 Bulgaria](https://creativecommons.org/licenses/by/2.5/bg/deed.en). The original 249 × 410 JPEG is bundled as `macron-profile-source.jpg`. The screenshot crops coordinates `(35, 24, 220, 209)` around the face, resizes to 80 × 80, and applies a circular mask. No face-generation or blur. The screenshot incorporates this attributed, licensed photograph alongside independently generated text.
+
+## LinkedIn and French Teams reconstructions
+
+Both are editable native interface reconstructions, not real account screenshots. LinkedIn writing/layout remain unchanged. Its invented identity/avatar stay blurred. The Teams layout follows [Microsoft’s combined Chat interface](https://support.microsoft.com/en-us/teams/teams-channels/explore-the-new-chat-and-channels-experience-in-microsoft-teams); no Microsoft screenshot pixels or actual employee messages are redistributed.
+
+The French intern’s message describes a tool for questions over technical documents, useful passages, PDF reading, information organisation and testing. It asks the manager to validate `Bilan_Stage_Recherche_Documents.pdf`. The manager incorrectly interprets document search as monitoring aircraft, deciding repairs and switching propulsion. The messages use less technical vocabulary. Names/avatars remain anonymized, and the PDF is an attachment only; no document interior is displayed. The intro states: classify only the manager’s reply. This is fiction inspired by the supplied internship topics, not a record or claim about an actual colleague.
+
+## Two plausible fictional news articles
+
+Rounds 5 and 8 replace the former RFC excerpts and printer incident. Both are original English AI writing created October 5, 2026. They imitate short news reporting without impersonating an actual publication or adding fake source citations. All incidents and quoted snippets are invented. The Bitcoin story is not financial reporting; the Mbappé story is not an award result. Both reveal AI. No outside article is credited because neither is copied from one.
+
+## SQL formatting reference — sample23.png
+
+The original AI-written employee-data aggregate query uses the clause formatting of [PostgreSQL’s official tutorial: Aggregate Functions](https://www.postgresql.org/docs/current/tutorial-agg.html). Uppercase clauses, lowercase identifiers/functions, four-space clause indentation and a plain monospace block are preserved. It filters active employees, groups by department, keeps groups of at least five and sorts by average salary. The use case stays implied in table/column/filter names. The new neutral introduction asks who wrote the SQL, without narrating a separate scenario. The code image is unchanged and reveals AI only.
+
+## Supplied logos and theme
+
+The two original embedded PNGs from the user’s `Logos_To_Add.docx` are bundled unchanged: `static/branding/logiclever.png` (189 × 63) and `totalenergies.png` (400 × 225). No logo generation, tracing, recoloring or cropping. They appear in the player, presenter, standalone bonus and local manager; the presenter’s final ranking retains its placements-only layout.
+
+The game’s blue `#1f2ade` is sampled from LogicLever. The UI red is `#e52330`. White/neutral backgrounds remain; gold/silver/bronze are reserved for medal/podium decoration. Original logo colors are preserved.
+
+## Retained legacy media
+
+Old assets remain available for older room snapshots/custom decks. They are not active questions. The motorcycle-football JPEG `sample15.jpg` credits **Bundesarchiv, Bild 102-12210 / CC-BY-SA 3.0 Germany**, August 1931; current Commons crop, JPEG re-encoding, no generative editing. [Source](https://commons.wikimedia.org/wiki/File:Bundesarchiv_Bild_102-12210,_Fussballspiel_mit_dem_Motorrad.jpg), [license](https://creativecommons.org/licenses/by-sa/3.0/de/deed.en). Other retained camera/technical image credits are in `ContentSources_Legacy.md` and `ContentSources_Technical.md`.
+
+`sample21.png` retains a reconstructed Trump Truth Social post dated May 16, 2025, [original](https://truthsocial.com/@realDonaldTrump/posts/114517718765768352), [archive](https://www.presidency.ucsb.edu/documents/truth-social-posts-may-16-2025). `sample22.png` retains the original AI-written English Trump-style firewall parody. Both identities were coarsely pixelated. Neither is used by this deck or rebuilt by the current default script. Removed RFC excerpts can still be added as custom HUMAN text with explicit source credits; their source-link feature remains supported.
 
 ### Legacy audio credit — not in the current deck
 
@@ -41,40 +78,6 @@ The public game reveals AI or HUMAN. The three real photographs additionally sho
 - [Official NSA release](https://www.nsa.gov/helpful-links/nsa-foia/declassification-transparency-initiatives/historical-releases/view/article/3880193/capt-grace-hopper-on-future-possibilities-data-hardware-software-and-people-1982/)
 - [Full recording, source and public-domain record](https://commons.wikimedia.org/wiki/File:Grace_Hopper_-_Future_Possibilities_-_Data,_Hardware,_Software,_and_People.webm)
 
-### April Fools excerpt mapping
-
-The text question combines short unchanged excerpts from four genuine April Fools RFCs. `[...]` marks omitted material or a change of document. Sources and authors (all four links and dates are now shown on the round reveal):
-
-- [RFC 1149](https://www.rfc-editor.org/rfc/rfc1149.html): David Waitzman, April 1, 1990. Frame Format excerpts about leg length, milligrams and padding (20 words).
-- [RFC 2549](https://www.rfc-editor.org/rfc/rfc2549.html): David Waitzman, April 1, 1999. Queuing and RED-paint excerpts (17 words).
-- [RFC 6214](https://www.rfc-editor.org/rfc/rfc6214.html): Brian Carpenter and Robert Hinden, April 1, 2011. Routing and Tunneling sentence about predators carrying eaten payloads (19 words).
-- [RFC 2324](https://www.rfc-editor.org/rfc/rfc2324.html): Larry Masinter, April 1, 1998. Omitted Header Fields and teapot-response excerpts (19 words).
-
-Copyright © The Internet Society (1998, 1999); © IETF Trust and the RFC 6214 authors (2011). Short excerpts, at most 25 words per source, retaining original wording. See each linked RFC for its copyright and permission statements.
-
-### Moth photograph — sample20.jpg
-
-Courtesy Naval Surface Warfare Center, Dahlgren; U.S. Navy photograph of the logbook. [Source and public-domain record](https://commons.wikimedia.org/wiki/File:First_Computer_Bug,_1947.jpg). [Smithsonian object record](https://americanhistory.si.edu/collections/object/nmah_334663). The real entry is September 9, 1947; old photo metadata sometimes incorrectly says 1945. The term bug already existed: this is a literal bug, not a claim to have invented the word. The local copy is resized to 1500 × 1186 and encoded as JPEG without generative editing.
-
-### Fictional social screenshots — sample18.png and sample19.png
-
-These are native editable UI reconstructions produced by `build_question_images.py`, not captures of real accounts. The LinkedIn writing is unchanged from the previous deck. Its compact post layout follows the user-supplied reference: profile header, body, reactions and four actions. Engagement numbers are fictional interface decoration. The Teams view follows [Microsoft's current combined Chat interface](https://support.microsoft.com/en-us/teams/teams-channels/explore-the-new-chat-and-channels-experience-in-microsoft-teams), accessed October 4, 2026; [official reference screenshot](https://support.microsoft.com/en-us/teams/media/simple-collab-combined-view.png). The layout has the light app bar, app rail, Chat filters/list, larger message bubbles and a PDF attachment, with no document panel. No reference screenshot pixels or original employee messages are redistributed.
-
-LinkedIn post and Teams reply text are the objects of classification. Blur hides invented identities and drawn avatars. The revised Teams request is an English Q3 aerospace GraphRAG handover: MinerU/DocLing OCR, extraction/normalization, Neo4j entities/relations/ontologies, Microsoft GraphRAG/LightRAG/RAGAnything and vector/text indexing with hybrid retrieval. The response invents flight control, propulsion switching and automatic repair approval. Both messages and the attachment are fictional; the user provided internship topics, not a transcript. No real colleague's use of AI is claimed. The visible PDF filename is `GraphRAG_Q3_Technical_Wrapup.pdf`.
-
-### AI-written data-management SQL — sample23.png
-
-The agent rewrote a common aggregate-query pattern for employee records on October 5, 2026. Its formatting reference is [PostgreSQL's official tutorial, section 2.7 Aggregate Functions](https://www.postgresql.org/docs/current/tutorial-agg.html), accessed the same day. The tutorial's examples use weather observations; the new query uses `employees`, `department`, `annual_salary` and `employment_status`. It filters active employees, groups by department, keeps groups of at least five and sorts by average salary. The use case is implied in the SQL. No real employee data, prose scenario, comments, source branding or origin label appears in the image.
-
-The rewrite preserves the reference's uppercase SQL clauses, lowercase identifiers and functions, four-space clause indentation and plain monospace block. The longer select list wraps onto a continuation line. The light block is a local UI recreation, not a website screenshot. This is **AI**, because the displayed SQL is newly authored by the agent rather than copied unchanged from documentation. The styling reference is credited privately in the deck; the game reveal shows only AI.
-
-### Anonymized social posts — current sample22.png and legacy sample21.png
-
-**sample21.png: legacy human-written post; removed from the current deck.** Donald J. Trump, May 16, 2025. [Original Truth Social post](https://truthsocial.com/@realDonaldTrump/posts/114517718765768352), ID 114517718765768352. The [American Presidency Project archive](https://www.presidency.ucsb.edu/documents/truth-social-posts-may-16-2025) preserves its complete 15-word text and posting time. The words are unchanged. This replaces the October 2012 Diet Coke tweet. The compact white card follows the user-supplied Truth Social screenshot and reconstructs a post with a drawn placeholder avatar and coarse name/handle pixelation. It omits date and engagement counts. HUMAN refers to original writing, not whether the claim is true.
-
-**sample22.png: AI-written fictional parody.** Original English cybersecurity satire created for this game on October 4, 2026. The firewall/CAPS LOCK text is unchanged. It uses the dark X post layout from the user-supplied screenshot with the same coarse identity pixelation and no date or engagement counts. These words are fictional and are not a genuine statement by Trump. AI refers to the post text.
-
-The local Python/Pillow `tweet()` function renders both cards. `GENUINE_TWEET` is the fixed verified text; `AI_TWEET` is the editable parody. `SOCIAL_NAME_PIXEL_SIZE = 24` and `SOCIAL_AVATAR_PIXEL_SIZE = 20` render coarse, solid pixels so neither name nor handle is legible. The avatars remain drawn placeholders. Neither card uses live embeds or paid APIs during play. Keep sources and classifications synchronized when replacing posts.
 
 ## Generated images: full prompts
 
@@ -84,15 +87,7 @@ The remaining generated image was made with OpenAI's built-in image generation t
 
 > Use case: historical-scene. Asset type: one landscape image for an AI-or-HUMAN party quiz. Create an original oil painting evocative of a large early nineteenth-century French imperial ceremony: Napoleon in ornate coronation clothes, gathered clergy and aristocrats, rich crimson robes, elaborate gold architecture, huge painted canvas texture and aged varnish. Sneak Inspector Gadget into the middle-distance guests: recognizable grey trench coat, grey hat, long nose, one subtly extended mechanical arm, but render him in the same realistic oil-painted style. His figure should be findable on close inspection on a projector, about 8% of image height, not a giant cartoon foreground subject. Make the rest of the painting convincingly historical and spatially coherent. This is a humorous fictional scene, not a claim of an authentic painting. No captions, no logos, no watermark, no text. Landscape aspect ratio.
 
-## Game inspiration and event notes
 
-[Sightengine's AI or Not](https://www.sightengine.com/ai-or-not) uses a simple real/generated choice across images, voices and videos. [Realdle](https://www.realdle.com/) encourages comparing plausible real and generated images. This deck borrows the quick choice and visual surprise; it adds a presenter-controlled reveal, humorous sources and discussion. It does not copy those games' assets or code.
+## Editing and installation
 
-All eight current question images are bundled locally. The current deck contains no audio/video questions and no externally hosted media. Manager media support and the legacy Hopper clip remain available for custom decks and older room snapshots. The cat photo has been removed from both the deck and ZIP. Its replacement is original tech satire; no additional April Fools RFC round was added.
-
-Keep this answer-key file outside `static/` and your source repository private if participants should not inspect it.
-
-
-## Reveal metadata
-
-Rounds 2, 4 and 10 have concise `image_reveal` captions stating the subject, archival/item date and credit. Their existing primary-image source URLs become public source links only with these captions. No caption is configured for social posts. The generated painting remains byte-identical; round 6's `image_highlight` coordinates add a red SVG circle only after the timer. LinkedIn and X writing are unchanged; the Teams messages are replaced with the aerospace GraphRAG exchange. The SQL card has no visible scenario paragraph and no added reveal caption. Round 5 has four `reveal_sources` entries with RFC labels, dates and HTTPS links. They appear only after the answer reveal on both presenter and player screens; the original excerpts are unchanged. The Teams PDF is a fictional attachment; its interior is not shown.
+Use the local manager or edit questions.json and its Content.py fallback together. `build_question_images.py` rebuilds the LinkedIn, French Teams, SQL and French Macron cards. The source portrait is bundled, so no live download is needed to play or rebuild. Deploy both deck files, updated frontend files and all new assets; create a new room, since existing rooms retain their original deck snapshots. Exact files and checks are in UpdateGuide.md.

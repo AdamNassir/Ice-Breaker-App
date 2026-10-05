@@ -1,21 +1,28 @@
-# Completed update — RFC reveal sources and implied SQL scenario
+# Completed update — logos, blue/red theme and revised questions
 
-## Resulting behaviour
+## Resulting behavior
 
-- Round 5 still uses the original April Fools excerpts. Its HUMAN reveal now shows all four RFC source links and publication dates on both presenter and phone screens. Sources remain hidden while voting. No explanation/discussion paragraphs are added.
-- Round 3 replaces the human Requests download example with original AI-written SQL for active employee headcounts and average salaries by department. The scenario is implied by table, column and filter names. Only SQL appears in the image; no scenario paragraph, title, comments or source clues.
-- SQL formatting follows the official PostgreSQL Aggregate Functions tutorial: uppercase clauses, lowercase identifiers/functions and four-space clause indentation. The reference URL and provenance stay in private author notes. The reveal is AI. The deck now has six AI and four HUMAN questions, still ten rounds.
-- Both deck files match. Optional reveal-source metadata is validated, kept out of live payloads and preserved by the local manager. See QuestionManager.md to edit its JSON list. Other questions and images are unchanged.
+- Both original supplied logos, LogicLever and TotalEnergies, appear in the player/presenter entry and game header, standalone bonus page and local question manager. Presenter final results retain their placements-only layout.
+- Public game and local manager use blue and red with white/neutral backgrounds. The logo pixels are not recolored. Metal colors remain only in final tournament decoration.
+- Every question shows an English title and short neutral introduction above its content. The QR lobby has no question yet, and presenter final results contain no round title or intro.
+- Both textual questions are replaced with plausible AI-written fictional news articles: a Bitcoin price-dashboard incident and a Ballon d’Or delivery-tracker leak. They are original quiz fiction, not genuine reporting.
+- A real Michael Jordan dunk replaces the motorbike-football round; subject/date/photographer/source appear only at reveal. The active Trump post is replaced by an AI-written French Macron parody with an unblurred real portrait, name and handle. It is not a genuine statement or account screenshot.
+- The Teams exchange is in French with less technical wording. The intern asks for validation of a document-search handover; the manager mistakes it for aircraft operations. The introduction explicitly asks players to classify the manager’s reply only. Identities stay anonymized and the PDF remains an attachment, without its interior.
+- Ten rounds remain: eight images/two texts, seven AI/three HUMAN. No audio/video questions. Both deck files match; private origins/source notes remain hidden while voting.
 
-## Install and verify
+## Install and redeploy
 
-1. Extract this complete ZIP and replace the modified files below in your repository. Preserve your local .env. Back up a custom deck before replacing questions.json/Content.py; the supplied files contain this updated default deck.
-2. Commit the changed deck, source, frontend and sample23.png files and redeploy to Vercel. No new pip dependency or Supabase migration is needed. Restart local FastAPI/question-manager processes to load the new parser/deck.
-3. Hard-refresh presenter/player pages. Create a new room: already-created rooms keep their earlier deck snapshot. Use the new SQL image with the new deck, not an older room's code question.
-4. Round 3 should show SQL alone and reveal AI. Round 5 should show HUMAN plus four RFC links/dates only once its countdown ends. Rehearse on a phone and projector after deployment.
-5. For a later change, replace this report with the request and save UpdateGuide.md. A running agent reads it, implements/tests, then replaces completed requests with a report for human review. No deployed file watcher is present.
+1. Extract the complete ZIP into the app source folder, replacing the modified/added files below. Preserve your own .env, virtual environment and deployment secrets. To adopt these questions, replace both questions.json and Content.py; your existing saved JSON deck otherwise takes priority over the fallback.
+2. Include the complete static/branding directory, sample24.jpg, sample25.png and macron-profile-source.jpg, plus the rebuilt sample19.png. Keep the unchanged media supplied with this complete archive as well.
+3. Stop/restart the local question manager and hard-refresh it (Ctrl+F5 on Windows). The title and short introduction fields control the public heading; private explanations/sources remain answer notes.
+4. Redeploy the updated source to Vercel through your usual workflow, then refresh presenter and phones. Updated asset query versions avoid older cached CSS/JS. No new production dependency or Supabase migration is needed.
+5. Create a NEW room: existing rooms keep their earlier question snapshots. Rehearse the QR, questions and selected duration on your projector and phone. Optional image rebuilds use python -m pip install Pillow, then python build_question_images.py.
 
-## Modified files relative to the last delivered ZIP
+## Validation
+
+42 Python tests and the complete check_project.py gate pass. Frontend checks cover exact titles/intros, blue/red tokens/logos, all ten actual API question states, timer/source secrecy, manager saves/uploads, zoom/pan/reveal alignment, Next/Enter, rankings/confetti and bonus/workflow persistence. Both rebuilt French screenshots were visually inspected. Logo byte identities and Jordan source-image checksum were verified. The full ZIP is freshly extracted, byte-compared and checked with the same gate. Physical phone/projector, live Vercel/Supabase and authenticated CLI integration were not tested here; see Verification.md.
+
+## Modified files relative to the previous ZIP
 
 - `Content.py`
 - `ContentSources.md`
@@ -26,25 +33,28 @@
 - `UpdateGuide.md`
 - `Verification.md`
 - `build_question_images.py`
-- `main.py`
-- `question_content.py`
+- `manager_assets/index.html`
+- `manager_assets/style.css`
 - `questions.json`
 - `static/app.js`
-- `static/images/sample23.png`
+- `static/bonus.html`
+- `static/images/sample19.png`
+- `static/imagestyle.css`
 - `static/index.html`
 - `static/presenter.html`
 - `static/style.css`
+- `tests/frontend/game.cjs`
+- `tests/run_frontend.py`
 - `tests/test_game.py`
-- `tests/test_question_manager.py`
 
-## Added or removed files
+## Added files
 
-None.
+- `static/branding/logiclever.png`
+- `static/branding/totalenergies.png`
+- `static/images/macron-profile-source.jpg`
+- `static/images/sample24.jpg`
+- `static/images/sample25.png`
 
-## Validation
+## Removed files
 
-- 28 Python API/manager tests pass, including reveal-source secrecy, save preservation and unsafe-link rejection.
-- Full ten-round presenter/player DOM checks and local-manager save/upload checks pass. All four RFC credits are verified on both roles at reveal, absent during voting and preserved during polling.
-- Image-zoom, presenter Enter/Next and post-bonus workflow checks pass. JavaScript syntax checks pass.
-- The exact SQL runs against a fabricated SQLite fixture with correct filtering, grouping, salary averages and ordering. The SQL PNG was visually inspected for legibility/clipping.
-- The archive is freshly extracted, checked against tested source and validated for matching decks and decodable images. Physical phone/projector rendering and live Supabase/Vercel/PostgreSQL deployment were not tested.
+None. Older images are retained for previous room snapshots/custom decks, but are not active questions.

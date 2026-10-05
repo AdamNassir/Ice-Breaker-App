@@ -1,6 +1,7 @@
 """Rebuild the three social screenshots and code card: python build_question_images.py.
 
 Optional authoring dependency only: python -m pip install Pillow
+Macron and Teams messages are in French; interface labels remain English.
 The deployed game uses the bundled PNGs and does not need Pillow.
 Edit LINKEDIN_POST, TEAMS_REQUEST, TEAMS_REPLY, or AI_TWEET below.
 AI_SQL is original AI-written SQL; SQL_STYLE_SOURCE credits its formatting reference.
@@ -22,18 +23,16 @@ LINKEDIN_POST = (
     "#BuildInPublic #AgenticEverything"
 )
 TEAMS_REQUEST = (
-    "Hi, here's the Q3 aerospace GraphRAG handover. It covers MinerU/DocLing OCR, "
-    "extraction and normalization; Neo4j entities, relations and ontologies; "
-    "Microsoft GraphRAG, LightRAG and RAGAnything; plus vector/text indexing "
-    "and hybrid retrieval for document-grounded answers. Please review the "
-    "attached technical report and validate before I leave."
+    "Bonjour, voici le bilan de mon stage. L'outil permet de poser une question "
+    "sur les documents techniques et de retrouver les passages utiles. Le rapport "
+    "présente la lecture des PDF, l'organisation des informations et les essais. "
+    "Peux-tu valider le document avant mon départ ?"
 )
 TEAMS_REPLY = (
-    "Validated. Neo4j should now guide aircraft through turbulence and approve "
-    "repairs automatically. Hybrid retrieval can switch between electric and "
-    "jet propulsion depending on the question. I'd add a fallback autopilot "
-    "for when the document database is offline. Otherwise, the fleet is ready "
-    "for take-off."
+    "C'est validé, merci. Le rapport montre bien que l'outil peut surveiller "
+    "les avions en vol et décider des réparations à effectuer. La recherche "
+    "hybride permettra aussi de passer automatiquement du moteur électrique "
+    "au réacteur. On peut donc lancer les essais sur la flotte. Beau travail !"
 )
 # Original AI rewrite of the PostgreSQL aggregate-query pattern.
 # Preserve uppercase clauses, lowercase names and four-space clause indentation.
@@ -46,10 +45,14 @@ AI_SQL = """SELECT department, count(*) AS headcount,
     ORDER BY average_salary DESC;"""
 SQL_STYLE_SOURCE = "https://www.postgresql.org/docs/current/tutorial-agg.html"
 AI_TWEET = (
-    "We will build the biggest FIREWALL anyone has ever seen. Beautiful firewall. "
-    "And the hackers are going to pay for it. They said nobody could secure a "
-    "network with CAPS LOCK. WRONG!"
+    "Nous allons simplifier les démarches administratives. "
+    "Un formulaire unique remplacera les douze formulaires actuels. "
+    "Pour y accéder, il faudra simplement joindre les douze anciens formulaires. "
+    "C'est cela, une France qui avance."
 )
+# Real, unblurred portrait; only the post text below is an original AI parody.
+# Attribution/licence and crop details: ContentSources.md.
+MACRON_PORTRAIT = ROOT / "macron-profile-source.jpg"
 
 
 def font(size, bold=False):
@@ -90,7 +93,7 @@ def paragraph(draw, xy, value, width, size=26, line=38, fill="#242424"):
     return y
 
 
-# CHANGE these block sizes for the two Trump cards. Larger blocks hide more.
+# CHANGE these block sizes for legacy Trump cards (not in the active deck). Larger blocks hide more.
 SOCIAL_NAME_PIXEL_SIZE = 24
 SOCIAL_AVATAR_PIXEL_SIZE = 20
 
@@ -266,11 +269,11 @@ def teams():
     d.rounded_rectangle((500,pdf_y,1230,pdf_y+88),7,fill="white",outline="#d8d8d8")
     d.rounded_rectangle((519,pdf_y+21,568,pdf_y+68),4,fill="#bd302f")
     text(d,(526,pdf_y+35),"PDF",16,"white",True)
-    text(d,(589,pdf_y+17),"GraphRAG_Q3_Technical_Wrapup.pdf",28,bold=True)
+    text(d,(589,pdf_y+17),"Bilan_Stage_Recherche_Documents.pdf",28,bold=True)
     text(d,(589,pdf_y+55),"84 KB",20,"#616161")
     reply_y=pdf_y+158
     blurred_label(im,(1338,reply_y-44),"Camille Bernard",23,245,34,bg="#f5f5f5",radius=4)
-    d=ImageDraw.Draw(im);text(d,(1654,reply_y-42),"09:42",20,"#616161")
+    d=ImageDraw.Draw(im);text(d,(1600,reply_y-42),"Manager · 09:42",19,"#616161")
     reply_bottom=reply_y+22+height(TEAMS_REPLY,1070)+18
     d.rounded_rectangle((620,reply_y,1738,reply_bottom),8,fill="#e8ebfa")
     paragraph(d,(644,reply_y+22),TEAMS_REPLY,1070,30,43)
@@ -306,7 +309,7 @@ def code_card():
     im.save(ROOT / "sample23.png", optimize=True)
 
 
-def tweet(value, filename, platform="X"):
+def tweet(value, filename, platform="X", macron=False):
     # Native UI reconstruction of the two user-supplied post references.
     dark=platform=="X"
     bg="#000000" if dark else "#ffffff"
@@ -318,14 +321,24 @@ def tweet(value, filename, platform="X"):
         avatar_y,name_y,handle_y,body_y=127,130,173,291
     else:
         avatar_y,name_y,handle_y,body_y=20,23,67,174
-    avatar(im,(31,avatar_y),80,pixel_size=SOCIAL_AVATAR_PIXEL_SIZE)
-    blurred_label(im,(132,name_y),"Donald J. Trump",32,370,44,True,
-                  bg=bg,fill=ink,pixel_size=SOCIAL_NAME_PIXEL_SIZE)
-    blurred_label(im,(132,handle_y),"@realDonaldTrump",29,370,42,
-                  bg=bg,fill=muted,pixel_size=SOCIAL_NAME_PIXEL_SIZE)
+    if macron:
+        # Crop the supplied licensed photograph around the face; no blur/pixelation.
+        with Image.open(MACRON_PORTRAIT) as portrait:
+            tile = portrait.convert("RGB").crop((35, 24, 220, 209)).resize((80, 80), Image.Resampling.LANCZOS)
+        mask = Image.new("L", (80, 80), 0)
+        ImageDraw.Draw(mask).ellipse((0, 0, 79, 79), fill=255)
+        im.paste(tile, (31, avatar_y), mask)
+        text(d, (132, name_y), "Emmanuel Macron", 32, ink, True)
+        text(d, (132, handle_y), "@EmmanuelMacron", 29, muted)
+    else:
+        avatar(im,(31,avatar_y),80,pixel_size=SOCIAL_AVATAR_PIXEL_SIZE)
+        blurred_label(im,(132,name_y),"Donald J. Trump",32,370,44,True,
+                      bg=bg,fill=ink,pixel_size=SOCIAL_NAME_PIXEL_SIZE)
+        blurred_label(im,(132,handle_y),"@realDonaldTrump",29,370,42,
+                      bg=bg,fill=muted,pixel_size=SOCIAL_NAME_PIXEL_SIZE)
     d=ImageDraw.Draw(im)
     # Verification badges sit outside the pixelated identity fields.
-    badge_y=name_y+16;badge_color="#829ba9" if dark else "#e8527b"
+    badge_y=name_y+16;badge_color="#1d9bf0" if macron else ("#829ba9" if dark else "#e8527b")
     points=[]
     import math
     for n in range(24):
@@ -360,5 +373,5 @@ if __name__ == "__main__":
     linkedin()
     teams()
     code_card()
-    tweet(AI_TWEET, "sample22.png")
-    print("Created static/images/sample18.png, sample19.png, sample23.png and sample22.png")
+    tweet(AI_TWEET, "sample25.png", macron=True)
+    print("Created static/images/sample18.png, sample19.png, sample23.png and sample25.png")

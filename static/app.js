@@ -153,7 +153,7 @@
         const piece = element('i', 'confetti-piece');
         piece.style.left = bounds.width ? `${box.left + box.width / 2 - bounds.left}px` : `${fallback}%`;
         piece.style.top = `${box.top - bounds.top + 12}px`;
-        piece.style.background = ['#bb2632', '#e65b16', '#d6a229', '#ffffff'][i % 4];
+        piece.style.background = ['#e52330', '#1f2ade', '#ffffff'][i % 3];
         piece.style.setProperty('--dx', `${(Math.random() - .5) * 420}px`);
         piece.style.setProperty('--rise', `${-160 - Math.random() * 180}px`);
         piece.style.setProperty('--spin', `${360 + Math.random() * 900}deg`);
@@ -244,6 +244,10 @@
       celebrate(stage.querySelector('.final-podium'), s.code);
     } else {
       const q = s.question;
+      const heading = element('div', 'question-heading');
+      heading.append(element('h2', 'question-title', q.title));
+      if (q.context) heading.append(element('p', 'question-intro', q.context));
+      stage.append(heading);
       if (q.kind === 'image') {
         stage.append(imageFrame(q, s.reveal?.image_highlight, zoomView));
       } else if (q.kind === 'audio' || q.kind === 'video') {

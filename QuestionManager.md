@@ -49,7 +49,7 @@ If port 8765 is busy, add `--port 8767` and use the printed link. To suppress au
 1. Click **Add question**. Choose **Text**, **Code**, **Commit message**, **Image**, **Voice / audio recording**, or **Video clip**. For media, the visible **+ Image**, **+ Audio**, and **+ Video** buttons add a question and open its upload controls directly.
 2. Enter a title and select the known **AI** or **HUMAN** origin. The tool records your answer key; it does not infer authorship.
 3. Paste/import text, upload an image/audio/video file or select an existing media file. For audio/video you can instead choose **Online link** and paste a direct HTTPS file URL; video also accepts YouTube watch/share links. Optionally enter clip start/end in seconds.
-4. Add an accessible description and any private setup/difficulty notes. The presenter’s timer applies to every round; stored question timers are ignored. Titles and introductions are retained for editing but are hidden in the public game.
+4. Add an accessible description, a short neutral introduction and any private difficulty notes. The presenter’s timer applies to every round; stored question timers are ignored. Titles and short introductions appear above the public question content; keep them free of source/answer hints.
 5. Open **Answer notes and source** to keep private explanations, credit/source links, technical details or discussion prompts. The game reveals AI or HUMAN. For a real photograph, fill **Photo reveal: what it is, date and source** to add a concise public caption at reveal; Source link adds the photo-source link. Leave that caption empty for social posts. Other explanation/discussion fields remain editor notes. These are optional.
 6. Inspect **Question preview**. For audio/video, press Play; playback starts when you choose it. Toggle **Show answer notes** to check the reveal.
 7. Click **Save deck to game**. All questions are saved together, in their listed order.
@@ -97,7 +97,7 @@ python -m uvicorn main:app --reload
 
 Open **http://127.0.0.1:8000/presenter** and create a new room. Saving a new deck does not alter an existing room. If the local game is already running, a restart is not required for a changed `questions.json`.
 
-If `questions.json` does not exist, the game uses the bundled `Content.py` starter deck. This archive already contains the English `questions.json`; the manager replaces it when you save. Invalid JSON or missing referenced media stops new room creation with a clear error rather than silently substituting another deck.
+If `questions.json` does not exist, the game uses the bundled `Content.py` starter deck. This archive contains `questions.json` (English titles/introductions, French Macron/Teams content); the manager replaces it when you save. Invalid JSON or missing referenced media stops new room creation with a clear error rather than silently substituting another deck.
 
 ## Use the deck on Vercel
 
@@ -161,7 +161,7 @@ Online links remain links in the saved deck; they are not copied to `static/`. P
 
 Switch to **Local file / upload** to use your own recording instead. Uploading a new file clears the question's online link. Store the known origin and source yourself; the tool does not guess whether content was generated.
 
-## Install this English fun deck update
+## Install this branding and content update
 
 Follow **UpdateGuide.md** for the current exact replacement list. In particular copy **static/media.js**, the updated HTML files, both deck files and all five new local assets. Earlier installation sections above describe previous versions; use UpdateGuide.md for this archive. Replace the older questions.json to use the new questions, or back it up and choose Load starter → Save deck to game. Existing rooms keep their previous deck.
 
@@ -171,7 +171,7 @@ The optional `image_highlight` JSON object is preserved when saving or exporting
 
 ## Source links for real text at reveal
 
-Round 5 keeps its four RFC credits in the optional `reveal_sources` list. The manager preserves this list through saving, importing and exporting; edit it in `questions.json`, then choose **Reload saved**. Each entry has `label` and an HTTPS `url`. For example:
+The current two news articles are AI fiction and have no external reveal sources. For a custom HUMAN text question, use the optional `reveal_sources` list. The manager preserves this list through saving, importing and exporting; edit it in `questions.json`, then choose **Reload saved**. Each entry has `label` and an HTTPS `url`. For example:
 
 ```json
 "reveal_sources": [
@@ -180,3 +180,7 @@ Round 5 keeps its four RFC credits in the optional `reveal_sources` list. The ma
 ```
 
 Up to eight links are allowed. Labels can include source names and publication dates. The game displays this list only for HUMAN text questions after the deadline, on presenter and phones. It is excluded from live question payloads. Leave it empty for social posts and AI text. Private **Source** and **Source link** notes do not automatically become public text credits. For manual edits, keep `Content.py` consistent with the JSON fallback when distributing the starter deck.
+
+## Titles, introductions and language
+
+**Question title** and **Short introduction shown with the question** now appear above the content on presenter and phones. Keep both neutral and short; sources and origins stay in answer notes. The interface remains English. In the default deck, Macron and Teams messages are French; the Teams introduction specifies that only the manager’s reply is judged. Both supplied logos and the blue/red palette also appear in this local editor.

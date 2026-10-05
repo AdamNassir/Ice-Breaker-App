@@ -1,0 +1,44 @@
+const {JSDOM,VirtualConsole}=require('jsdom');
+const fs=require('node:fs'),assert=require('node:assert/strict');
+const wait=()=>new Promise(r=>setImmediate(r));
+(async()=>{
+ const errors=[],vc=new VirtualConsole();vc.on('jsdomError',e=>errors.push(e.message));
+ const fixture=JSON.parse(fs.readFileSync(process.env.QA_FIXTURE));
+ const dom=new JSDOM(fs.readFileSync(process.env.QA_PROJECT+'/static/index.html','utf8'),{url:'https://game.test/?room='+fixture.room.code,runScripts:'outside-only',pretendToBeVisual:true,virtualConsole:vc});
+ const w=dom.window,d=w.document;let poll,current=fixture.rows.find(r=>r.phase==='live').player,stamp=Date.now()/1000,disconnections=0;
+ w.AbortController=global.AbortController;w.setInterval=(fn,ms)=>{if(ms===1500)poll=fn;return 1;};
+ w.ResizeObserver=class {constructor(fn){this.fn=fn;}observe(){queueMicrotask(()=>this.fn());}disconnect(){disconnections++;}};
+ w.HTMLElement.prototype.getBoundingClientRect=function(){return {left:0,top:0,width:300,height:200};};
+ Object.defineProperty(w.HTMLElement.prototype,'clientWidth',{get:()=>300});Object.defineProperty(w.HTMLElement.prototype,'clientHeight',{get:()=>200});
+ w.HTMLElement.prototype.setPointerCapture=function(id){this.captured=id;};
+ w.localStorage.setItem('icebreaker:player:'+fixture.room.code,JSON.stringify(fixture.player));
+ w.fetch=async()=>({ok:true,json:async()=>({...current,server_time:++stamp,deadline:stamp+10})});
+ for(const name of ['media.js','imagezoom.js','workflow.js','app.js'])w.eval(fs.readFileSync(process.env.QA_PROJECT+'/static/'+name,'utf8'));
+ await wait();await wait();
+ const viewer=()=>d.querySelector('.image-viewer'),viewport=()=>d.querySelector('.image-viewport'),view=()=>({...viewer().getView()});
+ const button=label=>d.querySelector(`[aria-label="${label}"]`);
+ function pointer(type,id,x,y,pointerType='touch'){
+  const event=new w.Event(type,{bubbles:true,cancelable:true});Object.assign(event,{pointerId:id,clientX:x,clientY:y,pointerType,button:0});viewport().dispatchEvent(event);return event;
+ }
+ assert.equal(view().scale,1);assert(button('Zoom out').disabled);button('Zoom in').click();assert.equal(view().scale,1.5);
+ for(let i=0;i<5;i++)button('Zoom in').click();assert.equal(view().scale,6);assert(button('Zoom in').disabled);
+ button('Reset image zoom and position').click();assert.deepEqual(view(),{scale:1,x:0,y:0});
+ assert(pointer('pointerdown',1,115,100).defaultPrevented);pointer('pointerdown',2,185,100);pointer('pointermove',1,80,100);pointer('pointermove',2,220,100);pointer('pointerup',1,80,100);pointer('pointerup',2,220,100);assert.equal(view().scale,2);
+ pointer('pointerdown',1,150,100);pointer('pointermove',1,195,125);pointer('pointerup',1,195,125);assert.deepEqual(view(),{scale:2,x:45,y:25});
+ const old=viewer();await poll();assert.equal(viewer(),old);assert.deepEqual(view(),{scale:2,x:45,y:25});
+ current=fixture.rows.find(r=>r.phase==='revealed'&&r.player.round_index===0).player;await poll();await wait();assert.notEqual(viewer(),old);assert.deepEqual(view(),{scale:2,x:45,y:25});assert(disconnections>0);
+ pointer('pointerdown',1,150,100);pointer('pointermove',1,10000,10000);pointer('pointercancel',1,10000,10000);assert.deepEqual(view(),{scale:2,x:150,y:100});
+ pointer('pointermove',1,-10000,-10000);assert.deepEqual(view(),{scale:2,x:150,y:100});
+ button('Reset image zoom and position').click();
+ for(let i=0;i<2;i++){pointer('pointerdown',1,150,100);pointer('pointerup',1,150,100);}assert.equal(view().scale,2.5);
+ viewport().dispatchEvent(new w.MouseEvent('dblclick',{clientX:150,clientY:100}));assert.equal(view().scale,2.5,'compatibility double click cannot undo touch zoom');
+ button('Reset image zoom and position').click();
+ for(const key of ['+','ArrowLeft'])viewport().dispatchEvent(new w.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true}));assert.equal(view().scale,1.5);assert.equal(view().x,40);
+ viewport().dispatchEvent(new w.KeyboardEvent('keydown',{key:'0',bubbles:true,cancelable:true}));assert.equal(view().scale,1);
+ current=fixture.rows.find(r=>r.phase==='live'&&r.player.round_index===5).player;await poll();assert.equal(view().scale,1);assert(!d.querySelector('.image-highlight'));
+ button('Zoom in').click();current=fixture.rows.find(r=>r.phase==='revealed'&&r.player.round_index===5).player;await poll();await wait();assert.equal(view().scale,1.5);
+ const img=d.querySelector('#stage img');Object.defineProperty(img,'naturalWidth',{value:1536});Object.defineProperty(img,'naturalHeight',{value:1024});img.dispatchEvent(new w.Event('load'));assert(d.querySelector('.image-frame .image-highlight circle'));assert(d.querySelector('.image-frame').style.transform.includes('scale(1.5)'));
+ current=fixture.rows.find(r=>r.phase==='live'&&r.player.question.kind==='text').player;await poll();assert(!viewer());assert(!d.querySelector('[data-answer="AI"]').disabled);
+ assert.deepEqual(errors,[]);assert(fs.readFileSync(process.env.QA_PROJECT+'/static/index.html','utf8').includes('/static/imagezoom.js?v=image-zoom-6'));
+ w.close();console.log('PASS player image gestures, pinch anchors, pan bounds, max/min zoom, double-tap compatibility, cancellation, controls/keyboard, polling/reveal retention, observer cleanup, circle grouping, round reset and answer-button access.');
+})().catch(e=>{console.error(e);process.exit(1);});
