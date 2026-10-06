@@ -14,10 +14,10 @@ Every round shows its title, classification target and content. The prompt ident
 | 2 | Michael Jordan’s free-throw-line dunk | HUMAN | Walter Iooss Jr. / Sports Illustrated, Chicago, February 6, 1988; complete source JPEG `sample26.jpg`. |
 | 3 | Employee-data SQL | AI | Original commented payroll/certification query: two CTEs, four source tables and conditional-aggregate pivot columns. PostgreSQL formatting/feature references; rebuilt `sample23.png`. |
 | 4 | Motorcycle football | HUMAN | Bundesarchiv, Bild 102-12210 / CC-BY-SA 3.0 Germany, August 1931; unchanged `sample15.jpg`. |
-| 5 | Bitcoin falls 50% | AI | Original fictional French market-crash article; not a display error. |
+| 5 | Bitcoin dashboard incident | AI | Newly authored fictional French article. No genuine exchange notice or market event claimed. |
 | 6 | Napoleon with Inspector Gadget | AI | Original generated imperial painting, `sample13.jpg`; unchanged painting and reveal circle. |
 | 7 | Macron post about AI in hospitals | AI | Original fictional French announcement, reconstructed X layout, visible name/handle and the supplied actual profile picture. `sample27.png`. Not a genuine post. |
-| 8 | Mbappé wins the Ballon d’or | AI | Original fictional French award article; not an accidental webpage. |
+| 8 | Ballon d’Or webpage leak | AI | Newly authored fictional French sports article. No genuine leaked result, organiser quote or award winner claimed. |
 | 9 | French internship handover on Teams | AI | Classify the manager’s reply only. Both messages and PDF attachment are fictional; simplified document-search request, mismatched aircraft-operations reply. `sample19.png`. |
 
 ## Authentic sports photograph — sample26.jpg
@@ -69,11 +69,15 @@ Both are editable native interface reconstructions, not real account screenshots
 
 The French intern’s message describes a tool for questions over technical documents, useful passages, PDF reading, information organisation and testing. It asks the manager to validate `Bilan_Stage_Recherche_Documents.pdf`. The manager incorrectly interprets document search as monitoring aircraft, deciding repairs and switching propulsion. The messages use less technical vocabulary. Adam Nassir, the supplied sender name, is blurred above the right-aligned light-blue outgoing message and PDF. The fictional manager’s reply is left-aligned in light grey; its identity/avatar remain anonymized. The PDF is an attachment only; no document interior is displayed. The intro states: classify only the manager’s reply. This is fiction inspired by the supplied internship topics, not a record or claim about an actual colleague.
 
-## Two direct-claim fictional news articles — October 6, 2026
+## Two plausible fictional news articles
 
-Round 5 directly states that Bitcoin fell 50% in twenty-four hours. Round 8 directly states that Kylian Mbappé won the Ballon d’or. Both are original AI-written French quiz fiction. The market movement, prices, award result, ceremony and reactions are invented; these are not current-event reports. Neither story concerns an erroneous price display, accidental publication or placeholder winner page.
+Rounds 5 and 8 are original AI-written French fiction, updated October 5, 2026. The Bitcoin story concerns a single platform displaying a wrong price, a short trading suspension and a review of affected transactions; it does not assert a market-wide crash. The sports story concerns a partner webpage accidentally published before a ceremony, with prewritten pages for multiple candidates as a plausible alternative explanation. No delivery tracker, private mail or trophy shipment remains. Incidents/statements are invented; neither story was published by Le Parisien. Both reveal AI only.
 
-Both keep the existing full news-page layout, byline presentation and neighbouring photographs. Neither the outlet nor the journalist named in that reconstruction authored or published the fictional story. The first paragraph is the headline, the second the chapo, and the remaining three are article body paragraphs. Reveals remain AI only; private provenance is not added as a hint to the live article.
+The full native Le Parisien page now uses six photographic cards (three actual images repeated in the sidebar and related row), replacing CSS placeholder thumbnails. Images were copied unchanged from recent Le Parisien stories checked October 5, 2026; the short neighbouring headlines are paraphrases of those stories. See LayoutSources.md for original article dates, URLs, image files, source URLs and observed photographer credits. No Creative Commons licence is claimed for these editorial photographs.
+
+The mock bylines use **Sébastien Lernould** (economy) and **Dominique Sévérac** (sports), as requested, with decorative October 5 timestamps. Their identities are verified on Le Parisien’s author pages. Neither journalist wrote, endorsed or published these invented quiz stories; the names/dates are presentation elements of the simulation, not authentic attribution. The actual logo and full-page French navigation/article/sidebar/footer remain. The original article bodies are not copied.
+
+The shared game/manager renderer uses `text_style: "news"`: first paragraph = headline, next = chapo, remaining paragraphs = body. Text is editable, rendered safely and scrollable. French text is marked `lang="fr"`; the outer app remains English. See LayoutSources.md for copying scope and matching limitations.
 
 ## SQL formatting reference — sample23.png
 

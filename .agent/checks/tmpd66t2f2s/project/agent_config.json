@@ -1,0 +1,10 @@
+{
+  "codex_command": ["codex"],
+  "model": "",
+  "poll_seconds": 0.5,
+  "debounce_seconds": 1.5,
+  "max_attempts": 3,
+  "agent_timeout_seconds": 900,
+  "check_timeout_seconds": 180,
+  "checks": [["{python}", "check_project.py"]]
+}

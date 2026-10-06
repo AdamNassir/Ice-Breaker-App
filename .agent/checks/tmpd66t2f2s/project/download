@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+*.sqlite3*
+.vercel/
+.pytest_cache/
+.question-manager-backups/
+.questions-*.tmp
+.agent/
+node_modules/
