@@ -51,7 +51,7 @@ class TeamTests(unittest.TestCase):
         return self.client.post(self.base + '/control', headers=self.host,
                                 json={'action': 'start', 'revision': self.state()['revision']})
 
-    def test_create_join_rosters_and_refresh_keep_individual_scores(self):
+    def test_create_join_rosters_and_refresh_use_team_scores(self):
         empty = self.state(self.ada)
         self.assertTrue(empty['teams_enabled'])
         self.assertTrue(empty['teams_open'])
@@ -81,8 +81,56 @@ class TeamTests(unittest.TestCase):
         self.assertEqual(self.client.post(self.base + '/vote', headers=self.ada,
                          json={'answer': main.ROUNDS[0]['answer'], 'round_index': 0}).status_code, 200)
         with patch.object(main.time, 'time', return_value=state['deadline'] + 1):
-            self.assertEqual(self.state(self.ada)['me']['score'], 100)
-            self.assertEqual(self.state(self.linus)['me']['score'], 0)
+            pooling = self.state(self.ada)
+            self.assertEqual(pooling['phase'], 'pooling')
+            self.assertIsNone(pooling['reveal'])
+            self.assertEqual(pooling['team_results'], {})
+            self.assertEqual(pooling['me']['score'], 0)
+        with patch.object(main.time, 'time', return_value=state['deadline'] + main.POOL_SECONDS + 2):
+            revealed = self.state(self.ada)
+            self.assertEqual(revealed['phase'], 'revealed')
+            self.assertEqual(revealed['team_results'][tid]['answer'], main.ROUNDS[0]['answer'])
+            self.assertEqual(revealed['me']['score'], 100)
+            self.assertEqual(self.state(self.linus)['me']['score'], 100)
+            self.assertEqual(len(revealed['leaderboard']), 1)
+            self.assertEqual(revealed['leaderboard'][0]['nickname'], 'Les Décodeurs')
+
+    def test_team_majority_tie_and_no_vote_pooling(self):
+        tid = self.create().json()['me']['team_id']
+        self.assertEqual(self.select(tid).status_code, 200)
+        third = self.join('Grace')
+        self.assertEqual(self.select(tid, third).status_code, 200)
+        self.start()
+        live = self.state()
+        correct = main.ROUNDS[0]['answer']
+        wrong = 'HUMAN' if correct == 'AI' else 'AI'
+        for headers, answer in ((self.ada, correct), (self.linus, correct), (third, wrong)):
+            response = self.client.post(self.base + '/vote', headers=headers,
+                json={'answer': answer, 'round_index': 0})
+            self.assertEqual(response.status_code, 200)
+        with patch.object(main.time, 'time', return_value=live['deadline'] + 1):
+            pooled = self.state()
+            self.assertEqual(pooled['phase'], 'pooling')
+            self.assertNotIn('answer', str(pooled['team_results']))
+        with patch.object(main.time, 'time', return_value=live['deadline'] + 5):
+            revealed = self.state()
+            self.assertEqual(revealed['team_results'][tid]['counts'][correct], 2)
+            self.assertEqual(revealed['team_results'][tid]['answer'], correct)
+            self.assertEqual(revealed['leaderboard'][0]['score'], 100)
+            self.assertEqual(self.state(third)['me']['score'], 100)
+        self.client.post(self.base + '/control', headers=self.host,
+            json={'action': 'next', 'revision': revealed['revision']})
+        live = self.state()
+        for headers, answer in ((self.ada, 'AI'), (self.linus, 'HUMAN')):
+            self.client.post(self.base + '/vote', headers=headers,
+                json={'answer': answer, 'round_index': 1})
+        with patch.object(main.time, 'time', return_value=live['deadline'] + 1):
+            self.state()
+        with patch.object(main.time, 'time', return_value=live['deadline'] + 5):
+            tied = self.state()
+            self.assertIsNone(tied['team_results'][tid]['answer'])
+            self.assertTrue(tied['team_results'][tid]['tie'])
+            self.assertEqual(tied['leaderboard'][0]['score'], 100)
 
     def test_authorization_invalid_names_and_room_isolation(self):
         self.assertEqual(self.client.post(self.base + '/teams', json={'name': 'X'}).status_code, 401)

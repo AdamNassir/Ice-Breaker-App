@@ -141,11 +141,15 @@
     if (!s.teams?.length) list.append(element('p', 'teams-empty', 'No teams yet. Create the first one, or wait for a team to appear.'));
     for (const team of s.teams || []) {
       const card = element('article', `team-card${team.id === s.me.team_id ? ' my-team' : ''}`);
+      const header = element('div', 'team-card-header');
+      const details = element('div', 'team-card-details');
       const title = element('h4', 'team-card-title', `${team.name} | ${team.creator.nickname}`);
-      card.append(title);
+      const meta = element('p', 'team-card-meta', `Founded by ${team.creator.nickname} · ${team.members.length} member${team.members.length === 1 ? '' : 's'}`);
+      details.append(title, meta); header.append(details);
+      card.append(header, element('p', 'team-members-label', 'THE CREW'));
       const members = element('ul', 'team-members');
       members.setAttribute('aria-label', `Members of ${team.name}`);
-      for (const member of team.members) members.append(element('li', '', member.nickname));
+      for (const member of team.members) { const li = element('li', '', member.nickname); if (member.id === team.creator.id) li.className = 'team-captain'; members.append(li); }
       card.append(members);
       if (team.id === s.me.team_id) card.append(element('span', 'team-selected', 'Your team'));
       else if (!mine && s.teams_open) {
@@ -201,12 +205,12 @@
     const podium = element('div', `final-podium podium-count-${ranks.length}`);
     for (const rank of ranks) {
       const place = element('div', `podium-place podium-rank-${rank}`);
-      s.leaderboard.filter(player => player.rank === rank).forEach(player => place.append(placement(player, s.me?.id, true)));
+      s.leaderboard.filter(player => player.rank === rank).forEach(player => place.append(placement(player, s.me?.team_id || s.me?.id, true)));
       podium.append(place);
     }
     wrap.append(podium);
     const rest = element('ol', 'final-list');
-    s.leaderboard.filter(player => player.rank > 3).forEach(player => rest.append(placement(player, s.me?.id)));
+    s.leaderboard.filter(player => player.rank > 3).forEach(player => rest.append(placement(player, s.me?.team_id || s.me?.id)));
     if (rest.children.length) wrap.append(rest);
     if (!host) wrap.append(playerBonus(s.code));
     return wrap;
@@ -311,7 +315,7 @@
     stage.dataset.newsKey = newsKey;
     stage.dataset.imageKey = imageKey;
     stage.replaceChildren();
-    stage.classList.toggle('text-stage', ['live', 'revealed'].includes(s.phase) && s.question?.kind === 'text');
+    stage.classList.toggle('text-stage', ['live', 'pooling', 'revealed'].includes(s.phase) && s.question?.kind === 'text');
     if (s.phase === 'lobby') {
       if (!host) stage.append(waiting("You're in.", `Welcome, ${s.me.nickname}. Watch this screen for the first round.`));
     } else if (s.phase === 'ready') {
@@ -321,6 +325,10 @@
       stage.append(results(s));
       celebrate(stage.querySelector('.final-podium'), s.code);
     } else {
+      if (s.phase === 'pooling') {
+        stage.append(waiting('Pooling team votes…', 'Answers are locked. Counting each team’s votes before the reveal.', '◉'));
+        return;
+      }
       const q = s.question;
       const heading = element('div', 'question-heading');
       heading.append(element('h2', 'question-title', q.title));
@@ -385,14 +393,14 @@
 
   function renderBoard(s) {
     if (host) return;
-    const signature = JSON.stringify([s.leaderboard, s.me?.id]);
+    const signature = JSON.stringify([s.leaderboard, s.me?.id, s.me?.team_id]);
     if (signature === boardKey) return;
     boardKey = signature;
     const board = $('leaderboard'); board.replaceChildren();
     if (!s.leaderboard.length) board.append(element('p', 'empty-board', 'Players will appear here as they join.'));
     s.leaderboard.forEach(p => {
-      const row = element('div', `leader-row${s.me?.id === p.id ? ' me' : ''}`);
-      const name = element('div', 'nickname', p.nickname + (s.me?.id === p.id ? ' (you)' : ''));
+      const row = element('div', `leader-row${(s.me?.team_id || s.me?.id) === p.id ? ' me' : ''}`);
+      const name = element('div', 'nickname', p.nickname + ((s.me?.team_id || s.me?.id) === p.id ? ' (your team)' : ''));
       if (p.streak > 1) name.append(element('span', 'leader-streak', `${p.streak} correct in a row`));
       row.append(element('span', 'rank', String(p.rank).padStart(2, '0')), name, element('span', 'leader-score', p.score)); board.append(row);
     });
@@ -417,11 +425,11 @@
     // Use monotonic browser time rather than the phone's possibly inaccurate wall clock.
     if (newSnapshot) clockEnd = performance.now() + Math.max(0, (s.deadline - s.server_time) * 1000 - roundTrip / 2);
     $('room-title').textContent = s.title;
-    const labels = {lobby:'IN THE LOBBY', ready:'TAKE A BREATHER', live:'MAKE YOUR CALL', revealed:'THE REVEAL', finished:'FINAL RESULTS'};
+    const labels = {lobby:'IN THE LOBBY', ready:'TAKE A BREATHER', live:'MAKE YOUR CALL', pooling:'POOLING TEAM VOTES', revealed:'THE REVEAL', finished:'FINAL RESULTS'};
     $('phase-label').textContent = labels[s.phase];
     $('round-label').textContent = s.phase === 'finished' ? `${s.round_count} rounds complete` : `Round ${s.round_number} / ${s.round_count}`;
     $('room-meta').textContent = `${s.player_count} player${s.player_count === 1 ? '' : 's'} · Room ${s.code}`;
-    if (!host) $('board-title').textContent = s.phase === 'finished' ? 'Final standings' : 'Leaderboard';
+    if (!host) $('board-title').textContent = s.teams?.length ? 'Team standings' : (s.phase === 'finished' ? 'Final standings' : 'Leaderboard');
     const progress = $('round-progress'); progress.replaceChildren();
     for (let i = 0; i < s.round_count; i++) {
       const node = element('span', i < s.round_index || s.phase === 'finished' || (i === s.round_index && s.phase === 'revealed') ? 'done' :
@@ -432,11 +440,11 @@
     renderStage(s); renderReveal(s); renderBoard(s);
     if (!host) renderTeams(s);
     if (host) {
-      $('answered-count').textContent = s.phase === 'live' || s.phase === 'revealed' ? `${s.answered_count} / ${s.player_count} answered` : '';
+      $('answered-count').textContent = ['live', 'pooling', 'revealed'].includes(s.phase) ? `${s.answered_count} / ${s.player_count} answered` : '';
       const button = $('control-button');
       button.hidden = s.phase === 'finished';
-      button.disabled = controlPending || s.phase === 'live' || !s.player_count;
-      button.textContent = s.phase === 'live' ? 'Round in progress' : s.phase === 'revealed' ?
+      button.disabled = controlPending || ['live', 'pooling'].includes(s.phase) || !s.player_count;
+      button.textContent = ['live', 'pooling'].includes(s.phase) ? (s.phase === 'pooling' ? 'Pooling team votes…' : 'Round in progress') : s.phase === 'revealed' ?
         s.round_number === s.round_count ? 'Show final results' : 'Next round' : `Start round ${s.round_number}`;
       const assigned = (s.teams || []).reduce((count, t) => count + t.members.length, 0);
       $('control-help').textContent = s.phase === 'lobby' && s.teams_enabled ?
@@ -448,8 +456,10 @@
         button.classList.toggle('selected', button.dataset.answer === s.me.vote);
         button.disabled = votePending || s.phase !== 'live' || Boolean(s.me.vote) || performance.now() >= clockEnd;
       });
-      $('vote-status').textContent = s.phase === 'live' ? (s.me.vote ? `${s.me.vote} locked in. Wait for the reveal.` : 'One answer. Make it count.') :
-        '';
+      $('vote-status').textContent = s.phase === 'live' ? (s.me.vote ? `${s.me.vote} locked in. Your vote contributes to your team.` : 'Vote individually. Your team’s majority decides.') :
+        s.phase === 'pooling' ? 'Voting closed. Pooling team answers…' :
+        s.phase === 'revealed' && s.me.team_id && s.team_results?.[s.me.team_id] ?
+        `Your team voted ${s.team_results[s.me.team_id].answer || 'no majority (abstained)'}.` : '';
     }
     updateClock();
   }

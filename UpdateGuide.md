@@ -1,59 +1,31 @@
-# Completed update — team composition after QR/pseudonym entry
+# Completed update — team discovery and pooled team voting
 
-## Resulting behavior
+## Changes
 
-- The supplied Ice_Breaker_Game_App_draft.zip is the sole baseline. After scanning its room QR and choosing a pseudonym, players see Create a team or Join a team in the phone lobby.
-- Creating accepts a visible group name up to 40 characters, takes the creator name from their authenticated pseudonym and includes them as the first member. Joining shows every created team as Group name | Creator name, with the current member pseudonyms underneath.
-- The directory updates while people create/join teams. Polling preserves partly typed names, focused join controls and unchanged roster DOMs. A browser refresh restores the selected team from the server. Same group names are allowed, distinguished by creator/member lists.
-- A player selects one team once. Duplicate/retried requests do not create extra groups or members. Creation/joining closes atomically with presenter Start; server checks prevent a late request from changing a started game's membership. Only authenticated players in that room can select teams.
-- The presenter retains the central QR lobby and sees team/member counts. Teams organize players; voting, scores, streaks and final placements remain individual. The presenter chooses when to start; unassigned/late players retain individual play. A selected team's label appears on the member's phone during questions. The question, reveal and presenter final screens retain their existing layout.
-- Teams are stored in the existing room JSON and use the same SQLite/Supabase transaction lock as Start. No new dependency or database migration. Existing rooms without team fields keep their original flow; new rooms enable teams.
-- Both deck files, every question/media asset, logos, the local manager and protected watcher/check files are unchanged byte-for-byte.
+- Team-directory cards now show a team name, founder, member count, highlighted captain and member chips, responsive grid styling, and clearer Join controls. Team names and nicknames are inserted as text, not HTML.
+- A round still accepts one immutable private AI/HUMAN vote per team member. On expiry the server freezes all ballots and enters a **3-second pooling phase**. The correct answer, final tally and reveal media remain unavailable until the reveal phase.
+- Each registered team is one scoring participant. Strict AI/HUMAN majority sets the team's answer. A tie or no votes means abstention, earning zero points. A team's streak and score apply equally to its members; the standings and podium rank teams rather than their individual members.
+- The reveal API exposes each team's answer and vote counts; the player UI confirms its team's chosen answer. Players without a team do not score in rooms with registered teams. Rooms without any teams retain the original solo-player behavior.
+- Presenter and players see a pooling message and cannot advance or vote during pooling. The presenter still starts rounds, and Next starts the following round immediately after a reveal.
 
-## Install / redeploy
+## Verification
 
-1. Extract the complete updated ZIP. Keep your own .env, database and installed dependencies from your local setup. The delivery omits local credentials, stored games and node_modules.
-2. Deploy the changed server and static files manually, then create a NEW room. No SQL migration or dependency change is needed. Old room snapshots keep their previous join flow.
-3. Rehearse with two phones: one creates a group, the other chooses Join a team, recognizes the creator and joins. Verify both member lists before pressing Start.
+- Python unit suite: **51 tests passed**, including new team majority, dissenting member, ties, frozen interim phase and team score assertions.
+- `node --check` on all JavaScript sources passed.
+- Full frontend DOM suite was **not executed** because npm dependencies are absent in this environment. Offline npm install reported an uncached `xmlchars` package; online installation timed out. `python check_project.py` consequently stops at its frontend dependency prerequisite.
+- No device, browser, remote database or deployment checks performed.
 
-## Validation
+## Install and test
 
-- 50 Python tests and the complete python check_project.py gate pass in the working project and a fresh ZIP extraction.
-- Six team API tests cover names, authorization/room isolation, derived creator identity, duplicate names/retries/concurrency, one-team membership, a simultaneous Start/join race, locks after start/reveal/results, refreshed membership, older rooms and unchanged individual scoring.
-- A real local FastAPI server plus multiple phone DOMs exercise the QR-prefilled form, choices, directory/member updates, typing/focus preserved through polls, restored membership in a new DOM, safe text rendering, closure at start, team badges and normal voting. Existing API/manager/HTML resource/QR/timer/zoom/identity reveal/Enter/results/confetti/bonus checks pass.
-- Source/archive byte comparisons, manifest and CRC checks verify all changed/added paths against the uploaded draft. Both deck files and every media asset match the draft. Runtime dependencies, caches and generated QA files are not delivered.
+Extract complete ZIP; retain your own `.env` and production database setup. Run `pip install -r requirements.txt -r requirements-dev.txt`, `npm --prefix tests/frontend ci`, then `python check_project.py`. Redeploy server and static assets and create a new room. Existing active room snapshots should not be used to assess team scoring. No schema migration is needed.
 
-## Limits
+## Modified paths relative to the supplied ZIP
 
-The installed Playwright package has no browser executable here, so native-browser screenshots and physical-phone/projector rehearsal were unavailable. DOM checks cover the shipped HTML/CSS and real local API. Live Supabase/Vercel, capacity and native Windows watcher operation were not tested or deployed.
-
-## Modified files relative to the supplied draft
-
-- `CreationInstructions.md`
-- `ReadMe.md`
-- `UpdateGuide.md`
-- `Verification.md`
 - `main.py`
 - `static/app.js`
 - `static/index.html`
 - `static/presenter.html`
 - `static/style.css`
-- `tests/run_frontend.py`
-
-## Added source files
-
-- `tests/frontend/teams.cjs`
 - `tests/test_teams.py`
-
-## Source files removed
-
-None.
-
-## Local runtime files excluded from the delivery
-
-- `.env`
-- `game.sqlite3`
-- `download` (local artifact)
-- `tests/frontend/node_modules/**`
-
-The original uploaded ZIP is not changed on disk. These files are excluded from the clean deliverable; installed test dependencies can be restored with the existing setup instructions.
+- `tests/frontend/teams.cjs`
+- `UpdateGuide.md`

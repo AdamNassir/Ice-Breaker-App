@@ -101,26 +101,72 @@ def qr_payload(link):
             "qr_data_uri": "data:image/svg+xml;base64," + base64.b64encode(svg).decode("ascii")}
 
 
-def settle(state):
-    """Reveal only after the server deadline. A phase change makes this exactly-once."""
-    now = time.time()
-    if state["phase"] != "live" or now < state["deadline"]:
-        return
+POOL_SECONDS = 3
+
+
+def pool_votes(state):
+    """Freeze one answer per team. Ties and no votes are abstentions."""
+    pooled = {}
+    for tid in state.get("teams", {}):
+        member_ids = [pid for pid, p in state["players"].items() if p.get("team_id") == tid]
+        counts = {choice: sum(state["votes"].get(pid, {}).get("answer") == choice
+                              for pid in member_ids) for choice in ("AI", "HUMAN")}
+        answer = "AI" if counts["AI"] > counts["HUMAN"] else "HUMAN" if counts["HUMAN"] > counts["AI"] else None
+        pooled[tid] = {"answer": answer, "counts": counts, "voted": sum(counts.values()),
+                       "member_count": len(member_ids), "tie": counts["AI"] == counts["HUMAN"] and counts["AI"] > 0}
+    return pooled
+
+
+def score_round(state):
     answer = state["rounds"][state["index"]]["answer"]
-    for player_id, player in state["players"].items():
-        # Late joiners who joined after the deadline don't lose a streak.
-        if player["joined_at"] > state["deadline"]:
-            continue
-        vote = state["votes"].get(player_id)
-        correct = bool(vote and vote["answer"] == answer)
-        player["streak"] = player["streak"] + 1 if correct else 0
-        points = BASE_POINTS + min((player["streak"] - 1) * STREAK_STEP, MAX_STREAK_BONUS) if correct else 0
-        player["score"] += points
-        player["correct"] += int(correct)
-        player["history"].append({"round": state["index"] + 1, "answer": vote["answer"] if vote else None,
-                                  "correct": correct, "points": points})
+    if state.get("teams"):
+        for tid, tally in state["team_results"].items():
+            team = state["teams"][tid]
+            correct = tally["answer"] == answer
+            team["streak"] = team.get("streak", 0) + 1 if correct else 0
+            points = BASE_POINTS + min((team["streak"] - 1) * STREAK_STEP, MAX_STREAK_BONUS) if correct else 0
+            team["score"] = team.get("score", 0) + points
+            team["correct"] = team.get("correct", 0) + int(correct)
+            team.setdefault("history", []).append({"round": state["index"] + 1,
+                "answer": tally["answer"], "correct": correct, "points": points})
+        # Unassigned users cannot contribute to any team's score.
+        for pid, player in state["players"].items():
+            if player.get("team_id") in state["teams"]:
+                team = state["teams"][player["team_id"]]
+                player["score"] = team["score"]
+                player["streak"] = team["streak"]
+                player["correct"] = team["correct"]
+                player["history"] = list(team["history"])
+    else:
+        # Legacy rooms without teams keep their individual scoring behavior.
+        for player_id, player in state["players"].items():
+            if player["joined_at"] > state["deadline"]:
+                continue
+            vote = state["votes"].get(player_id)
+            correct = bool(vote and vote["answer"] == answer)
+            player["streak"] = player["streak"] + 1 if correct else 0
+            points = BASE_POINTS + min((player["streak"] - 1) * STREAK_STEP, MAX_STREAK_BONUS) if correct else 0
+            player["score"] += points
+            player["correct"] += int(correct)
+            player["history"].append({"round": state["index"] + 1, "answer": vote["answer"] if vote else None,
+                                      "correct": correct, "points": points})
     state["phase"] = "revealed"
     state["revision"] += 1
+
+
+def settle(state):
+    """Server-authoritative voting -> pooling -> reveal, exactly once per transition."""
+    now = time.time()
+    if state["phase"] == "live" and now >= state["deadline"]:
+        if state.get("teams"):
+            state["team_results"] = pool_votes(state)
+            state["phase"] = "pooling"
+            state["pool_deadline"] = now + POOL_SECONDS
+            state["revision"] += 1
+        else:
+            score_round(state)
+    if state["phase"] == "pooling" and now >= state["pool_deadline"]:
+        score_round(state)
 
 
 def view(state, role, player_id):
@@ -142,16 +188,26 @@ def view(state, role, player_id):
         teams.append({"id": tid, "name": team["name"],
                       "creator": {"id": team["creator_id"], "nickname": creator["nickname"]},
                       "members": members})
+    team_board = []
+    for tid, team in state.get("teams", {}).items():
+        team_board.append({"id": tid, "nickname": team["name"], "score": team.get("score", 0),
+                           "streak": team.get("streak", 0), "correct": team.get("correct", 0),
+                           "members": len(next(t["members"] for t in teams if t["id"] == tid))})
+    team_board.sort(key=lambda t: (-t["score"], t["nickname"].casefold(), t["id"]))
+    for position, item in enumerate(team_board):
+        item["rank"] = 1 + next(i for i, t in enumerate(team_board) if t["score"] == item["score"])
     result = {"code": state["code"], "title": state["title"], "phase": state["phase"],
               "round_index": state["index"], "round_number": state["index"] + 1,
               "round_count": len(state["rounds"]), "revision": state["revision"],
               "server_time": time.time(), "deadline": state["deadline"],
               "duration": state["duration"], "player_count": len(players),
-              "answered_count": len(state["votes"]), "leaderboard": board, "question": None,
+              "answered_count": len(state["votes"]), "leaderboard": team_board if state.get("teams") else board, "question": None,
+              "pool_deadline": state.get("pool_deadline") if state["phase"] == "pooling" else None,
+              "team_results": state.get("team_results", {}) if state["phase"] == "revealed" else {},
               "me": None, "reveal": None,
               "teams_enabled": "teams" in state,
               "teams_open": "teams" in state and state["phase"] == "lobby", "teams": teams}
-    if state["phase"] in ("live", "revealed"):
+    if state["phase"] in ("live", "pooling", "revealed"):
         question = state["rounds"][state["index"]]
         result["question"] = {k: question[k] for k in
                               ("title", "kind", "body", "media", "alt", "image_fit", "image_position",
@@ -175,6 +231,8 @@ def view(state, role, player_id):
                         "team_id": player.get("team_id"),
                         "vote": state["votes"].get(player_id, {}).get("answer"),
                         "history": player["history"]}
+        if player.get("team_id") in state.get("teams", {}):
+            result["me"]["rank"] = next(t["rank"] for t in team_board if t["id"] == player["team_id"])
     return result
 
 
@@ -386,6 +444,8 @@ def control(code: str, body: Control, authorization: str | None = Header(default
             else:
                 state["index"] += 1
                 state["votes"] = {}
+                state.pop("team_results", None)
+                state.pop("pool_deadline", None)
                 state["duration"] = state["default_seconds"]
                 state["deadline"] = time.time() + state["duration"]
                 state["phase"] = "live"

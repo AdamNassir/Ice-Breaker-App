@@ -43,6 +43,9 @@ async function request(path,body,token){
   ada.d.getElementById('team-create-form').dispatchEvent(new ada.w.Event('submit',{bubbles:true,cancelable:true}));
   await until(()=>ada.d.getElementById('team-heading').textContent==='Your team');
   assert.equal(ada.d.querySelector('.team-card-title').textContent,'Les Décodeurs | Ada');
+  assert.equal(ada.d.querySelector('.team-avatar'),null);
+  assert(ada.d.querySelector('.team-card-meta').textContent.includes('1 member'));
+  assert(ada.d.querySelector('.team-captain')); 
   assert.deepEqual([...ada.d.querySelectorAll('.team-members li')].map(n=>n.textContent),['Ada']);
   await linus.poll();
   assert.equal(linus.d.querySelector('.team-card-title').textContent,'Les Décodeurs | Ada');
@@ -51,6 +54,7 @@ async function request(path,body,token){
   await until(()=>linus.d.getElementById('team-heading').textContent==='Your team');
   await ada.poll();
   assert.deepEqual([...ada.d.querySelectorAll('.team-members li')].map(n=>n.textContent),['Ada','Linus']);
+  assert(ada.d.querySelector('.team-card-meta').textContent.includes('2 members'));
   const restored=await phone('Linus',linus.session);
   assert.equal(restored.d.querySelector('.team-card-title').textContent,'Les Décodeurs | Ada');
   assert(restored.d.querySelector('.team-selected'));

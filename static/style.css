@@ -148,3 +148,19 @@
 .team-lock-note{margin:24px 0 0;line-height:1.5}
 .team-badge{font-size:13px;font-weight:700;color:var(--blue);margin:8px 0 0;overflow-wrap:anywhere}
 @media(max-width:480px){.team-choices{grid-template-columns:1fr}.team-lobby{padding:18px 12px}.team-card{padding:16px}}
+
+/* Team discovery: distinctive, readable crews instead of plain roster text. */
+.team-list{grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:16px}
+.team-card{display:flex;flex-direction:column;gap:12px;border:1px solid #d9def4;background:linear-gradient(145deg,#fff 65%,#f4f6ff);box-shadow:0 8px 22px rgba(28,40,101,.07);transition:border-color .15s,transform .15s}
+.team-card:hover{border-color:#8796df;transform:translateY(-2px)}
+.team-card-header{display:flex;align-items:center;gap:12px;min-width:0}
+.team-card-details{min-width:0;overflow-wrap:anywhere}
+.team-card-title{margin:0 0 4px;font-size:17px}
+.team-card-meta{margin:0;font-size:12px;color:#59617d;line-height:1.45}
+.team-members-label{font-size:11px;font-weight:800;letter-spacing:.12em;color:#6270a4;margin:4px 0 0}
+.team-members{padding:0;display:flex;flex-wrap:wrap;gap:7px;list-style:none;margin:0 0 6px}
+.team-members li{border-radius:100px;padding:5px 10px;background:#edf0fc;color:#26336c;font-size:13px;max-width:100%;overflow-wrap:anywhere}
+.team-members li.team-captain{background:#dce5ff;font-weight:750}
+.team-members li.team-captain::before{content:'★ ';color:#ad751c}
+.team-join{margin-top:auto}
+.team-selected{margin-top:auto}
