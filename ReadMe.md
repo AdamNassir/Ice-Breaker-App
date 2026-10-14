@@ -14,6 +14,18 @@ For Vercel, commit the saved `questions.json` and uploaded media, redeploy and c
 
 **Installing this update:** follow `UpdateGuide.md` and deploy the complete app source, both deck files and the expanded SQL image. Create a new room to use nine rounds. No new production dependency or SQL migration is needed. The optional local agent setup remains documented in AgentSetup.md.
 
+## Teams after scanning the QR
+
+1. Players scan the QR, enter their pseudonym, then choose **Create a team** or **Join a team**.
+2. **Create a team** asks for a group name (up to 40 characters). The creator joins automatically, using their existing pseudonym.
+3. **Join a team** shows every team as **Group name | Creator name**, with the current members listed underneath. The list updates while people join, including teams created after the list was opened. Teams may share a name; the creator and roster distinguish them.
+4. After choosing a team, players see the room's rosters and their selected team. Refreshing restores membership. Selection is one-time; a player cannot belong to multiple teams.
+5. Team creation and joining close when the presenter starts round 1. The server locks this transition against concurrent requests. A team label stays on each member's phone during the game.
+
+Team composition uses the existing room state in SQLite/Supabase; **no database migration or new dependency** is required. Teams organize players; voting, streaks, scores and final placements remain individual. The presenter sees how many players have chosen teams and can start when ready. Players without a team, including late arrivals, retain individual play. Rooms already created before this update keep their previous join flow; create a **new room** to use teams.
+
+After deploying the changed server/frontend files, create a new room and rehearse with two phones: one creates a team, the other joins it. The local question manager and deck content are unchanged. Keep your own `.env`/database locally when updating; the delivery excludes private settings, saved game data and installed test dependencies.
+
 ## Bundled starter deck
 
 The deck includes the four company-free French paragraphs supplied from a public LinkedIn post about AI and education, the full-frame Michael Jordan 1988 free-throw-line dunk, a historical motorcycle-football photograph, two original AI-written plausible French news articles, Napoleon with a hidden Inspector Gadget, an AI-written commented employee/payroll SQL query with joins and pivot-style columns, a fictional French Macron announcement about hospital AI and a French internship handover on Teams. Every round shows a descriptive title and a short classification target, without look/read/inspect instructions. Both articles are in French and use a full Le Parisien page reconstruction, including the masthead, French navigation, headline/chapo/byline, article, sidebar, related stories and footer; references and implementation limits are in `LayoutSources.md`; choose **Text presentation → News article** in the manager to edit this style. The SQL use case remains implied in the code. For Teams, players judge only the manager’s reply. Reveals show AI or HUMAN; real photos also show their subject, date and credit, and Inspector Gadget gets a red circle. Social posts get no extra reveal commentary. The news incidents and Macron words are invented for the quiz, not reports or quotations from real publications/accounts.

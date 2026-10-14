@@ -1,5 +1,6 @@
 {
-  "request_hash": "c606366d39347476c25a4702d201f394d334aded790522fc7a288aa6c23f60ab",
-  "status": "running",
-  "run_directory": ".agent/runs/20261006T060713-0023eea1"
+  "request_hash": "f2da9f7e00b18332dac660a565a12e50374a1cec7d69c5c6c081a6808ec87afc",
+  "status": "completed",
+  "run_directory": ".agent/runs/20261006T080147-240dc782",
+  "report": ".agent/runs/20261006T080147-240dc782/report.md"
 }

@@ -6,6 +6,7 @@
   const storage = host ? sessionStorage : localStorage;
   const key = code => `icebreaker:${host ? 'host' : 'player'}:${code}`;
   let session = null, state = null, polling = false, votePending = false, controlPending = false;
+  let teamMode = '', teamPending = false, teamListKey = '';
   let stageKey = '', boardKey = '', clockEnd = 0, noticeTimeout = null, qrAttempt = 0;
   const query = new URLSearchParams(location.search);
   let lastHost = '', playerLink = '';
@@ -105,6 +106,79 @@
     const wrap = element('div', 'waiting');
     wrap.append(element('span', 'waiting-icon', symbol), element('h2', '', title), element('p', '', message));
     return wrap;
+  }
+
+  function renderTeams(s) {
+    const panel = $('team-lobby');
+    if (!panel) return;
+    const inLobby = s.phase === 'lobby' && s.teams_enabled;
+    panel.hidden = !inLobby;
+    document.body.classList.toggle('player-team-lobby', inLobby);
+    const mine = (s.teams || []).find(t => t.id === s.me?.team_id);
+    const badge = $('my-team-label');
+    badge.hidden = !mine || inLobby || s.phase === 'finished';
+    badge.textContent = mine ? `${mine.name} | ${mine.creator.nickname}` : '';
+    if (!inLobby) return;
+    $('team-heading').textContent = mine ? 'Your team' : 'Choose your team';
+    $('team-player').textContent = `Playing as ${s.me.nickname}`;
+    $('team-status').textContent = mine ? 'You’re in. Waiting for the presenter to start.' : 'Create a team or join one that is already here.';
+    $('team-choices').hidden = Boolean(mine);
+    $('team-create-form').hidden = Boolean(mine) || teamMode !== 'create';
+    $('team-directory').hidden = !mine && teamMode !== 'join';
+    $('team-directory-heading').textContent = mine ? 'Teams in this room' : 'Join a team';
+    for (const button of panel.querySelectorAll('[data-team-mode]')) {
+      button.classList.toggle('active', button.dataset.teamMode === teamMode);
+      button.setAttribute('aria-pressed', String(button.dataset.teamMode === teamMode));
+      button.disabled = teamPending;
+    }
+    $('team-create-button').disabled = teamPending || !s.teams_open;
+    const signature = JSON.stringify([s.teams, s.me.team_id, s.teams_open, teamPending]);
+    if (signature === teamListKey) return;
+    teamListKey = signature;
+    const list = $('team-list');
+    const focused = list.contains(document.activeElement) ? document.activeElement.dataset.joinTeam : null;
+    list.replaceChildren();
+    if (!s.teams?.length) list.append(element('p', 'teams-empty', 'No teams yet. Create the first one, or wait for a team to appear.'));
+    for (const team of s.teams || []) {
+      const card = element('article', `team-card${team.id === s.me.team_id ? ' my-team' : ''}`);
+      const title = element('h4', 'team-card-title', `${team.name} | ${team.creator.nickname}`);
+      card.append(title);
+      const members = element('ul', 'team-members');
+      members.setAttribute('aria-label', `Members of ${team.name}`);
+      for (const member of team.members) members.append(element('li', '', member.nickname));
+      card.append(members);
+      if (team.id === s.me.team_id) card.append(element('span', 'team-selected', 'Your team'));
+      else if (!mine && s.teams_open) {
+        const join = element('button', 'secondary team-join', 'Join team');
+        join.type = 'button'; join.dataset.joinTeam = team.id; join.disabled = teamPending;
+        join.setAttribute('aria-label', `Join ${team.name}, created by ${team.creator.nickname}`);
+        join.addEventListener('click', () => selectTeam('join', team.id));
+        card.append(join);
+      }
+      list.append(card);
+    }
+    if (focused) [...list.querySelectorAll('[data-join-team]')].find(b => b.dataset.joinTeam === focused)?.focus();
+  }
+
+  async function selectTeam(action, teamId) {
+    if (!session || !state?.teams_open || teamPending || state.me?.team_id) return;
+    const activeSession = session;
+    teamPending = true; renderTeams(state);
+    try {
+      const path = `/api/rooms/${session.code}/teams` + (action === 'join' ? `/${teamId}/join` : '');
+      const body = action === 'join' ? {} : {name:$('team-name').value.trim()};
+      const result = await api(path, body);
+      if (session === activeSession) {
+        render(result);
+        if (action === 'create') $('team-name').value = '';
+      }
+    } catch (error) {
+      if (session === activeSession) notify(error.message);
+    } finally {
+      teamPending = false;
+      if (state && session === activeSession) renderTeams(state);
+      await poll(); // Recover a committed selection if its response was lost.
+    }
   }
 
   function placement(player, me, podium = false) {
@@ -356,6 +430,7 @@
     }
     $('clock-wrap').hidden = s.phase !== 'live'; $('timer-track').hidden = s.phase !== 'live';
     renderStage(s); renderReveal(s); renderBoard(s);
+    if (!host) renderTeams(s);
     if (host) {
       $('answered-count').textContent = s.phase === 'live' || s.phase === 'revealed' ? `${s.answered_count} / ${s.player_count} answered` : '';
       const button = $('control-button');
@@ -363,7 +438,9 @@
       button.disabled = controlPending || s.phase === 'live' || !s.player_count;
       button.textContent = s.phase === 'live' ? 'Round in progress' : s.phase === 'revealed' ?
         s.round_number === s.round_count ? 'Show final results' : 'Next round' : `Start round ${s.round_number}`;
-      $('control-help').textContent = '';
+      const assigned = (s.teams || []).reduce((count, t) => count + t.members.length, 0);
+      $('control-help').textContent = s.phase === 'lobby' && s.teams_enabled ?
+        `${s.teams.length} team${s.teams.length === 1 ? '' : 's'} · ${assigned} / ${s.player_count} players on a team` : '';
     } else {
       $('my-score').textContent = s.me.score; $('my-streak').textContent = s.me.streak; $('my-rank').textContent = s.me.rank;
       $('vote-controls').hidden = s.phase !== 'live';
@@ -386,7 +463,7 @@
   }
 
   async function poll() {
-    if (!session || polling || votePending || controlPending || document.hidden) return;
+    if (!session || polling || votePending || controlPending || teamPending || document.hidden) return;
     polling = true;
     const started = performance.now();
     try {
@@ -438,6 +515,14 @@
     });
   } else {
     $('room-code').value = initialCode;
+    document.querySelectorAll('[data-team-mode]').forEach(button => button.addEventListener('click', () => {
+      if (teamPending || !state?.teams_open || state.me?.team_id) return;
+      teamMode = button.dataset.teamMode; renderTeams(state);
+      if (teamMode === 'create') $('team-name').focus();
+    }));
+    $('team-create-form').addEventListener('submit', event => {
+      event.preventDefault(); selectTeam('create');
+    });
     $('join-form').addEventListener('submit', async event => {
       event.preventDefault(); $('join-button').disabled = true;
       try {
@@ -461,10 +546,10 @@
     try { if (host) sessionStorage.removeItem('icebreaker:last-host'); } catch {}
     history.replaceState(null, '', host ? '/presenter' : '/');
     $('entry').hidden = false; $('game').hidden = true; $('leave').hidden = true;
-    document.body.classList.remove('results-mode', 'presenter-lobby', 'presenter-playing');
+    document.body.classList.remove('results-mode', 'presenter-lobby', 'presenter-playing', 'player-team-lobby');
     document.querySelectorAll('.topbar, footer, .game-heading, #round-progress, .round-toolbar, .side-card, .host-controls, #vote-status, #connection').forEach(node => node.hidden = false);
     $('connection').textContent = ''; if (!host) $('room-code').value = '';
-    stageKey = ''; boardKey = '';
+    stageKey = ''; boardKey = ''; teamListKey = ''; teamMode = '';
   });
   try {
     const saved = initialCode && storage.getItem(key(initialCode));

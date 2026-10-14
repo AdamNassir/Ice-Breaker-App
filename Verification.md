@@ -1,6 +1,14 @@
-# Verification — October 5, 2026
+# Verification — October 14, 2026
 
 ## Current update
+
+- Added phone lobby team composition after pseudonym entry, live creator/member lists, automatic creator membership, restored selection after refresh, and atomic closure of team creation/joining at game start. Teams are kept in the existing room state; no schema migration or new dependency. Individual scoring/voting/placements and all nine question records/media are unchanged relative to the supplied draft.
+- **50 Python tests pass**, including six team tests for authenticated identity, room isolation, Unicode/name validation, duplicate/retried/concurrent operations, identical team names with different creators, locked membership after start/reveal/results, a simultaneous join/start race, legacy rooms and unchanged individual scoring.
+- The complete `python check_project.py` gate passes. A new integration check uses a real local FastAPI server and multiple phone DOMs to exercise the QR-prefilled pseudonym form, create/join choices, live roster/member updates, typing preserved through polling, stable roster DOMs, membership restored in a new browser DOM, safely rendered hostile strings, start locking, team badges and normal voting. Existing manager/game/QR/image-zoom/identity-reveal/keyboard/results/bonus checks pass.
+- The ZIP is compared against the uploaded draft: exact changed and added source paths, unchanged deck/media/protected gate bytes, CRC and complete manifest. A fresh extraction runs the same gate. Private `.env`, local game database, an opaque local download artifact and bundled `node_modules` are excluded from delivery, not deleted from the original upload.
+- Native Playwright could not render the mobile views because its browser executable is not installed. Team layout was checked through the shipped HTML/CSS in the DOM; no native-browser screenshot or physical-phone rehearsal is claimed. Supabase/Vercel deployment, capacity and native Windows watcher behavior remain untested here.
+
+## Earlier verification notes
 
 - LinkedIn now displays all four paragraphs pasted by the presenter, preserving wording and paragraph boundaries. The attached profile image loads and its original bytes are bundled. Both 1365 × 1062 variants were visually inspected: real photo/name blurred for voting, Anne GENETET and photo clear at reveal. The body/footer are pixel-identical between variants. Deck/fallback match; the other eight round records and unrelated images are unchanged.
 - Reveal images/alt text are validated and withheld from live API payloads. API-backed presenter/player DOM checks cover the image swap; manager checks cover preview/save/reload; phone gesture checks preserve zoom/pan and repeated-poll stability across the swap. Invalid/missing reveal paths are rejected. The public reveal remains HUMAN without contextual commentary.

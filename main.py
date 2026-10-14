@@ -41,6 +41,10 @@ class JoinRoom(BaseModel):
     nickname: str = Field(min_length=1, max_length=24)
 
 
+class CreateTeam(BaseModel):
+    name: str = Field(min_length=1, max_length=40)
+
+
 class Vote(BaseModel):
     answer: Literal["AI", "HUMAN"]
     round_index: int = Field(ge=0)
@@ -129,13 +133,24 @@ def view(state, role, player_id):
         last_score = player["score"]
         board.append({"id": pid, "nickname": player["nickname"], "score": player["score"],
                       "streak": player["streak"], "correct": player["correct"], "rank": rank})
+    teams = []
+    for tid, team in state.get("teams", {}).items():
+        creator = state["players"][team["creator_id"]]
+        members = [{"id": pid, "nickname": player["nickname"]}
+                   for pid, player in state["players"].items() if player.get("team_id") == tid]
+        members.sort(key=lambda p: p["id"] != team["creator_id"])
+        teams.append({"id": tid, "name": team["name"],
+                      "creator": {"id": team["creator_id"], "nickname": creator["nickname"]},
+                      "members": members})
     result = {"code": state["code"], "title": state["title"], "phase": state["phase"],
               "round_index": state["index"], "round_number": state["index"] + 1,
               "round_count": len(state["rounds"]), "revision": state["revision"],
               "server_time": time.time(), "deadline": state["deadline"],
               "duration": state["duration"], "player_count": len(players),
               "answered_count": len(state["votes"]), "leaderboard": board, "question": None,
-              "me": None, "reveal": None}
+              "me": None, "reveal": None,
+              "teams_enabled": "teams" in state,
+              "teams_open": "teams" in state and state["phase"] == "lobby", "teams": teams}
     if state["phase"] in ("live", "revealed"):
         question = state["rounds"][state["index"]]
         result["question"] = {k: question[k] for k in
@@ -157,6 +172,7 @@ def view(state, role, player_id):
     if player_id:
         player = state["players"][player_id]
         result["me"] = {**next(row for row in board if row["id"] == player_id),
+                        "team_id": player.get("team_id"),
                         "vote": state["votes"].get(player_id, {}).get("answer"),
                         "history": player["history"]}
     return result
@@ -227,7 +243,8 @@ def create_room(body: CreateRoom, request: Request):
                  "join_url": join_link(request, code),
                  "expires_at": time.time() + ROOM_LIFETIME_HOURS * 3600, "players": {},
                  "rounds": copy.deepcopy(rounds), "phase": "lobby", "index": 0, "revision": 0,
-                 "deadline": None, "duration": body.seconds, "default_seconds": body.seconds, "votes": {}}
+                 "deadline": None, "duration": body.seconds, "default_seconds": body.seconds, "votes": {},
+                 "teams": {}}
         if store.create(code, state):
             return {"code": code, "token": token, "join_url": state["join_url"]}
     raise HTTPException(503, "Could not allocate a room. Try again.")
@@ -263,6 +280,55 @@ def join_room(code: str, body: JoinRoom):
         state["players"][pid] = {"nickname": name, "token": digest(token), "score": 0, "streak": 0,
                                  "correct": 0, "history": [], "joined_at": time.time()}
     return {"code": code, "player_id": pid, "token": token}
+
+
+def team_player(state, authorization):
+    """Team membership changes share the same transaction lock as round start."""
+    role, pid = identity(state, authorization)
+    if role != "player":
+        raise HTTPException(403, "Only players can create or join a team.")
+    if "teams" not in state:
+        raise HTTPException(409, "Create a new room to use teams.")
+    if state["phase"] != "lobby":
+        raise HTTPException(409, "Team selection is closed. Teams lock when the game starts.")
+    return pid
+
+
+@app.post("/api/rooms/{code}/teams")
+def create_team(code: str, body: CreateTeam, authorization: str | None = Header(default=None)):
+    name = " ".join(body.name.split())
+    if not name or any(not c.isprintable() for c in name):
+        raise HTTPException(400, "Choose a visible group name, up to 40 characters.")
+    try:
+        name.encode("utf-8")
+    except UnicodeError as error:
+        raise HTTPException(400, "Use valid Unicode in the group name.") from error
+    with store.room(room_code(code)) as state:
+        pid = team_player(state, authorization)
+        player = state["players"][pid]
+        current = state["teams"].get(player.get("team_id"))
+        if current:
+            # A retry after a lost response must not create a second team.
+            if current["creator_id"] != pid or current["name"] != name:
+                raise HTTPException(409, "You already belong to a team.")
+        else:
+            tid = secrets.token_hex(8)
+            state["teams"][tid] = {"name": name, "creator_id": pid}
+            player["team_id"] = tid
+        return view(state, "player", pid)
+
+
+@app.post("/api/rooms/{code}/teams/{team_id}/join")
+def join_team(code: str, team_id: str, authorization: str | None = Header(default=None)):
+    with store.room(room_code(code)) as state:
+        pid = team_player(state, authorization)
+        if team_id not in state["teams"]:
+            raise HTTPException(404, "Team not found. Refresh the list and choose an existing team.")
+        player = state["players"][pid]
+        if player.get("team_id") and player["team_id"] != team_id:
+            raise HTTPException(409, "You already belong to a team.")
+        player["team_id"] = team_id
+        return view(state, "player", pid)
 
 
 @app.get("/api/rooms/{code}/state")

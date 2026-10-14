@@ -62,17 +62,31 @@ with tempfile.TemporaryDirectory(dir=checks_dir) as tmp:
   (fixture_file).write_text(json.dumps(dict(room=room,player=player,rows=rows,qr=qr,placements=placements)))
  log=(Path(tmp)/'manager.log').open('w',encoding='utf-8')
  server=subprocess.Popen([sys.executable,'question_manager.py','--no-browser','--port',str(port)],cwd=project,env=os.environ,stdout=log,stderr=log)
+ with socket.socket() as sock:
+  sock.bind(('127.0.0.1',0));game_port=sock.getsockname()[1]
+ os.environ['QA_GAME_BASE']=f'http://127.0.0.1:{game_port}'
+ game_log=(Path(tmp)/'game.log').open('w',encoding='utf-8')
+ game_server=subprocess.Popen([sys.executable,'-m','uvicorn','main:app','--host','127.0.0.1','--port',str(game_port)],cwd=project,env=os.environ,stdout=game_log,stderr=game_log)
  try:
   for i in range(150):
    if server.poll() is not None:raise RuntimeError('Local manager stopped before checks. Read its startup output.')
    try:urllib.request.urlopen(base_url+'/api/deck',timeout=1);break
    except OSError:time.sleep(.1)
   else:raise RuntimeError('Local manager did not start.')
-  for filename in ('resources.cjs','game.cjs','zoom.cjs','keyboard.cjs','workflow.cjs'):
+  for i in range(150):
+   if game_server.poll() is not None:raise RuntimeError('Local game stopped before checks.')
+   try:urllib.request.urlopen(os.environ['QA_GAME_BASE']+'/api/health',timeout=1);break
+   except OSError:time.sleep(.1)
+  else:raise RuntimeError('Local game did not start.')
+  for filename in ('resources.cjs','game.cjs','zoom.cjs','keyboard.cjs','workflow.cjs','teams.cjs'):
    subprocess.run([node,str(ROOT/'tests/frontend'/filename)],cwd=ROOT,env=os.environ,check=True)
  finally:
   server.terminate()
   try:server.wait(timeout=5)
   except subprocess.TimeoutExpired:server.kill();server.wait()
   log.close()
+  game_server.terminate()
+  try:game_server.wait(timeout=5)
+  except subprocess.TimeoutExpired:game_server.kill();game_server.wait()
+  game_log.close()
 print('PASS frontend states generated from the actual API; isolated manager and game checks.')
