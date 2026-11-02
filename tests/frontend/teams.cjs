@@ -45,7 +45,7 @@ async function request(path,body,token){
   assert.equal(ada.d.querySelector('.team-card-title').textContent,'Les Décodeurs | Ada');
   assert.equal(ada.d.querySelector('.team-avatar'),null);
   assert(ada.d.querySelector('.team-card-meta').textContent.includes('1 member'));
-  assert(ada.d.querySelector('.team-captain')); 
+  assert(ada.d.querySelector('.team-captain')); assert.equal(ada.d.querySelector('.team-members-label'), null); 
   assert.deepEqual([...ada.d.querySelectorAll('.team-members li')].map(n=>n.textContent),['Ada']);
   await linus.poll();
   assert.equal(linus.d.querySelector('.team-card-title').textContent,'Les Décodeurs | Ada');

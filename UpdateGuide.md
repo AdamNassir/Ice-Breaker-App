@@ -1,31 +1,40 @@
-# Completed update — team discovery and pooled team voting
+# IceBreaker: LogicLever branding, midnight mode and video-first countdown
 
-## Changes
+## Changes in this version
 
-- Team-directory cards now show a team name, founder, member count, highlighted captain and member chips, responsive grid styling, and clearer Join controls. Team names and nicknames are inserted as text, not HTML.
-- A round still accepts one immutable private AI/HUMAN vote per team member. On expiry the server freezes all ballots and enters a **3-second pooling phase**. The correct answer, final tally and reveal media remain unavailable until the reveal phase.
-- Each registered team is one scoring participant. Strict AI/HUMAN majority sets the team's answer. A tie or no votes means abstention, earning zero points. A team's streak and score apply equally to its members; the standings and podium rank teams rather than their individual members.
-- The reveal API exposes each team's answer and vote counts; the player UI confirms its team's chosen answer. Players without a team do not score in rooms with registered teams. Rooms without any teams retain the original solo-player behavior.
-- Presenter and players see a pooling message and cannot advance or vote during pooling. The presenter still starts rounds, and Next starts the following round immediately after a reveal.
+- Removed TotalEnergies logo from all game and local Question Manager pages, and removed the unused PNG from the project.
+- Centered the supplied LogicLever logo on headers and opening screens. Its original black text is always displayed over a light surface, including in midnight mode.
+- Added **Midnight mode / Light mode** toggle to presenter, player, standalone bonus and local Question Manager. It uses browser `localStorage` and persists on each site origin. The separate local manager and deployed Vercel site have independent preferences.
+- Removed the literal **THE CREW** section title while keeping individual team roster names.
+- Added a **watching** phase for video questions: the presenter starts the round, video plays, and server-authoritative voting timer starts only when the presenter player reports `ended`. For YouTube, the supported IFrame API reports the same event. If autoplay or event detection fails, presenter can click **Video cannot finish? Start voting** once the clip has actually finished.
+- Refreshed the local Question Manager's help text to describe optional context and video-timer behavior. No change to the shared `questions.json` schema.
 
-## Verification
+## GitHub + Vercel deployment
 
-- Python unit suite: **51 tests passed**, including new team majority, dissenting member, ties, frozen interim phase and team score assertions.
-- `node --check` on all JavaScript sources passed.
-- Full frontend DOM suite was **not executed** because npm dependencies are absent in this environment. Offline npm install reported an uncached `xmlchars` package; online installation timed out. `python check_project.py` consequently stops at its frontend dependency prerequisite.
-- No device, browser, remote database or deployment checks performed.
+1. Unzip the updated project into your **existing GitHub working copy**. Preserve your `.git` directory, `.env`, local database and any newer files or media not supplied here. Review changes before committing; don't replace production secrets.
+2. Commit source files and any intended `questions.json` and `static` media edits. **Do not** commit `.env`, a local `game.sqlite3`, `.venv`, `node_modules`, `.agent`, caches or question-manager backups.
+3. Push to the branch connected to your Vercel production deployment and wait for the deployment to complete. No new dependency, SQL migration or change to `vercel.json` is required.
+4. Check `<YOUR_DEPLOYMENT>/api/health` and open `/presenter`. Create a **new** room and test both phone and presenter screens. Try the midnight toggle and verify that team cards no longer say THE CREW.
+5. Add a short video question locally if you want to validate the new playback-before-timer behavior, then save `questions.json`, push and deploy, create another new room and rehearse. **The bundled nine-question deck contains no videos.** Test both locally uploaded MP4 and a YouTube link on target devices.
 
-## Install and test
+The public game is run by `main.py`; the Question Manager in `question_manager.py` runs **only on your computer**, not on Vercel. The manager saves `questions.json` in the same local folder. After editing a question, use **Save deck to game**, commit/push `questions.json` (and new media) to GitHub, allow Vercel to redeploy, and open a **new** room. A live room retains its already loaded question snapshot.
 
-Extract complete ZIP; retain your own `.env` and production database setup. Run `pip install -r requirements.txt -r requirements-dev.txt`, `npm --prefix tests/frontend ci`, then `python check_project.py`. Redeploy server and static assets and create a new room. Existing active room snapshots should not be used to assess team scoring. No schema migration is needed.
+## Question content and limits
 
-## Modified paths relative to the supplied ZIP
+The manager and game already use the same `Question` model in `question_content.py`, so saved questions, optional context, sources and media are read by `main.py` when a new room is created. The editor supports text/notes/logs/transcripts/code/commit messages (UTF-8 text, 50,000 characters), image uploads (JPG, PNG, WebP, GIF, AVIF, BMP), audio uploads or direct HTTPS media URLs, and video uploads/direct HTTPS video URLs/YouTube watch or share URLs. Its media upload size limit is **25 MB per file**. Optional `context` is visible with every question type (max **2,000 characters**). A title, known AI/HUMAN answer and valid body or media source are required; the system does not automatically classify the question.
 
-- `main.py`
-- `static/app.js`
-- `static/index.html`
-- `static/presenter.html`
-- `static/style.css`
-- `tests/test_teams.py`
-- `tests/frontend/teams.cjs`
-- `UpdateGuide.md`
+**Not arbitrary file formats:** PDF, DOCX, PPTX, HTML websites as navigable pages, and arbitrary social links cannot be inserted as playable question media without preparing them first. Convert to text, an image, or compatible audio/video. A YouTube URL must point to a supported video. Check browser codec and embedding restrictions. Clip trimming works on supported HTML media and YouTube.
+
+The managed deck takes precedence over `Content.py`. Edits in `Content.py` do not override an existing `questions.json`. No live, bidirectional syncing with GitHub or Supabase is implemented: GitHub/Vercel deployment is the update mechanism, not a collaboration API.
+
+## Testing
+
+```bash
+python -m pip install -r requirements.txt -r requirements-dev.txt
+python -m unittest discover -s tests -p 'test_game.py' -v
+python -m unittest discover -s tests -p 'test_question_manager.py' -v
+npm --prefix tests/frontend ci
+python tests/run_frontend.py
+```
+
+The frontend script tests UI code against the actual local API, including a simulated video-end transition. This is separate from hands-on YouTube/autoplay verification on physical devices. Local SQLite is sufficient for tests, while Vercel needs Supabase `DATABASE_URL` and a presenter password.

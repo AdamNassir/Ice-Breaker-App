@@ -9,11 +9,32 @@
 /* Supplied branding; match the public game's blue/red palette. */
 .brand-logos{display:flex;align-items:center;gap:18px;flex-shrink:0}
 .brand-logos img{display:block;object-fit:contain;width:auto;height:44px;max-width:170px}
-.brand-logos .logo-totalenergies{height:50px;max-width:100px}
-@media(max-width:650px){.topbar{height:auto;min-height:105px;flex-wrap:wrap;gap:8px;padding:12px 18px}.brand-logos{margin:auto;gap:16px}.brand-logos img{height:34px}.brand-logos .logo-totalenergies{height:40px}}
+
+@media(max-width:650px){.topbar{height:auto;min-height:105px;flex-wrap:wrap;gap:8px;padding:12px 18px}.brand-logos{margin:auto;gap:16px}.brand-logos img{height:34px}}
 
 .topbar .brand-logos .logo-logiclever{width:150px;height:auto;max-height:60px;object-fit:contain}
 @media(max-width:650px){.topbar .brand-logos .logo-logiclever{width:120px;max-height:48px}}
 
 /* Blend the complete white-backed wordmark into its surrounding surface. */
 .logo-logiclever{mix-blend-mode:multiply}
+
+/* Same persistent midnight palette as the game; forms remain light for dark ink. */
+html[data-theme="midnight"] { color-scheme: light;--bg:#172646;--paper:#edf3ff;
+  --ink:#17243c;--muted:#475b79;--line:#b6c4dc;--blue:#2738b3; }
+html[data-theme="midnight"] body { background:#172646; }
+html[data-theme="midnight"] .topbar,html[data-theme="midnight"] .deck-card,
+html[data-theme="midnight"] .editor-card,html[data-theme="midnight"] .preview-card {
+  background:#edf3ff;color:#17243c; }
+html[data-theme="midnight"] .heading h1,html[data-theme="midnight"] .heading .intro,
+html[data-theme="midnight"] .heading .save-state,html[data-theme="midnight"] footer {color:#e7eeff;}
+html[data-theme="midnight"] .heading h1 span {color:#d3ddff;}
+html[data-theme="midnight"] .brand-logos img { mix-blend-mode:normal; }
+.topbar { position:relative; }
+.topbar > .brand-logos { position:absolute;left:50%;transform:translateX(-50%);margin:0; }
+.topbar > .theme-toggle { margin-left:auto; }
+.theme-toggle { border:1px solid var(--line);background:#e8edff;color:#1b2a5b;
+  border-radius:999px;padding:9px 13px;font-size:12px;font-weight:750;white-space:nowrap;cursor:pointer; }
+.theme-toggle:focus-visible { outline:3px solid var(--blue);outline-offset:3px; }
+@media(max-width:920px){.topbar{height:auto;min-height:90px;flex-wrap:wrap;padding:12px 18px;gap:10px}
+.topbar > .brand-logos {position:static;transform:none;order:10;flex-basis:100%;justify-content:center}
+.topbar > .theme-toggle {margin-left:auto}}

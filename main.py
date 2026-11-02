@@ -51,7 +51,7 @@ class Vote(BaseModel):
 
 
 class Control(BaseModel):
-    action: Literal["start", "next"]
+    action: Literal["start", "next", "begin_voting"]
     revision: int = Field(ge=0)
 
 
@@ -207,7 +207,7 @@ def view(state, role, player_id):
               "me": None, "reveal": None,
               "teams_enabled": "teams" in state,
               "teams_open": "teams" in state and state["phase"] == "lobby", "teams": teams}
-    if state["phase"] in ("live", "pooling", "revealed"):
+    if state["phase"] in ("watching", "live", "pooling", "revealed"):
         question = state["rounds"][state["index"]]
         result["question"] = {k: question[k] for k in
                               ("title", "kind", "body", "media", "alt", "image_fit", "image_position",
@@ -435,9 +435,22 @@ def control(code: str, body: Control, authorization: str | None = Header(default
                 # The presenter chooses one timer for the entire room. Legacy
                 # question-level seconds must never override that choice.
                 state["duration"] = state["default_seconds"]
-                state["deadline"] = time.time() + state["duration"]
-                state["phase"] = "live"
+                if state["rounds"][state["index"]]["kind"] == "video":
+                    # Do not start voting while the clip is still playing.
+                    # Only the presenter's completed-player event (or their
+                    # explicit fallback button) can release the timer.
+                    state["deadline"] = None
+                    state["phase"] = "watching"
+                else:
+                    state["deadline"] = time.time() + state["duration"]
+                    state["phase"] = "live"
                 state["revision"] += 1
+        elif body.action == "begin_voting" and state["phase"] == "watching" and state["rounds"][state["index"]]["kind"] == "video":
+            # Server-authoritative countdown, starting AFTER the video ends.
+            # The same revision guard prevents duplicate completion signals.
+            state["deadline"] = time.time() + state["duration"]
+            state["phase"] = "live"
+            state["revision"] += 1
         elif body.action == "next" and state["phase"] == "revealed":
             if state["index"] == len(state["rounds"]) - 1:
                 state["phase"] = "finished"
@@ -447,8 +460,12 @@ def control(code: str, body: Control, authorization: str | None = Header(default
                 state.pop("team_results", None)
                 state.pop("pool_deadline", None)
                 state["duration"] = state["default_seconds"]
-                state["deadline"] = time.time() + state["duration"]
-                state["phase"] = "live"
+                if state["rounds"][state["index"]]["kind"] == "video":
+                    state["deadline"] = None
+                    state["phase"] = "watching"
+                else:
+                    state["deadline"] = time.time() + state["duration"]
+                    state["phase"] = "live"
             state["revision"] += 1
         else:
             error = (409, "That action is unavailable in this phase.")

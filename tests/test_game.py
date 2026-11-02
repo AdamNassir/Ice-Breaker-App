@@ -45,19 +45,62 @@ class GameTests(unittest.TestCase):
         self.assertEqual(managed[6]['answer'], 'AI')
         self.assertTrue(all(not q.get('media_url') for q in managed))
 
-    def test_supplied_logos_are_served_on_all_entry_views(self):
-        for name in ('logiclever.png', 'totalenergies.png'):
-            response = self.client.get('/static/branding/' + name)
-            self.assertEqual(response.status_code, 200)
-            self.assertTrue(response.headers['content-type'].startswith('image/png'))
-            self.assertTrue(response.content.startswith(b'\x89PNG\r\n\x1a\n'))
-            used_name = 'logiclever-full.jpg' if name == 'logiclever.png' else name
-            for route in ('/', '/presenter', '/bonus'):
-                self.assertIn('/static/branding/' + used_name, self.client.get(route).text)
-        complete = self.client.get('/static/branding/logiclever-full.jpg')
-        self.assertEqual(complete.status_code, 200)
-        self.assertEqual(complete.headers['content-type'], 'image/jpeg')
-        self.assertTrue(complete.content.startswith(b'\xff\xd8'))
+    def test_logiclever_only_branding_and_midnight_theme(self):
+        for route in ('/', '/presenter', '/bonus'):
+            html = self.client.get(route).text
+            self.assertEqual(html.count('logiclever-full.jpg'), 2 if route != '/bonus' else 1)
+            self.assertNotIn('totalenergies', html.casefold())
+            self.assertIn('theme-toggle', html)
+            self.assertIn('/static/theme.js', html)
+        logo = self.client.get('/static/branding/logiclever-full.jpg')
+        self.assertEqual(logo.status_code, 200)
+        self.assertEqual(logo.headers['content-type'], 'image/jpeg')
+        self.assertTrue(logo.content.startswith(b'\xff\xd8'))
+        self.assertIn('icebreaker:theme', self.client.get('/static/theme.js').text)
+        self.assertNotIn('logo-totalenergies', self.client.get('/static/branding/publication.svg').text)
+
+    def test_video_plays_before_countdown_and_synchronizes_across_players(self):
+        video = {"title": "Judge this clip", "kind": "video", "answer": "HUMAN",
+                 "context": "Optional video context", "body": "",
+                 "media_url": "https://youtu.be/dQw4w9WgXcQ"}
+        with main.store.room(self.code) as room:
+            room['rounds'] = [video]
+        started = self.control('start')
+        self.assertEqual(started.status_code, 200)
+        self.assertEqual(started.json()['phase'], 'watching')
+        self.assertIsNone(started.json()['deadline'])
+        self.assertEqual(self.state(self.p1)['question']['context'], video['context'])
+        self.assertEqual(self.state(self.p1)['phase'], 'watching')
+        self.assertEqual(self.vote(self.p1, 'HUMAN').status_code, 409)
+        revision = self.state()['revision']
+        denied = self.client.post(f'/api/rooms/{self.code}/control', headers=self.p1,
+                                  json={'action': 'begin_voting', 'revision': revision})
+        self.assertEqual(denied.status_code, 403)
+        begun = self.control('begin_voting')
+        self.assertEqual(begun.status_code, 200)
+        self.assertEqual(begun.json()['phase'], 'live')
+        self.assertEqual(begun.json()['duration'], 5)
+        self.assertGreater(begun.json()['deadline'], begun.json()['server_time'])
+        self.assertEqual(self.client.post(f'/api/rooms/{self.code}/control', headers=self.host,
+                     json={'action': 'begin_voting', 'revision': revision}).status_code, 409)
+        self.assertEqual(self.vote(self.p1, 'HUMAN').status_code, 200)
+
+    def test_video_after_text_round_is_also_pre_countdown(self):
+        with main.store.room(self.code) as room:
+            room['rounds'] = [{"title": "Text", "kind": "text", "answer": "AI", "body": "Test"},
+                              {"title": "Video", "kind": "video", "answer": "AI",
+                               "media_url": "https://youtu.be/dQw4w9WgXcQ"}]
+        self.assertEqual(self.control('start').json()['phase'], 'live')
+        self.expire()
+        self.state()
+        with main.store.room(self.code) as room:
+            room['pool_deadline'] = 0
+        self.assertEqual(self.state()['phase'], 'revealed')
+        next_state = self.control('next').json()
+        self.assertEqual(next_state['phase'], 'watching')
+        self.assertEqual(next_state['round_index'], 1)
+        self.assertIsNone(next_state['deadline'])
+        self.assertEqual(next_state['question']['kind'], 'video')
 
     def test_workflow_asset_and_creation_brief_privacy(self):
         self.assertEqual(self.client.get('/static/workflow.js').status_code, 200)

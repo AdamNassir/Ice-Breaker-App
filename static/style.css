@@ -100,25 +100,25 @@
 /* Original supplied logos: no recoloring, stretching or external downloads. */
 .brand-logos{display:flex;align-items:center;justify-content:center;gap:18px;flex-shrink:0}
 .brand-logos img{display:block;object-fit:contain;height:48px;width:auto;max-width:190px}
-.brand-logos .logo-totalenergies{height:52px;max-width:110px}
+
 .topbar .top-label{display:none}
 .question-heading{width:100%;max-width:1120px;margin:0 auto 18px;text-align:center}
 .stage .question-title{font-size:clamp(22px,2.5vw,36px);line-height:1.2;margin:0 0 8px;color:var(--ink)}
 .question-intro{max-width:900px;margin:0 auto;color:var(--muted);font-size:clamp(14px,1.25vw,18px);line-height:1.4}
 .presenter-playing .stage{min-height:0;justify-content:flex-start}
 .presenter-playing .brand-logos img{height:36px}
-.presenter-playing .brand-logos .logo-totalenergies{height:42px}
+
 .bonus-page .brand-logos{margin-bottom:8px}
-@media(max-width:760px){.topbar{height:auto;min-height:92px;display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px 18px}.topbar .brand-logos{grid-column:1/-1;grid-row:2;gap:18px}.topbar .brand-logos img{height:30px;max-width:130px}.topbar .brand-logos .logo-totalenergies{height:34px;max-width:84px}.presenter-playing .topbar{height:auto}.question-heading{margin-bottom:14px}.stage .question-title{font-size:22px;margin-bottom:7px}.question-intro{font-size:14px}.bonus-page .brand-logos{gap:18px}.bonus-page .brand-logos img{height:38px}.bonus-page .brand-logos .logo-totalenergies{height:44px}}
+@media(max-width:760px){.topbar{height:auto;min-height:92px;display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px 18px}.topbar .brand-logos{grid-column:1/-1;grid-row:2;gap:18px}.topbar .brand-logos img{height:30px;max-width:130px}.presenter-playing .topbar{height:auto}.question-heading{margin-bottom:14px}.stage .question-title{font-size:22px;margin-bottom:7px}.question-intro{font-size:14px}.bonus-page .brand-logos{gap:18px}.bonus-page .brand-logos img{height:38px}}
 
 /* Opening branding replaces the old title. Natural dimensions keep every logo edge visible. */
 .brand-intro{display:flex;align-items:center;justify-content:center;min-width:0;overflow:visible}
 .brand-intro .brand-logos-hero{display:flex;flex-direction:column;gap:42px;width:100%;padding:24px 12px;flex-shrink:1;overflow:visible}
 .brand-intro .brand-logos-hero img{display:block;height:auto;max-height:none;max-width:100%;object-fit:contain;flex-shrink:0}
 .brand-intro .brand-logos-hero .logo-logiclever{width:min(100%,480px);height:auto;max-width:100%}
-.brand-intro .brand-logos-hero .logo-totalenergies{width:min(100%,280px);height:auto;max-width:100%}
+
 .topbar .brand-logos .logo-logiclever{width:165px;height:auto;max-height:64px;object-fit:contain}
-@media(max-width:760px){.brand-intro .brand-logos-hero{gap:22px;padding:18px 12px}.brand-intro .brand-logos-hero .logo-logiclever{width:min(100%,350px)}.brand-intro .brand-logos-hero .logo-totalenergies{width:min(100%,180px)}.topbar .brand-logos .logo-logiclever{width:125px;height:auto;max-height:48px}}
+@media(max-width:760px){.brand-intro .brand-logos-hero{gap:22px;padding:18px 12px}.brand-intro .brand-logos-hero .logo-logiclever{width:min(100%,350px)}.topbar .brand-logos .logo-logiclever{width:125px;height:auto;max-height:48px}}
 
 /* Blend the complete white-backed wordmark into its surrounding surface. */
 .logo-logiclever{mix-blend-mode:multiply}
@@ -164,3 +164,51 @@
 .team-members li.team-captain::before{content:'★ ';color:#ad751c}
 .team-join{margin-top:auto}
 .team-selected{margin-top:auto}
+
+/* Shared theme. Midnight is a deep-blue canvas, NOT black content cards: readable dark
+   lettering and the unmodified black LogicLever wordmark are preserved on light panels. */
+html[data-theme="midnight"] { color-scheme: light;
+  --bg:#172646; --paper:#edf3ff; --ink:#17243c; --muted:#475b79;
+  --line:#b6c4dc; --blue:#2738b3; --blue-dark:#202d91; }
+html[data-theme="midnight"] body { background:#172646; }
+html[data-theme="midnight"] .topbar { background:#e7eefb; }
+html[data-theme="midnight"] .entry-card,html[data-theme="midnight"] .game-card,
+html[data-theme="midnight"] .side-card,html[data-theme="midnight"] .team-card,
+html[data-theme="midnight"] .podium-place,html[data-theme="midnight"] .final-list .final-player,
+html[data-theme="midnight"] .stage,html[data-theme="midnight"] .score-tray {
+  background:#edf3ff; color:#17243c; }
+html[data-theme="midnight"] .entry-card input,html[data-theme="midnight"] .share-url,
+html[data-theme="midnight"] .team-card,html[data-theme="midnight"] .secondary {
+  background:#fff; color:#17243c; }
+html[data-theme="midnight"] .intro,html[data-theme="midnight"] footer,
+html[data-theme="midnight"] .connection { color:#dce8ff; }
+html[data-theme="midnight"] .brand-intro .logo-logiclever,
+html[data-theme="midnight"] .bonus-page .logo-logiclever {
+  background:#fff; border-radius:18px; padding:12px; box-shadow:0 10px 30px #090f2d40; }
+/* Multiply removes the logo's white backing in light mode, but must NOT run over midnight. */
+html[data-theme="midnight"] .logo-logiclever { mix-blend-mode:normal; }
+html[data-theme="midnight"] .code-block { background:#fbfcff;color:#422d35; }
+html[data-theme="midnight"] .bonus-page { background:#edf3ff; color:#17243c; border-radius:20px; }
+/* Center the wordmark relative to the whole bar, independently of right-hand links. */
+.topbar { position:relative; }
+.topbar > .brand-logos { position:absolute;left:50%;transform:translateX(-50%); margin:0; }
+.topbar > .theme-toggle { margin-left:auto; }
+.theme-toggle { border:1px solid var(--line);background:#e8edff;color:#1b2a5b;
+  border-radius:999px;padding:9px 13px;font-size:12px;font-weight:750;
+  white-space:nowrap;cursor:pointer; }
+.theme-toggle:hover { background:#dce5fc; }
+.theme-toggle:focus-visible { outline:3px solid var(--blue);outline-offset:3px; }
+.bonus-page > .theme-toggle { display:block; margin:0 0 18px auto; }
+.brand-intro .brand-logos-hero { align-items:center; }
+@media(max-width:980px){
+  .topbar { flex-wrap:wrap; height:auto;min-height:92px;padding:12px 18px;gap:10px; }
+  .topbar > .brand-logos { position:static;transform:none;order:10;flex-basis:100%;justify-content:center; }
+  .topbar > .theme-toggle { margin-left:auto; }
+}
+@media(max-width:760px){
+  .topbar { display:flex; }
+  .topbar > .brand-logos { grid-column:auto;grid-row:auto; }
+  .topbar .text-link { font-size:12px; }
+}
+/* Video exposure is a dedicated non-voting phase before the countdown. */
+.video-watch-note { margin:12px auto 0;font-size:14px;color:var(--muted);text-align:center;max-width:720px; }

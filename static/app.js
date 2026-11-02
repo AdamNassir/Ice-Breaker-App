@@ -146,7 +146,7 @@
       const title = element('h4', 'team-card-title', `${team.name} | ${team.creator.nickname}`);
       const meta = element('p', 'team-card-meta', `Founded by ${team.creator.nickname} · ${team.members.length} member${team.members.length === 1 ? '' : 's'}`);
       details.append(title, meta); header.append(details);
-      card.append(header, element('p', 'team-members-label', 'THE CREW'));
+      card.append(header);
       const members = element('ul', 'team-members');
       members.setAttribute('aria-label', `Members of ${team.name}`);
       for (const member of team.members) { const li = element('li', '', member.nickname); if (member.id === team.creator.id) li.className = 'team-captain'; members.append(li); }
@@ -302,6 +302,21 @@
     return panel;
   }
 
+  async function beginVideoVoting(roundIndex) {
+    // Only the presenter can report playback completion. Every other screen
+    // receives the new, server-authoritative timer on its next state poll.
+    if (!host || !session || !state || state.phase !== 'watching' ||
+        state.round_index !== roundIndex || controlPending) return;
+    controlPending = true;
+    try {
+      render(await api(`/api/rooms/${session.code}/control`,
+        {action:'begin_voting', revision:state.revision}));
+    } catch (error) {
+      if (error.status !== 409) notify(error.message);
+      await poll();
+    } finally { controlPending = false; if (state) render(state); }
+  }
+
   function renderStage(s) {
     const signature = JSON.stringify([s.code, s.phase, s.round_index, s.question, s.reveal?.reveal_media, s.reveal?.reveal_alt, s.phase === 'finished' ? s.leaderboard : null]);
     if (signature === stageKey) return;
@@ -314,8 +329,9 @@
     const newsScroll = newsKey && stage.dataset.newsKey === newsKey ? stage.querySelector('.news-site')?.scrollTop : 0;
     stage.dataset.newsKey = newsKey;
     stage.dataset.imageKey = imageKey;
+    stage.querySelector('iframe.youtube-player')?._icebreakerCleanup?.();
     stage.replaceChildren();
-    stage.classList.toggle('text-stage', ['live', 'pooling', 'revealed'].includes(s.phase) && s.question?.kind === 'text');
+    stage.classList.toggle('text-stage', ['watching', 'live', 'pooling', 'revealed'].includes(s.phase) && s.question?.kind === 'text');
     if (s.phase === 'lobby') {
       if (!host) stage.append(waiting("You're in.", `Welcome, ${s.me.nickname}. Watch this screen for the first round.`));
     } else if (s.phase === 'ready') {
@@ -343,8 +359,13 @@
         const isVideo = q.kind === 'video';
         const player = window.IcebreakerMedia.create(q, isVideo ? 'round-video' : 'round-audio', message => {
           if (!stage.querySelector('.image-error')) stage.append(element('p', 'image-error', message));
-        });
+        }, isVideo && s.phase === 'watching' && host ? {
+          autoPlay: true, onEnded: () => beginVideoVoting(s.round_index)
+        } : {});
         stage.append(player);
+        if (isVideo && s.phase === 'watching') stage.append(element('p', 'video-watch-note',
+          host ? 'Watch the entire clip. Voting starts automatically when it finishes. If autoplay is blocked, press Play on the video.' :
+            'Watch the video. Voting will open after the presenter finishes playing it.'));
       } else if (q.kind === 'text') {
         if (q.text_style === 'news') {
           const page = window.IcebreakerNews.create(q);
@@ -423,9 +444,10 @@
     }
     if (finished) $('notice').hidden = true;
     // Use monotonic browser time rather than the phone's possibly inaccurate wall clock.
-    if (newSnapshot) clockEnd = performance.now() + Math.max(0, (s.deadline - s.server_time) * 1000 - roundTrip / 2);
+    if (newSnapshot) clockEnd = s.deadline == null ? 0 :
+      performance.now() + Math.max(0, (s.deadline - s.server_time) * 1000 - roundTrip / 2);
     $('room-title').textContent = s.title;
-    const labels = {lobby:'IN THE LOBBY', ready:'TAKE A BREATHER', live:'MAKE YOUR CALL', pooling:'POOLING TEAM VOTES', revealed:'THE REVEAL', finished:'FINAL RESULTS'};
+    const labels = {lobby:'IN THE LOBBY', ready:'TAKE A BREATHER', watching:'WATCH THE VIDEO', live:'MAKE YOUR CALL', pooling:'POOLING TEAM VOTES', revealed:'THE REVEAL', finished:'FINAL RESULTS'};
     $('phase-label').textContent = labels[s.phase];
     $('round-label').textContent = s.phase === 'finished' ? `${s.round_count} rounds complete` : `Round ${s.round_number} / ${s.round_count}`;
     $('room-meta').textContent = `${s.player_count} player${s.player_count === 1 ? '' : 's'} · Room ${s.code}`;
@@ -433,7 +455,7 @@
     const progress = $('round-progress'); progress.replaceChildren();
     for (let i = 0; i < s.round_count; i++) {
       const node = element('span', i < s.round_index || s.phase === 'finished' || (i === s.round_index && s.phase === 'revealed') ? 'done' :
-        i === s.round_index && s.phase === 'live' ? 'active' : '');
+        i === s.round_index && ['watching', 'live'].includes(s.phase) ? 'active' : '');
       progress.append(node);
     }
     $('clock-wrap').hidden = s.phase !== 'live'; $('timer-track').hidden = s.phase !== 'live';
@@ -444,10 +466,13 @@
       const button = $('control-button');
       button.hidden = s.phase === 'finished';
       button.disabled = controlPending || ['live', 'pooling'].includes(s.phase) || !s.player_count;
-      button.textContent = ['live', 'pooling'].includes(s.phase) ? (s.phase === 'pooling' ? 'Pooling team votes…' : 'Round in progress') : s.phase === 'revealed' ?
+      button.textContent = s.phase === 'watching' ? 'Video cannot finish? Start voting' :
+        ['live', 'pooling'].includes(s.phase) ? (s.phase === 'pooling' ? 'Pooling team votes…' : 'Round in progress') : s.phase === 'revealed' ?
         s.round_number === s.round_count ? 'Show final results' : 'Next round' : `Start round ${s.round_number}`;
       const assigned = (s.teams || []).reduce((count, t) => count + t.members.length, 0);
-      $('control-help').textContent = s.phase === 'lobby' && s.teams_enabled ?
+      $('control-help').textContent = s.phase === 'watching' ?
+        'The video plays before the countdown. Use this button only if the clip cannot finish.' :
+        s.phase === 'lobby' && s.teams_enabled ?
         `${s.teams.length} team${s.teams.length === 1 ? '' : 's'} · ${assigned} / ${s.player_count} players on a team` : '';
     } else {
       $('my-score').textContent = s.me.score; $('my-streak').textContent = s.me.streak; $('my-rank').textContent = s.me.rank;
@@ -500,7 +525,8 @@
       if (!state || !session || controlPending || $('control-button').disabled || $('control-button').hidden) return;
       controlPending = true; $('control-button').disabled = true;
       try {
-        const s = await api(`/api/rooms/${session.code}/control`, {action:state.phase === 'revealed' ? 'next' : 'start', revision:state.revision});
+        const s = await api(`/api/rooms/${session.code}/control`, {action:state.phase === 'revealed' ? 'next' :
+          state.phase === 'watching' ? 'begin_voting' : 'start', revision:state.revision});
         render(s);
       } catch (error) { notify(error.message); await poll(); }
       finally { controlPending = false; if (state) render(state); }
@@ -559,6 +585,7 @@
     document.body.classList.remove('results-mode', 'presenter-lobby', 'presenter-playing', 'player-team-lobby');
     document.querySelectorAll('.topbar, footer, .game-heading, #round-progress, .round-toolbar, .side-card, .host-controls, #vote-status, #connection').forEach(node => node.hidden = false);
     $('connection').textContent = ''; if (!host) $('room-code').value = '';
+    $('stage').querySelector('iframe.youtube-player')?._icebreakerCleanup?.();
     stageKey = ''; boardKey = ''; teamListKey = ''; teamMode = '';
   });
   try {
