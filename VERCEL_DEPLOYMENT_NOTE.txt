@@ -1,0 +1,20 @@
+ICEBREAKER — COMPLETE VERCEL APP SOURCE (2026-11-03)
+=====================================================
+This archive contains the original IceBreaker app's deployable source,
+including its public-Blob URL media support, and is provided separately
+because you supplied two applications.
+
+NO ICEBREAKER APPLICATION CODE CHANGES were needed for the specific error:
+"Le module Vercel Blob est absent du serveur séminaire".
+The error happens in Mercato's Python/Docker service before room creation.
+
+For that specific error, update and rebuild MERCATO using the other ZIP.
+Redeploy IceBreaker on Vercel only if your deployed version is older than the
+source in this ZIP (or if the deployment lacks the integration capabilities).
+
+Removed from this distribution: .env, local database, .git, .venv,
+.agent history, dependency node_modules and Python caches. Copy or configure
+environment variables separately in Vercel as needed. For public Vercel Blob
+images, the READ_WRITE_TOKEN is held in Mercato, not required by IceBreaker.
+
+No live Blob upload or Vercel deployment was performed for this archive.
