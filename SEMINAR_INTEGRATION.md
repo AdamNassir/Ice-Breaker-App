@@ -13,6 +13,6 @@ Déployez **ce ZIP IceBreaker complet** dans le projet Vercel correspondant (Git
 
 Ensuite, dans l'application séminaire mise à jour, ouvrez **Organiser → IceBreaker** et configurez cette URL et le mot de passe. Le jeu anciennement déployé ne reconnaît pas les nouveaux appels; déployez cette version avant de créer des salles depuis Organizer.
 
-Les modifications de questions **texte** faites dans Organizer sont transmises dans le corps de création de salle, sans autre déploiement. Les **nouveaux fichiers médias** doivent être ajoutés dans le dépôt IceBreaker et redéployés avant de pouvoir les afficher aux joueurs.
+Les modifications de questions **texte** faites dans Organizer sont transmises dans le corps de création de salle, sans autre déploiement. Les nouveaux médias d’Organizer sont publiés automatiquement dans Vercel Blob (configuration unique dans Organizer). Consultez `MEDIAS_SEMINAIRE_VERCEL_BLOB.md`.
 
 L'installation ne nécessite aucune modification du modèle de données Supabase pour cette intégration. Les salons déjà créés ne reçoivent pas automatiquement le nouveau deck. Pour une nouvelle série, créez une nouvelle salle dans Organizer.

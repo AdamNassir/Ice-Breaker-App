@@ -18,6 +18,24 @@ MEDIA_FOLDERS = {"image": "images", "audio": "audio", "video": "videos"}
 MEDIA_EXTENSIONS = {"image": IMAGE_EXTENSIONS, "audio": AUDIO_EXTENSIONS, "video": VIDEO_EXTENSIONS}
 
 
+def is_public_icebreaker_blob(value: str, folder: str) -> bool:
+    """Only immutable media under the IceBreaker prefix in Vercel public Blob.
+
+    This is intentionally more restrictive than arbitrary external URLs: it
+    prevents a saved room from embedding untrusted tracking/media endpoints.
+    """
+    if not isinstance(value, str) or len(value) > 300:
+        return False
+    parsed = urlsplit(value)
+    return bool(parsed.scheme == 'https' and parsed.hostname and
+                re.fullmatch(r'[a-z0-9-]+\.public\.blob\.vercel-storage\.com', parsed.hostname) and
+                not parsed.username and not parsed.password and parsed.port in (None, 443) and
+                not parsed.query and not parsed.fragment and
+                parsed.path.startswith(f'/icebreaker/{folder}/') and
+                PurePosixPath(parsed.path).suffix.lower() in MEDIA_EXTENSIONS[
+                    {v: k for k, v in MEDIA_FOLDERS.items()}[folder]])
+
+
 # These two bundled articles predate text_style; old room snapshots may contain
 # the parser's former default "plain". Limit migration to those known titles
 # and headlines so custom plain text remains an explicit author choice.
@@ -195,18 +213,20 @@ class Question(BaseModel):
                     raise ValueError("Use a direct audio/video file URL, or a YouTube watch/share link for video.")
         elif self.kind in MEDIA_FOLDERS:
             expected = MEDIA_FOLDERS[self.kind]
-            path = PurePosixPath(self.media)
-            if (not self.media.startswith(f"/static/{expected}/") or ".." in path.parts or
-                    "\\" in self.media or "%" in self.media or "?" in self.media or "#" in self.media):
-                raise ValueError(f"Choose a file from static/{expected} or upload one.")
-            extensions = MEDIA_EXTENSIONS[self.kind]
-            if path.suffix.lower() not in extensions:
-                raise ValueError("This media format is not supported. Choose a browser-compatible file.")
+            if not is_public_icebreaker_blob(self.media, expected):
+                path = PurePosixPath(self.media)
+                if (not self.media.startswith(f"/static/{expected}/") or ".." in path.parts or
+                        "\\" in self.media or "%" in self.media or "?" in self.media or "#" in self.media):
+                    raise ValueError(f"Choose a file from static/{expected} or upload one.")
+                extensions = MEDIA_EXTENSIONS[self.kind]
+                if path.suffix.lower() not in extensions:
+                    raise ValueError("This media format is not supported. Choose a browser-compatible file.")
         if self.reveal_media:
             path = PurePosixPath(self.reveal_media)
-            if (self.kind != 'image' or not self.reveal_media.startswith('/static/images/') or
-                    '..' in path.parts or any(c in self.reveal_media for c in '\\%?#') or
-                    path.suffix.lower() not in MEDIA_EXTENSIONS['image']):
+            if (self.kind != 'image' or not is_public_icebreaker_blob(self.reveal_media, 'images') and
+                    (not self.reveal_media.startswith('/static/images/') or
+                     '..' in path.parts or any(c in self.reveal_media for c in '\\%?#') or
+                     path.suffix.lower() not in MEDIA_EXTENSIONS['image'])):
                 raise ValueError("Reveal images must be supported local files inside static/images, for image questions only.")
         for value in (self.source_url, self.technical_source_url):
             if value:
@@ -232,14 +252,14 @@ def validate_rounds(rounds, root=ROOT, allow_empty=False, *, require_media=True)
             field = ".".join(str(p) for p in first["loc"])
             message = first["msg"].removeprefix("Value error, ")
             raise DeckError(f"Question {index}{' (' + field + ')' if field else ''}: {message}") from error
-        if question.kind in MEDIA_FOLDERS and not question.media_url:
+        if question.kind in MEDIA_FOLDERS and not question.media_url and not is_public_icebreaker_blob(question.media, MEDIA_FOLDERS[question.kind]):
             base = (Path(root) / "static" / MEDIA_FOLDERS[question.kind]).resolve()
             media = (Path(root) / question.media.lstrip("/")).resolve()
             if not media.is_relative_to(base):
                 raise DeckError(f"Question {index}: media must stay inside static/{base.name}.")
             if require_media and not media.is_file():
                 raise DeckError(f"Question {index}: the selected media file is missing ({question.media}). Upload a replacement or remove this question.")
-        if question.reveal_media:
+        if question.reveal_media and not is_public_icebreaker_blob(question.reveal_media, 'images'):
             base = (Path(root) / 'static/images').resolve()
             media = (Path(root) / question.reveal_media.lstrip('/')).resolve()
             if not media.is_relative_to(base):
