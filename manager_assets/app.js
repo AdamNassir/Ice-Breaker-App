@@ -1,6 +1,27 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
+  const isGlobal = document.body.dataset.deckMode === 'global';
+  const newsNames = ['publication','logo_url','edition','navigation','section','breadcrumb','headline','chapo','author','published','topic','sidebar_title','sidebar_caption','advertisement','hero_image','hero_alt'];
+  const defaultRelated = [
+    {section:'VIE ÉTUDIANTE',title:'Aides au logement : ce qui change en octobre',image:'housing',alt:'Étudiants près du campus'},
+    {section:'SPORTS',title:'France-Belgique : les Bleus préparent leur prochain match',image:'football',alt:'Football'},
+    {section:'HIGH-TECH',title:'OpenAI se sépare de trois chercheurs en sécurité',image:'ai',alt:'Logo'}
+  ];
+  function newsFromEditor() {
+    const value={};for(const name of newsNames)value[name]=$('news-'+name).value.trim();
+    value.related=[...document.querySelectorAll('[data-news-card="0"][data-card-field="title"], [data-news-card="1"][data-card-field="title"], [data-news-card="2"][data-card-field="title"]')].map((_,i)=>{
+      const row={};for(const name of ['section','title','image','alt'])row[name]=document.querySelector(`[data-news-card="${i}"][data-card-field="${name}"]`).value.trim();return row;
+    }).filter(row=>row.title);
+    return value;
+  }
+  function fillNews(value={}) {
+    for(const name of newsNames)$('news-'+name).value=value[name]||'';
+    for(let i=0;i<3;i++)for(const name of ['section','title','image','alt']) {
+      document.querySelector(`[data-news-card="${i}"][data-card-field="${name}"]`).value=value.related?.[i]?.[name]||'';
+    }
+  }
+
   let rounds = [], selected = -1, revision = '', token = '', source = '';
   let dirty = false, busy = false, mediaBusy = false, loaded = false;
   let media = {image: [], audio: [], video: []};
@@ -47,6 +68,7 @@
     Object.entries(textFields).forEach(([key,id]) => q[key] = $(id).value);
     q.kind = $('kind').value; q.answer = $('answer').value;
     q.text_style = q.kind === 'text' ? $('text-style').value : 'plain';
+    q.news = q.text_style === 'news' ? newsFromEditor() : (q.news || null);
     q.body = ['audio','video'].includes(q.kind) ? $('audio-body').value : q.kind === 'image' ? '' : $('body').value;
     if ($('seconds').value !== '') q.seconds = Number($('seconds').value); else delete q.seconds;
     if ($('difficulty').value !== '') q.difficulty = Number($('difficulty').value); else delete q.difficulty;
@@ -73,6 +95,7 @@
     const kind = $('kind').value, hasMedia = Boolean(formats[kind]);
     $('text-fields').hidden = hasMedia; $('media-fields').hidden = !hasMedia;
     $('text-style-field').hidden = kind !== 'text';
+    $('news-editor').hidden = kind !== 'text' || $('text-style').value !== 'news';
     $('image-options').hidden = kind !== 'image'; $('audio-description').hidden = !['audio','video'].includes(kind);
     const canLink = ['audio','video'].includes(kind), linked = canLink && $('media-mode').value === 'link';
     $('media-source-fields').hidden = !canLink; $('clip-fields').hidden = !canLink;
@@ -104,6 +127,7 @@
     $('seconds').value = q.seconds ?? ''; $('difficulty').value = q.difficulty ?? '';
     $('body').value = q.body || ''; $('audio-body').value = q.body || '';
     $('text-style').value = q.text_style || 'plain';
+    fillNews(q.news||{});
     $('media-path').value = q.media || ''; $('image-fit').value = q.image_fit || 'contain';
     $('media-url').value = q.media_url || ''; $('media-mode').value = q.media_url ? 'link' : 'local';
     $('media-start').value = q.media_start ?? ''; $('media-end').value = q.media_end ?? '';
@@ -139,7 +163,7 @@
   }
   async function api(path, method = 'GET', body, raw = false) {
     const headers = {};
-    if (method !== 'GET') headers['X-Manager-Token'] = token;
+    if (!isGlobal && method !== 'GET') headers['X-Manager-Token'] = token;
     if (body !== undefined) headers['Content-Type'] = raw ? 'application/octet-stream' : 'application/json';
     const controller = new AbortController(), timeout = setTimeout(()=>controller.abort(),30000);
     try {
@@ -150,7 +174,7 @@
       }
       return data;
     } catch(error) {
-      if (error.name === 'AbortError') throw new Error('The local manager timed out. Keep it running and try again.');
+      if (error.name === 'AbortError') throw new Error('The question manager timed out. Try again.');
       throw error;
     } finally {clearTimeout(timeout);}
   }
@@ -159,7 +183,7 @@
     busy = true; updateControls();
     try {
       const [data,files] = await Promise.all([api('/api/deck'),api('/api/media')]);
-      rounds=data.rounds;revision=data.revision;token=data.manager_token;source=data.source;media=files;
+      rounds=data.rounds;revision=data.revision;if(!isGlobal)token=data.manager_token;source=data.source;media=files;
       selected=rounds.length?0:-1;dirty=false;loaded=true;renderList();loadEditor();
       if(data.warning)tell(`Deck needs repair: ${data.warning} Edit the affected question, or import a backup, then save.`,true);
       else $('status').hidden=true;
@@ -179,9 +203,10 @@
   });
   $('kind').addEventListener('change',()=>{
     readEditor();const q=rounds[selected];
-    if(q.media && !q.media.startsWith(`/static/${mediaFolders[q.kind]}/`))q.media='';
+    if(q.media && !q.media.startsWith(`/static/${mediaFolders[q.kind]}/`) && !/^https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\/icebreaker\//.test(q.media))q.media='';
     $('media-path').value=q.media||'';showFields();chooseMedia();markDirty();renderList();renderPreview();
   });
+  $('text-style').addEventListener('change',()=>{readEditor();showFields();markDirty();renderPreview();});
   $('media-mode').addEventListener('change',()=>{readEditor();showFields();markDirty();renderPreview();});
   $('media-choice').addEventListener('change',()=>{
     $('media-path').value=$('media-choice').value;readEditor();markDirty();renderPreview();
@@ -190,7 +215,7 @@
     const file=$('media-file').files[0],q=rounds[selected];if(!file||!q)return;
     const kind=q.kind, suffix=file.name.split('.').pop().toLowerCase(), extension='.'+suffix;
     if(!formats[kind]||!formats[kind].extensions.includes(suffix)){tell(`Choose a supported ${kind} file. ${formats[kind]?.help || 'Select Image, Audio or Video first.'}`,true);$('media-file').value='';return;}
-    if(file.size>25*1024*1024){tell('This file exceeds 25 MB. Choose a smaller copy.',true);$('media-file').value='';return;}
+    if(file.size>(isGlobal?4:25)*1024*1024){tell(`This file exceeds ${isGlobal?4:25} MB. Choose a smaller copy.`,true);$('media-file').value='';return;}
     mediaBusy=true;updateControls();tell('Copying the selected file into the app…');
     try {
       const result=await api(`/api/media?kind=${encodeURIComponent(kind)}&extension=${encodeURIComponent(extension)}`,'POST',file,true);
@@ -217,6 +242,48 @@
   $('starter-deck').addEventListener('click',async()=>{if(!confirm('Replace the draft with the bundled starter deck? You can edit it before saving.'))return;busy=true;updateControls();try{const data=await api('/api/starter');replaceDraft(data.rounds);if(data.warning)tell(`Starter needs repair: ${data.warning}`,true);}catch(error){tell(error.message,true);}finally{busy=false;updateControls();}});
   $('reload-deck').addEventListener('click',loadDeck);
   $('preview-answer').addEventListener('change',renderPreview);
+
+  $('bitcoin-template').addEventListener('click',async()=>{
+    if(!confirm('Replace this question with a copy of the bundled Bitcoin news article?'))return;
+    try{
+      const starter=await api('/api/starter');
+      const bitcoin=starter.rounds.find(q=>q.kind==='text' && /bitcoin/i.test(q.body||''));
+      if(!bitcoin)throw new Error('Bitcoin template is missing from the bundled starter.');
+      const draft=JSON.parse(JSON.stringify(bitcoin)); draft.text_style='news';
+      draft.news={publication:'Le Parisien',edition:'Paris & Île-de-France',section:'Économie',
+        breadcrumb:'Accueil / Économie / Votre argent',author:'Sébastien Lernould',
+        published:'Le 5 octobre 2026 à 08h12',topic:'Bitcoin',related:defaultRelated};
+      rounds[selected]=draft;markDirty();renderList();loadEditor();tell('Bitcoin article copied. All visible text and branding can now be edited.');
+    }catch(error){tell(error.message,true);}
+  });
+
+  $('news-logo-file').addEventListener('change',async()=>{
+    const file=$('news-logo-file').files[0],q=rounds[selected];if(!file||!q)return;
+    const ext='.'+file.name.split('.').pop().toLowerCase();
+    if(!formats.image.extensions.includes(ext.slice(1))){tell('Choose a supported image format.',true);return;}
+    if(file.size>(isGlobal?4:25)*1024*1024){tell(`Maximum file size: ${isGlobal?4:25} MB.`,true);return;}
+    mediaBusy=true;updateControls();
+    try{
+      const result=await api('/api/media?kind=image&extension='+encodeURIComponent(ext),'POST',file,true);
+      if(rounds.includes(q)){q.news=q.news||{};q.news.logo_url=result.media;
+        if(rounds[selected]===q){$('news-logo_url').value=result.media;renderPreview();}
+        markDirty();tell('Publication logo uploaded. Save the deck to publish.');}
+    }catch(error){tell(error.message,true)}finally{mediaBusy=false;$('news-logo-file').value='';updateControls()}
+  });
+  $('news-image-file').addEventListener('change',async()=>{
+    const file=$('news-image-file').files[0], q=rounds[selected];if(!file||!q)return;
+    const ext='.'+file.name.split('.').pop().toLowerCase();
+    if(!formats.image.extensions.includes(ext.slice(1))){tell('Choose a JPG, PNG, WebP or other supported image.',true);return;}
+    if(file.size>(isGlobal?4:25)*1024*1024){tell(`Maximum file size here: ${isGlobal?4:25} MB.`,true);return;}
+    mediaBusy=true;updateControls();
+    try{
+      const result=await api('/api/media?kind=image&extension='+encodeURIComponent(ext),'POST',file,true);
+      if(rounds.includes(q)) {q.news=q.news||{};q.news.hero_image=result.media;
+        if(rounds[selected]===q){$('news-hero_image').value=result.media;renderPreview();}
+        markDirty();tell('Article photo uploaded. Save your deck to publish the new article.');}
+    }catch(error){tell(error.message,true)}finally{mediaBusy=false;$('news-image-file').value='';updateControls()}
+  });
+
   $('import-text').addEventListener('click',()=>$('text-file').click());
   $('text-file').addEventListener('change',async()=>{
     const file=$('text-file').files[0],q=rounds[selected];if(!file||!q)return;
@@ -244,4 +311,10 @@
   });
   window.addEventListener('beforeunload',event=>{if(dirty){event.preventDefault();event.returnValue='';}});
   loadDeck();
+  // Pull other-editor saves into an open page; never overwrite unsaved drafts.
+  setInterval(async()=>{
+    if(!loaded || dirty || busy || mediaBusy || document.hidden)return;
+    try{const snapshot=await api('/api/deck');if(snapshot.revision!==revision)await loadDeck();}
+    catch(_error){/* The explicit reload button will display the error. */}
+  },30000);
 })();

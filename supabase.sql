@@ -18,3 +18,5 @@ create policy app_only on icebreaker.rooms for all to icebreaker_app
 -- Do not add the icebreaker schema to the Supabase Data API exposed schemas.
 -- To clear expired sessions periodically, run this in the SQL Editor:
 -- delete from icebreaker.rooms where expires_at < extract(epoch from now());
+
+-- For the hosted global question deck, also run supabase_deck_migration.sql.

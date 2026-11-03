@@ -213,8 +213,11 @@ class ManagerTests(unittest.TestCase):
                 with game_store.room(new['code']) as room:
                     self.assertEqual(room['rounds'][0]['title'], 'New question')
                     self.assertEqual(room['rounds'][0]['answer'], 'AI')
-                for path in ['/questions.json','/question_manager.py','/manager-assets/app.js','/api/deck']:
+                for path in ['/questions.json','/question_manager.py']:
                     self.assertEqual(game.get(path).status_code, 404)
+                # The global manager assets are public; deck data stays password protected.
+                self.assertEqual(game.get('/manager-assets/app.js').status_code, 200)
+                self.assertEqual(game.get('/api/deck').status_code, 503)
                 (self.root / 'questions.json').write_text('broken')
                 self.assertEqual(game.post('/api/rooms', json={}).status_code, 503)
 

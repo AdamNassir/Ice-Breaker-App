@@ -16,3 +16,7 @@ Ensuite, dans l'application séminaire mise à jour, ouvrez **Organiser → IceB
 Les modifications de questions **texte** faites dans Organizer sont transmises dans le corps de création de salle, sans autre déploiement. Les nouveaux médias d’Organizer sont publiés automatiquement dans Vercel Blob (configuration unique dans Organizer). Consultez `MEDIAS_SEMINAIRE_VERCEL_BLOB.md`.
 
 L'installation ne nécessite aucune modification du modèle de données Supabase pour cette intégration. Les salons déjà créés ne reçoivent pas automatiquement le nouveau deck. Pour une nouvelle série, créez une nouvelle salle dans Organizer.
+
+## Nouvel éditeur global Vercel (novembre 2026)
+
+Consultez **`GLOBAL_DECK_DEPLOYMENT_FR.md`** pour la configuration à jour, obligatoire pour synchroniser Mercato et l'éditeur global. Les prérequis supplémentaires sont `supabase_deck_migration.sql`, `DECK_ADMIN_PASSWORD` et le magasin Blob public associé au déploiement Vercel. L'URL de l'éditeur indépendant est `/deck-manager` et le deck partagé est enregistré dans `icebreaker.shared_decks`. Les instructions historiques ci-dessus décrivent le mode d'intégration antérieur, **sans synchronisation globale**.

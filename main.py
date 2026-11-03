@@ -3,6 +3,7 @@ import copy
 import base64
 import hashlib
 import os
+import mimetypes
 import re
 import secrets
 import time
@@ -19,8 +20,9 @@ from pydantic import BaseModel, Field
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
 from Content import ROUNDS
-from question_content import DeckError, load_rounds, validate_rounds, deck_bytes, text_presentation, classification_context
+from question_content import DeckError, load_rounds, validate_rounds, deck_bytes, text_presentation, classification_context, MEDIA_EXTENSIONS, MEDIA_FOLDERS, is_public_icebreaker_blob
 from store import Store
+from global_deck import get_shared_deck, put_shared_deck
 
 app = FastAPI(title="AI or Human", docs_url=None, redoc_url=None, openapi_url=None)
 store = Store()
@@ -212,7 +214,7 @@ def view(state, role, player_id):
         question = state["rounds"][state["index"]]
         result["question"] = {k: question[k] for k in
                               ("title", "kind", "body", "media", "alt", "image_fit", "image_position",
-                               "media_url", "media_start", "media_end", "difficulty", "context", "text_style") if k in question}
+                               "media_url", "media_start", "media_end", "difficulty", "context", "text_style", "news") if k in question}
         if question["kind"] == "text":
             # Resolve presentation for snapshots created before the format field.
             # Keep the saved room content and private answer fields untouched.
@@ -283,7 +285,7 @@ def health():
 @app.get("/api/integration/capabilities")
 def integration_capabilities():
     """Used to detect IceBreaker versions that accept Organizer-edited decks."""
-    return {"version": 1, "room_deck": True, "seminar_host_handoff": True}
+    return {"version": 2, "room_deck": True, "seminar_host_handoff": True, "shared_deck": True, "vercel_blob_media": True}
 
 
 @app.post("/api/rooms")
@@ -294,7 +296,7 @@ def create_room(body: CreateRoom, request: Request):
     if password and not secrets.compare_digest(body.password.encode(), password.encode()):
         raise HTTPException(403, "Presenter password is incorrect.")
     try:
-        rounds = validate_rounds(body.deck, ROOT) if body.deck is not None else load_rounds(ROOT, fallback=ROUNDS)
+        rounds = validate_rounds(body.deck, ROOT) if body.deck is not None else validate_rounds(get_shared_deck(store, load_rounds(ROOT, fallback=ROUNDS))["rounds"], ROOT)
     except DeckError as error:
         source = "questions.json" if (ROOT / "questions.json").exists() else "Content.py starter deck; questions.json is absent"
         raise HTTPException(503, f"Question deck cannot load ({source}): {error} Save a valid deck in the manager and include its media files in the app or deployment.") from error
@@ -481,6 +483,119 @@ def control(code: str, body: Control, authorization: str | None = Header(default
     if error:
         raise HTTPException(*error)
     return result
+
+
+
+
+# The following editor is separate from the game interface and Mercato.
+# It can be opened directly on the Vercel deployment without an extra login.
+class SaveSharedDeck(BaseModel):
+    revision: str = Field(max_length=80)
+    rounds: list[dict] = Field(max_length=200)
+
+
+def _allow_deck_request(request: Request):
+    """Allow the standalone deck editor without a separate password.
+
+    Writes still reject unexpected browser origins when an Origin header is
+    provided. Mercato server-to-server calls omit Origin and remain allowed.
+    """
+    if request.method != 'GET':
+        origin = request.headers.get('origin', '')
+        if origin and origin != str(request.base_url).rstrip('/'):
+            raise HTTPException(403, 'Editor request origin is not allowed.')
+
+
+@app.get('/deck-manager')
+def deck_manager_page():
+    return FileResponse(ROOT / 'manager_assets' / 'index.html', headers={'Cache-Control': 'no-store'})
+
+
+@app.get('/api/deck')
+def global_get_deck(request: Request):
+    _allow_deck_request(request)
+    starter = load_rounds(ROOT, fallback=ROUNDS)
+    result = get_shared_deck(store, starter)
+    result.update({'warning': '', 'max_upload_mb': 4})
+    return result
+
+
+@app.get('/api/starter')
+def global_starter_deck(request: Request):
+    _allow_deck_request(request)
+    return {'rounds': load_rounds(ROOT, fallback=ROUNDS), 'warning': ''}
+
+
+@app.put('/api/deck')
+def global_put_deck(body: SaveSharedDeck, request: Request):
+    _allow_deck_request(request)
+    try:
+        rounds = validate_rounds(body.rounds, ROOT, require_media=True)
+    except DeckError as error:
+        raise HTTPException(422, str(error)) from error
+    return put_shared_deck(store, load_rounds(ROOT, fallback=ROUNDS), body.revision, rounds)
+
+
+@app.get('/api/media')
+def global_list_media(request: Request):
+    _allow_deck_request(request)
+    result = {kind: [] for kind in MEDIA_FOLDERS}
+    for kind, folder in MEDIA_FOLDERS.items():
+        directory = ROOT / 'static' / folder
+        for file in sorted(directory.iterdir()) if directory.is_dir() else []:
+            if file.is_file() and file.suffix.lower() in MEDIA_EXTENSIONS[kind]:
+                result[kind].append({'path': '/static/' + folder + '/' + file.name, 'name': file.name})
+    token = os.getenv('BLOB_READ_WRITE_TOKEN', '')
+    if token:
+        try:
+            from vercel.blob import BlobClient
+            with BlobClient(token=token) as blob:
+                for kind, folder in MEDIA_FOLDERS.items():
+                    page = blob.list_objects(prefix='icebreaker/' + folder + '/', limit=100)
+                    for item in page.blobs:
+                        if is_public_icebreaker_blob(item.url, folder):
+                            result[kind].append({'path': item.url, 'name': item.pathname.split('/')[-1]})
+        except Exception:
+            # Listing failure must not prevent a saved deck from being edited.
+            pass
+    return result
+
+
+@app.post('/api/media')
+async def global_upload_media(request: Request, kind: str, extension: str):
+    _allow_deck_request(request)
+    if kind not in MEDIA_FOLDERS or extension.lower() not in MEDIA_EXTENSIONS[kind]:
+        raise HTTPException(422, 'Unsupported media format.')
+    max_bytes = 4 * 1024 * 1024  # Vercel Function body limit; never pretend 25MB works here.
+    if request.headers.get('content-length', '').isdigit() and int(request.headers['content-length']) > max_bytes:
+        raise HTTPException(413, 'Vercel uploads are limited to 4 MB. Compress the file or upload it through Mercato.')
+    chunks, size = [], 0
+    async for chunk in request.stream():
+        size += len(chunk)
+        if size > max_bytes:
+            raise HTTPException(413, 'Vercel uploads are limited to 4 MB. Compress the file or upload it through Mercato.')
+        chunks.append(chunk)
+    if not size:
+        raise HTTPException(422, 'Empty upload.')
+    token = os.getenv('BLOB_READ_WRITE_TOKEN', '')
+    if not token:
+        raise HTTPException(503, 'Connect a PUBLIC Vercel Blob store to IceBreaker (BLOB_READ_WRITE_TOKEN).')
+    name = 'icebreaker/' + MEDIA_FOLDERS[kind] + '/' + secrets.token_hex(16) + extension.lower()
+    try:
+        from vercel.blob import BlobClient
+        with BlobClient(token=token) as blob:
+            item = blob.put(name, b''.join(chunks), access='public',
+                            content_type=mimetypes.guess_type(name)[0] or 'application/octet-stream',
+                            add_random_suffix=True)
+        url = item.get('url', '') if isinstance(item, dict) else getattr(item, 'url', '')
+    except Exception as error:
+        raise HTTPException(502, 'Vercel Blob upload failed. Check store access and token.') from error
+    if not is_public_icebreaker_blob(url, MEDIA_FOLDERS[kind]):
+        raise HTTPException(502, 'Vercel Blob did not return a valid public media URL.')
+    return {'media': url, 'size': size, 'synced': True}
+
+
+app.mount('/manager-assets', StaticFiles(directory=ROOT / 'manager_assets'), name='manager-assets')
 
 
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")

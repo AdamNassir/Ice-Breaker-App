@@ -136,6 +136,54 @@ class RevealSource(BaseModel):
         return self
 
 
+class NewsRelatedCard(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    section: str = Field(default='Actualités', max_length=80)
+    title: str = Field(default='', max_length=180)
+    image: str = Field(default='', max_length=300)
+    alt: str = Field(default='', max_length=250)
+
+    @model_validator(mode='after')
+    def valid_media(self):
+        if self.image and not (self.image in ('housing', 'football', 'ai') or
+                               is_public_icebreaker_blob(self.image, 'images') or
+                               re.fullmatch(r'/static/(?:news|images)/[a-zA-Z0-9_.-]{1,120}\.(?:jpg|jpeg|png|webp|gif|avif|bmp)', self.image)):
+            raise ValueError('Related article pictures must use a bundled picture or a public IceBreaker Blob URL.')
+        return self
+
+
+class NewsArticleLayout(BaseModel):
+    """All visibly displayed news metadata is optional and editable."""
+    model_config = ConfigDict(extra='forbid')
+    publication: str = Field(default='Le Parisien', max_length=90)
+    logo_url: str = Field(default='', max_length=300)
+    edition: str = Field(default='Paris & Île-de-France', max_length=150)
+    navigation: str = Field(default='', max_length=400)
+    section: str = Field(default='', max_length=90)
+    breadcrumb: str = Field(default='', max_length=220)
+    headline: str = Field(default='', max_length=300)
+    chapo: str = Field(default='', max_length=1200)
+    author: str = Field(default='', max_length=120)
+    published: str = Field(default='', max_length=120)
+    topic: str = Field(default='', max_length=140)
+    sidebar_title: str = Field(default='Les plus lus', max_length=120)
+    sidebar_caption: str = Field(default='L’actualité en direct', max_length=120)
+    advertisement: str = Field(default='PUBLICITÉ', max_length=50)
+    hero_image: str = Field(default='', max_length=300)
+    hero_alt: str = Field(default='', max_length=300)
+    related: list[NewsRelatedCard] = Field(default_factory=list, max_length=3)
+
+    @model_validator(mode='after')
+    def valid_media(self):
+        if self.logo_url and not (is_public_icebreaker_blob(self.logo_url, 'images') or
+                                   re.fullmatch(r'/static/(?:images|branding)/[a-zA-Z0-9_.-]{1,120}', self.logo_url)):
+            raise ValueError('Publication logo must be a valid IceBreaker Blob image URL or local bundled image.')
+        if self.hero_image and not (is_public_icebreaker_blob(self.hero_image, 'images') or
+                                    re.fullmatch(r'/static/images/[a-zA-Z0-9_.-]{1,120}', self.hero_image)):
+            raise ValueError('Article image must be a public IceBreaker Blob URL or a local static/images image.')
+        return self
+
+
 class Question(BaseModel):
     model_config = ConfigDict(extra="forbid")
     title: str = Field(min_length=1, max_length=120)
@@ -144,6 +192,7 @@ class Question(BaseModel):
     body: str = Field(default="", max_length=50000)
     context: str = Field(default="", max_length=2000)
     text_style: Literal["plain", "news"] = "plain"
+    news: NewsArticleLayout | None = None
     seconds: int | None = Field(default=None, ge=5, le=120, strict=True)
     difficulty: int | None = Field(default=None, ge=1, le=5, strict=True)
     media: str = Field(default="", max_length=300)
