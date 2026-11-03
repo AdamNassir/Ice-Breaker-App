@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
 from Content import ROUNDS
-from question_content import DeckError, load_rounds, text_presentation, classification_context
+from question_content import DeckError, load_rounds, validate_rounds, deck_bytes, text_presentation, classification_context
 from store import Store
 
 app = FastAPI(title="AI or Human", docs_url=None, redoc_url=None, openapi_url=None)
@@ -35,6 +35,7 @@ class CreateRoom(BaseModel):
     title: str = Field(default="AI or Human", min_length=1, max_length=60)
     seconds: int = Field(default=25, ge=5, le=120)
     password: str = Field(default="", max_length=256)
+    deck: list[dict] | None = Field(default=None, max_length=200)
 
 
 class JoinRoom(BaseModel):
@@ -279,6 +280,12 @@ def health():
     return {"status": "ok", "storage": "Supabase PostgreSQL" if store.url else "local SQLite"}
 
 
+@app.get("/api/integration/capabilities")
+def integration_capabilities():
+    """Used to detect IceBreaker versions that accept Organizer-edited decks."""
+    return {"version": 1, "room_deck": True, "seminar_host_handoff": True}
+
+
 @app.post("/api/rooms")
 def create_room(body: CreateRoom, request: Request):
     password = os.getenv("PRESENTER_PASSWORD", "")
@@ -287,7 +294,7 @@ def create_room(body: CreateRoom, request: Request):
     if password and not secrets.compare_digest(body.password.encode(), password.encode()):
         raise HTTPException(403, "Presenter password is incorrect.")
     try:
-        rounds = load_rounds(ROOT, fallback=ROUNDS)
+        rounds = validate_rounds(body.deck, ROOT) if body.deck is not None else load_rounds(ROOT, fallback=ROUNDS)
     except DeckError as error:
         source = "questions.json" if (ROOT / "questions.json").exists() else "Content.py starter deck; questions.json is absent"
         raise HTTPException(503, f"Question deck cannot load ({source}): {error} Save a valid deck in the manager and include its media files in the app or deployment.") from error
@@ -304,7 +311,8 @@ def create_room(body: CreateRoom, request: Request):
                  "deadline": None, "duration": body.seconds, "default_seconds": body.seconds, "votes": {},
                  "teams": {}}
         if store.create(code, state):
-            return {"code": code, "token": token, "join_url": state["join_url"]}
+            return {"code": code, "token": token, "join_url": state["join_url"],
+                    "deck_hash": hashlib.sha256(deck_bytes(rounds)).hexdigest()}
     raise HTTPException(503, "Could not allocate a room. Try again.")
 
 

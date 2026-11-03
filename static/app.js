@@ -12,6 +12,29 @@
   let lastHost = '', playerLink = '';
   const celebratedRooms = new Set();
   try { if (host) lastHost = sessionStorage.getItem('icebreaker:last-host') || ''; } catch {}
+  const fragment = new URLSearchParams(location.hash.replace(/^#/, ''));
+  const bridgedHost = host && fragment.get('host_token');
+  const returnCandidate = query.get('return_to') || '';
+  let seminarReturn = '';
+  try {
+    const parsed = new URL(returnCandidate);
+    if (['https:', 'http:'].includes(parsed.protocol) && !parsed.username && !parsed.password &&
+        (parsed.protocol === 'https:' || ['localhost', '127.0.0.1'].includes(parsed.hostname)))
+      seminarReturn = parsed.href;
+  } catch (_) {}
+  const backLink = document.getElementById('seminar-return-link');
+  if (backLink && seminarReturn) { backLink.href = seminarReturn; backLink.hidden = false; }
+  if (host && bridgedHost) {
+    const linkedCode = (query.get('room') || '').toUpperCase();
+    if (/^[A-Z2-9]{6}$/.test(linkedCode)) {
+      try { sessionStorage.setItem(key(linkedCode), JSON.stringify({code:linkedCode,token:bridgedHost})); }
+      catch (_) {}
+    }
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+  const seminarHostMode = host && query.get('seminar') === '1';
+  const seminarHostHint = document.getElementById('seminar-host-hint');
+  if (seminarHostHint) seminarHostHint.hidden = !seminarHostMode;
   const initialCode = (query.get('room') || lastHost).toUpperCase();
 
   function notify(message, persistent = false) {
@@ -50,7 +73,7 @@
       storage.setItem(key(value.code), JSON.stringify(value));
       if (host) sessionStorage.setItem('icebreaker:last-host', value.code);
     } catch { notify('Browser storage is unavailable. Keep this tab open during the game.'); }
-    history.replaceState(null, '', `${host ? '/presenter' : '/'}?room=${value.code}`);
+    history.replaceState(null, '', `${host ? '/presenter' : '/'}?room=${value.code}` + (seminarReturn ? `&return_to=${encodeURIComponent(seminarReturn)}` : '') + (seminarHostMode ? '&seminar=1' : ''));
     $('entry').hidden = true; $('game').hidden = false; $('leave').hidden = false;
     if (host) {
       $('share-code').textContent = value.code;
@@ -63,6 +86,7 @@
     const qr = $('join-qr'), status = $('qr-status'), retry = $('retry-qr');
     const attempt = ++qrAttempt;
     qr.hidden = true; retry.hidden = true;
+    if (seminarHostMode) {status.hidden = false;status.textContent = 'Les participants rejoignent la partie depuis l’application Séminaire, sans deuxième QR code.';return;}
     status.hidden = false; status.textContent = 'Creating QR code…';
     try {
       const result = await api(`/api/rooms/${value.code}/qr`);
