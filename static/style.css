@@ -216,3 +216,8 @@ html[data-theme="midnight"] .bonus-page { background:#edf3ff; color:#17243c; bor
 /* Return to the seminar is available even when the game hides its header/footer. */
 .seminar-return-link{position:fixed;z-index:10000;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));padding:11px 14px;border:1px solid #758fca;background:#15264b;color:#f5f8ff;text-decoration:none;border-radius:999px;font-weight:800;font-size:13px;box-shadow:0 8px 26px #0005}
 .seminar-return-link[hidden]{display:none!important}
+
+/* Round video playback: clean presentation with a separate, accessible fallback. */
+#stage .video-play-action{display:block;margin:14px auto 6px;max-width:320px;text-align:center}
+#stage .video-play-action[hidden]{display:none!important}
+#stage .video-watch-note{text-align:center;color:var(--muted);font-size:14px;line-height:1.5;margin:10px auto;max-width:650px}

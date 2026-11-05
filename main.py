@@ -158,6 +158,17 @@ def score_round(state):
     state["revision"] += 1
 
 
+def round_seconds(state):
+    """A deck question may override the presenter's room-wide voting duration.
+
+    Old rooms/decks without seconds retain the configured room duration.
+    The snapshot is validated on room creation; never trust client clock values.
+    """
+    question = state['rounds'][state['index']]
+    local = question.get('seconds')
+    return local if question.get('timer_mode') == 'local' and isinstance(local, int) and not isinstance(local, bool) and 5 <= local <= 120 else state['default_seconds']
+
+
 def settle(state):
     """Server-authoritative voting -> pooling -> reveal, exactly once per transition."""
     now = time.time()
@@ -443,9 +454,7 @@ def control(code: str, body: Control, authorization: str | None = Header(default
             if not state["players"]:
                 error = (409, "Wait for at least one player to join.")
             else:
-                # The presenter chooses one timer for the entire room. Legacy
-                # question-level seconds must never override that choice.
-                state["duration"] = state["default_seconds"]
+                state["duration"] = round_seconds(state)
                 if state["rounds"][state["index"]]["kind"] == "video":
                     # Do not start voting while the clip is still playing.
                     # Only the presenter's completed-player event (or their
@@ -470,7 +479,7 @@ def control(code: str, body: Control, authorization: str | None = Header(default
                 state["votes"] = {}
                 state.pop("team_results", None)
                 state.pop("pool_deadline", None)
-                state["duration"] = state["default_seconds"]
+                state["duration"] = round_seconds(state)
                 if state["rounds"][state["index"]]["kind"] == "video":
                     state["deadline"] = None
                     state["phase"] = "watching"

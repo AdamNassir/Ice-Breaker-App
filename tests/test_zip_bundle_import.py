@@ -111,3 +111,10 @@ def test_jira_overlay_fits_and_keeps_right_side():
     assert img.size==(1000,617)
     assert img.getpixel((700,100))[0]>200
     assert img.getpixel((30,60)) != (255,255,255)
+
+
+def test_low_resolution_squirrel_is_rejected_before_any_upload():
+    import deck_bundle_import as importer
+    with patch.object(importer,'fetch_curated',return_value=tiny_jpeg()):
+        with pytest.raises(Exception,match='Media resolution too low'):
+            importer.collect_assets({'assets/02_stuck_squirrel.jpg': {'source_id':'squirrel_nikon_2024'}},{})

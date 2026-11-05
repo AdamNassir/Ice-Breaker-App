@@ -70,7 +70,8 @@
     q.text_style = q.kind === 'text' ? $('text-style').value : 'plain';
     q.news = q.text_style === 'news' ? newsFromEditor() : (q.news || null);
     q.body = ['audio','video'].includes(q.kind) ? $('audio-body').value : q.kind === 'image' ? '' : $('body').value;
-    if ($('seconds').value !== '') q.seconds = Number($('seconds').value); else delete q.seconds;
+    q.timer_mode = $('timer-mode').value;
+    if (q.timer_mode === 'local') q.seconds = $('seconds').value === '' ? null : Number($('seconds').value); else delete q.seconds;
     if ($('difficulty').value !== '') q.difficulty = Number($('difficulty').value); else delete q.difficulty;
     q.media = formats[q.kind] ? $('media-path').value : '';
     const linked = ['audio','video'].includes(q.kind) && $('media-mode').value === 'link';
@@ -93,6 +94,8 @@
   function showFields() {
     if (selected < 0) return;
     const kind = $('kind').value, hasMedia = Boolean(formats[kind]);
+    $('local-timer-fields').hidden = $('timer-mode').value !== 'local';
+    $('seconds').required = $('timer-mode').value === 'local';
     $('text-fields').hidden = hasMedia; $('media-fields').hidden = !hasMedia;
     $('text-style-field').hidden = kind !== 'text';
     $('news-editor').hidden = kind !== 'text' || $('text-style').value !== 'news';
@@ -110,7 +113,7 @@
     rounds.forEach((q,index) => {
       const button = node('button','question-item'); button.type = 'button'; button.setAttribute('aria-pressed', index === selected ? 'true' : 'false');
       const copy = node('span','question-copy');
-      copy.append(node('strong','', q.title || 'Untitled question'), node('small','', `${q.kind || 'Choose format'} · ${q.answer || 'Choose origin'} · ${q.seconds ? q.seconds + 's' : 'Room timer'}`));
+      copy.append(node('strong','', q.title || 'Untitled question'), node('small','', `${q.kind || 'Choose format'} · ${q.answer || 'Choose origin'} · ${q.timer_mode==='local' ? q.seconds + 's custom' : 'Presenter timer'}`));
       button.append(node('span','question-number',String(index+1).padStart(2,'0')),copy);
       button.addEventListener('click', () => { readEditor(); selected = index; renderList(); loadEditor(); });
       list.append(button);
@@ -124,6 +127,7 @@
     $('editor-heading').textContent = `Question ${selected+1}`;
     Object.entries(textFields).forEach(([key,id]) => $(id).value = q[key] || '');
     $('kind').value = q.kind || 'text'; $('answer').value = q.answer || '';
+    $('timer-mode').value = q.timer_mode === 'local' ? 'local' : 'global';
     $('seconds').value = q.seconds ?? ''; $('difficulty').value = q.difficulty ?? '';
     $('body').value = q.body || ''; $('audio-body').value = q.body || '';
     $('text-style').value = q.text_style || 'plain';
@@ -205,6 +209,10 @@
     readEditor();const q=rounds[selected];
     if(q.media && !q.media.startsWith(`/static/${mediaFolders[q.kind]}/`) && !/^https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\/icebreaker\//.test(q.media))q.media='';
     $('media-path').value=q.media||'';showFields();chooseMedia();markDirty();renderList();renderPreview();
+  });
+  $('timer-mode').addEventListener('change',()=>{
+    if($('timer-mode').value === 'local' && !$('seconds').value) $('seconds').value = '30';
+    readEditor(); showFields(); markDirty(); renderList();
   });
   $('text-style').addEventListener('change',()=>{readEditor();showFields();markDirty();renderPreview();});
   $('media-mode').addEventListener('change',()=>{readEditor();showFields();markDirty();renderPreview();});

@@ -37,7 +37,7 @@ MAX_QUESTION_BYTES = 2 * 1024 * 1024
 CURATED_SOURCES = {
     'squirrel_nikon_2024': 'https://c02.purpledshub.com/uploads/sites/62/2024/12/Nikon-Comedy-Wildlife-Awards-stuck-squirrel.jpg',
     'jira_cloud_excentia_2026': 'https://www.excentia.es/img/atlassian-products/nueva-vista-work-item-jira-cloud.png',
-    'excel_arena_microsoft_2025': 'https://techcommunity.microsoft.com/t5/s/gxcuf89792/images/bS00NDc0MjQ1LU5oMVA0Mg?constrain-image=true&image-dimensions=2000x2000&revision=7',
+    'excel_arena_microsoft_2025': 'https://techcommunity.microsoft.com/t5/s/gxcuf89792/images/bS00NDc1MjI4LTN1UzNhRA?revision=2',
     'pope_leo_nikes_2026': 'https://i.pdimage.com/static/content/26-05/08/vatikanin-papa-14-leo-icin-hazirladigi-belgeselde-papanin-ayaginda-nike-ayakkabili-fotograflari-seytan-prada-giyer-papa-nike-esprilerine-neden-oldu.jpg',
     'flamingone_original_miles_astray': 'https://static.wixstatic.com/media/c396be_17aa907139bc454887e9ec2b59da986d~mv2.jpg',
 }
@@ -283,7 +283,16 @@ def collect_assets(media, embedded):
     def get_one(item):
         path, meta = item
         raw = embedded.get(path) or fetch_curated(meta['source_id'])
-        return path, normalize_image(raw, meta.get('transform'))
+        normalized = normalize_image(raw, meta.get('transform'))
+        if path.startswith('assets/') and path != 'assets/03_jira_user_story.png':
+            # Reject accidental low-resolution thumbnails (a previous import
+            # accepted a blurred squirrel thumbnail). Keep the deck untouched.
+            from PIL import Image
+            with Image.open(io.BytesIO(normalized)) as img:
+                min_width, min_height = (900, 600) if path.endswith('02_stuck_squirrel.jpg') else (700, 450)
+                if img.width < min_width or img.height < min_height:
+                    raise HTTPException(422, 'Media resolution too low for projection: ' + path)
+        return path, normalized
     # Resolve/transform all media before uploading any object or changing deck.
     with ThreadPoolExecutor(max_workers=5) as pool:
         return dict(pool.map(get_one, media.items()))

@@ -85,6 +85,47 @@ class GameTests(unittest.TestCase):
                      json={'action': 'begin_voting', 'revision': revision}).status_code, 409)
         self.assertEqual(self.vote(self.p1, 'HUMAN').status_code, 200)
 
+    def test_explicit_question_timer_and_video_end_override_room_timer(self):
+        """Legacy seconds alone stay global; explicit local timers apply on each round."""
+        rounds = [
+            {'title':'Quick custom', 'kind':'text', 'body':'Hi', 'answer':'AI',
+             'timer_mode':'local', 'seconds':42},
+            {'title':'Presenter configured', 'kind':'text', 'body':'Hello', 'answer':'HUMAN',
+             'timer_mode':'global', 'seconds':90},
+            {'title':'Watch and decide', 'kind':'video', 'answer':'AI',
+             'media_url':'https://youtu.be/dQw4w9WgXcQ', 'timer_mode':'local', 'seconds':18},
+        ]
+        with main.store.room(self.code) as saved:
+            saved['rounds'] = rounds
+        started = self.control('start').json()
+        self.assertEqual(started['duration'], 42)
+        self.assertAlmostEqual(started['deadline'] - started['server_time'], 42, delta=1)
+        self.expire()
+        next_round = self.control('next').json()
+        self.assertEqual(next_round['duration'], 5)
+        self.assertEqual(next_round['phase'], 'live')
+        self.expire()
+        video = self.control('next').json()
+        self.assertEqual(video['phase'], 'watching')
+        self.assertEqual(video['duration'], 18)
+        self.assertIsNone(video['deadline'])
+        self.assertEqual(self.state(self.p1)['duration'], 18)
+        start_vote = self.control('begin_voting').json()
+        self.assertEqual(start_vote['duration'], 18)
+        self.assertAlmostEqual(start_vote['deadline'] - start_vote['server_time'], 18, delta=1)
+
+    def test_timer_mode_legacy_validation(self):
+        base={'title':'Text','kind':'text','body':'Hello','answer':'AI'}
+        self.assertEqual(validate_rounds([{**base, 'seconds':25}], main.ROOT)[0]['timer_mode'], 'global')
+        self.assertEqual(validate_rounds([{**base, 'seconds':35, 'timer_mode':'local'}], main.ROOT)[0]['seconds'],35)
+        for invalid in [{**base,'timer_mode':'local'},
+                        {**base,'timer_mode':'local','seconds':3},
+                        {**base,'timer_mode':'local','seconds':121},
+                        {**base,'timer_mode':'automatic','seconds':30}]:
+            with self.subTest(invalid=invalid):
+                with self.assertRaises(__import__('question_content').DeckError):
+                    validate_rounds([invalid], main.ROOT)
+
     def test_video_after_text_round_is_also_pre_countdown(self):
         with main.store.room(self.code) as room:
             room['rounds'] = [{"title": "Text", "kind": "text", "answer": "AI", "body": "Test"},

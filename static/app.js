@@ -379,17 +379,38 @@
         const revealed = s.phase === 'revealed' && s.reveal?.reveal_media;
         const image = revealed ? {...q, media: s.reveal.reveal_media, alt: s.reveal.reveal_alt || q.alt} : q;
         stage.append(imageFrame(image, s.reveal?.image_highlight, zoomView));
+      } else if (q.kind === 'video' && s.phase !== 'watching') {
+        // Do not re-create a YouTube iframe (or replay the video) when the timer starts.
+        stage.append(waiting('Clip completed', s.phase === 'revealed' ?
+          'See the answer and explanation below.' : 'Now choose AI or HUMAN before time runs out.', '▶'));
       } else if (q.kind === 'audio' || q.kind === 'video') {
         const isVideo = q.kind === 'video';
+        const playButton = isVideo ? element('button', 'secondary video-play-action', '▶ Play / resume video') : null;
+        let playbackStarted = false;
+        if (playButton) { playButton.type = 'button'; playButton.hidden = true; }
         const player = window.IcebreakerMedia.create(q, isVideo ? 'round-video' : 'round-audio', message => {
           if (!stage.querySelector('.image-error')) stage.append(element('p', 'image-error', message));
-        }, isVideo && s.phase === 'watching' && host ? {
-          autoPlay: true, onEnded: () => beginVideoVoting(s.round_index)
+          if (playButton) playButton.hidden = false;
+        }, isVideo && s.phase === 'watching' ? {
+          hideControls: true, autoPlay: true,
+          onEnded: host ? () => beginVideoVoting(s.round_index) : undefined,
+          onPlaying: () => { playbackStarted = true; if (playButton) playButton.hidden = true; },
+          onPlaybackBlocked: () => { if (playButton) playButton.hidden = false; }
         } : {});
         stage.append(player);
-        if (isVideo && s.phase === 'watching') stage.append(element('p', 'video-watch-note',
-          host ? 'Watch the entire clip. Voting starts automatically when it finishes. If autoplay is blocked, press Play on the video.' :
-            'Watch the video. Voting will open after the presenter finishes playing it.'));
+        if (playButton) {
+          playButton.addEventListener('click', () => {
+            // A user gesture is required by browsers that block unmuted autoplay.
+            if (typeof player._icebreakerPlay === 'function') player._icebreakerPlay();
+            else playButton.hidden = false;
+          });
+          stage.append(playButton);
+          // Some browsers silently block autoplay without emitting a failure event.
+          setTimeout(() => { if (!playbackStarted && playButton.isConnected && state?.phase === 'watching') playButton.hidden = false; }, 3500);
+          stage.append(element('p', 'video-watch-note', host ?
+            'The clip starts with the round. Voting begins automatically when it ends. If playback is blocked, tap Play / resume video.' :
+            'The clip starts with the round where autoplay is permitted. The presenter controls when voting opens.'));
+        }
       } else if (q.kind === 'text') {
         if (q.text_style === 'news') {
           const page = window.IcebreakerNews.create(q);
@@ -495,7 +516,7 @@
         s.round_number === s.round_count ? 'Show final results' : 'Next round' : `Start round ${s.round_number}`;
       const assigned = (s.teams || []).reduce((count, t) => count + t.members.length, 0);
       $('control-help').textContent = s.phase === 'watching' ?
-        'The video plays before the countdown. Use this button only if the clip cannot finish.' :
+        'The countdown begins after the video finishes. Use this fallback only if playback or the end signal fails.' :
         s.phase === 'lobby' && s.teams_enabled ?
         `${s.teams.length} team${s.teams.length === 1 ? '' : 's'} · ${assigned} / ${s.player_count} players on a team` : '';
     } else {

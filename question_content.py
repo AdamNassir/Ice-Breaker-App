@@ -193,6 +193,9 @@ class Question(BaseModel):
     context: str = Field(default="", max_length=2000)
     text_style: Literal["plain", "news"] = "plain"
     news: NewsArticleLayout | None = None
+    # Explicit opt-in: bundled/legacy `seconds` values must NOT silently
+    # override the presenter's timer unless the question selects local mode.
+    timer_mode: Literal["global", "local"] = "global"
     seconds: int | None = Field(default=None, ge=5, le=120, strict=True)
     difficulty: int | None = Field(default=None, ge=1, le=5, strict=True)
     media: str = Field(default="", max_length=300)
@@ -244,6 +247,8 @@ class Question(BaseModel):
         self.technical_source_url = self.technical_source_url.strip()
         if not self.title:
             raise ValueError("Give the question a title.")
+        if self.timer_mode == 'local' and self.seconds is None:
+            raise ValueError("Set a custom timer between 5 and 120 seconds for this question.")
         if self.kind in {"text", "code", "commit"} and not self.body.strip():
             raise ValueError("Enter the question text or code.")
         if self.kind in MEDIA_FOLDERS:
