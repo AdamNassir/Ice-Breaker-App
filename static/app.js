@@ -2,6 +2,8 @@
 (() => {
   'use strict';
   const host = document.body.dataset.role === 'presenter';
+  // Keep the optional bonus available at /bonus without adding it to the final standings.
+  const SHOW_POST_GAME_BONUS = false;
   const $ = id => document.getElementById(id);
   const storage = host ? sessionStorage : localStorage;
   const key = code => `icebreaker:${host ? 'host' : 'player'}:${code}`;
@@ -233,7 +235,7 @@
     wrap.append(element('p', 'final-summary', `${rounds} round${rounds === 1 ? '' : 's'} completed · ${count} ${isTeamRanking ? 'team' : 'player'}${count === 1 ? '' : 's'} ranked · Points`));
     if (!count) {
       wrap.append(element('p', 'final-empty', isTeamRanking ? 'No teams to rank.' : 'No players to rank.'));
-      if (!host) wrap.append(playerBonus(s.code));
+      if (!host && SHOW_POST_GAME_BONUS) wrap.append(playerBonus(s.code));
       return wrap;
     }
     const ranks = [1, 2, 3].filter(rank => s.leaderboard.some(player => player.rank === rank));
@@ -247,7 +249,7 @@
     const rest = element('ol', 'final-list');
     s.leaderboard.filter(player => player.rank > 3).forEach(player => rest.append(placement(player, s.me?.team_id || s.me?.id)));
     if (rest.children.length) wrap.append(rest);
-    if (!host) wrap.append(playerBonus(s.code));
+    if (!host && SHOW_POST_GAME_BONUS) wrap.append(playerBonus(s.code));
     return wrap;
   }
 

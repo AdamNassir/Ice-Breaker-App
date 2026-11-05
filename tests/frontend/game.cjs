@@ -99,22 +99,16 @@ function shared(w){w.eval(fs.readFileSync(project+'/static/newsarticle.js','utf8
   assert.deepEqual(placements.map(p=>p.querySelector('.final-score').textContent),['1750','1600','1400','1000','1000','750']);
   assert.deepEqual([...pd.querySelectorAll('#stage .final-medal')].map(p=>p.textContent),['🥇','🥈','🥉']);
   assert(!pd.querySelector('.bonus-link'));
-  if(role==='host') {assert(!pd.querySelector('.build-workflow'));assert(!pd.querySelector('.player-bonus'));assert.equal(pd.querySelector('.final-heading').textContent,'Final individual ranking');assert(pd.querySelector('.final-summary').textContent.includes('9 rounds completed'));}
-  else {
-   const panel=pd.querySelector('.player-bonus');assert(panel);
-   assert.equal(panel.querySelector('h2').textContent,'Was this game made with AI or not ?');
-   assert.deepEqual([...panel.querySelectorAll('button')].map(n=>n.textContent),['AI','HUMAN']);
-   assert(panel.querySelector('.bonus-reveal').hidden);assert(panel.querySelector('.build-workflow').hidden);
-   const scoreBefore=placements.map(n=>n.querySelector('.final-score').textContent);
-   panel.querySelectorAll('button')[1].click();
-   assert(panel.querySelector('.vote-controls').hidden);assert(!panel.querySelector('.bonus-reveal').hidden);
-   assert.equal(panel.querySelector('.bonus-reveal').textContent,'AI');assert(!panel.querySelector('.build-workflow').hidden);assert.equal(panel.querySelectorAll('.workflow-step').length,6);assert.deepEqual([...panel.querySelectorAll('.workflow-step h4')].map(n=>n.textContent),['One complete instruction file','The agent built and checked the app','I reviewed the code and tested it','I set up the question manager','UpdateGuide.md became the update loop','I verified the report and tested again']);assert(panel.querySelector('.build-workflow').textContent.includes('build, test, fix and test again'));
-   assert.deepEqual([...pd.querySelectorAll('.final-score')].map(n=>n.textContent),scoreBefore);
-  }
+  assert(!pd.querySelector('.player-bonus'), 'no unscored AI/HUMAN question on the final standings');
+  assert(!pd.querySelector('.build-workflow'), 'no workflow explanation beneath the final standings');
+  assert(!pd.querySelector('.final-standings h2:not(.final-heading)'));
+  if(role==='host') {assert.equal(pd.querySelector('.final-heading').textContent,'Final individual ranking');assert(pd.querySelector('.final-summary').textContent.includes('9 rounds completed'));}
+  const scoreBefore=placements.map(n=>n.querySelector('.final-score').textContent);
+  assert.deepEqual([...pd.querySelectorAll('.final-score')].map(n=>n.textContent),scoreBefore);
   assert.equal(pd.querySelectorAll('.final-list .final-medal').length,0);assert(!pd.querySelector('#stage .waiting'));
   pd.querySelectorAll('.topbar,footer,.game-heading,#round-progress,.round-toolbar,.side-card,.host-controls,#vote-status,#connection').forEach(node=>assert(node.hidden));
   const gold=placements[0],goldGroup=gold.closest('.podium-place'),silver=placements[1].closest('.podium-place');assert.equal(pw.getComputedStyle(goldGroup).gridColumn,'2');assert.equal(pw.getComputedStyle(silver).gridColumn,'1');
-  current={...fixture.placements[role],leaderboard:fixture.placements[role].leaderboard.map((p,i)=>({...p,rank:i<2?1:i+1}))};await poll();assert.equal(pd.querySelectorAll('.podium-rank-1 .final-medal').length,2);assert(!pd.querySelector('.confetti-layer'),'rank updates must not restart confetti');if(role==='player'){assert(pd.querySelector('.player-bonus .vote-controls').hidden);assert(!pd.querySelector('.player-bonus .bonus-reveal').hidden);assert(!pd.querySelector('.build-workflow').hidden);}
+  current={...fixture.placements[role],leaderboard:fixture.placements[role].leaderboard.map((p,i)=>({...p,rank:i<2?1:i+1}))};await poll();assert.equal(pd.querySelectorAll('.podium-rank-1 .final-medal').length,2);assert(!pd.querySelector('.confetti-layer'),'rank updates must not restart confetti');if(role==='player'){assert(!pd.querySelector('.player-bonus'));assert(!pd.querySelector('.build-workflow'));}
   pw.matchMedia=()=>({matches:true});current={...current,code:'REDUCED'};await poll();assert(!pd.querySelector('.confetti-layer'),'reduced motion skips confetti');
   page.window.close();console.log('PASS '+role+': ten-second timer, question titles/short introductions, blue/red branding, AI/HUMAN reveals with configured photo credits, minimal podium, medals, numeric scores and tied ranks; QR/copy link retained.');
  }

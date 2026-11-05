@@ -75,7 +75,9 @@ def run(page, role, count):
     assert page.locator('#control-button').is_hidden() if role=='presenter' else page.locator('#vote-controls').is_hidden()
     if role=='player':
         assert page.locator('.final-me').count()==1
-        assert page.locator('.player-bonus').count()==1
+        assert page.locator('.player-bonus').count()==0
+        assert 'Was this game made with AI or not ?' not in page.locator('#stage').inner_text()
+        assert page.locator('.build-workflow').count()==0
     else:
         assert page.locator('.player-bonus').count()==0
     widths=page.evaluate('''() => ({scroll:document.documentElement.scrollWidth, client:document.documentElement.clientWidth})''')

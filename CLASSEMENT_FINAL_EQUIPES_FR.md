@@ -9,6 +9,7 @@ Cette version conserve les fonctions du Global Deck Manager, l'upload d'images d
 - Le résultat final s'affiche à la fois sur l'écran du présentateur et sur les téléphones des participants dès la synchronisation suivante.
 - Le classement affiche toutes les équipes avec leur score cumulé et leur rang. Le podium montre les trois premiers rangs, puis les autres équipes suivent dans la liste. Les ex-aequo partagent leur rang (exemple : 1, 1, 3).
 - Les téléphones affichent un classement compact sur une seule colonne à petite largeur. Le classement reste stable lors des rafraîchissements.
+- La question bonus « Was this game made with AI or not ? » et son explication sont **masquées sur la page de classement final**, pour les participants et le présentateur. La page `/bonus` indépendante reste disponible si nécessaire.
 - La mention « Final team ranking » apparait lorsqu'au moins une équipe est créée avant le début. Sans équipe, IceBreaker reste compatible avec le classement individuel.
 
 ## Vérifications
