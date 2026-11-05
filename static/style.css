@@ -221,3 +221,8 @@ html[data-theme="midnight"] .bonus-page { background:#edf3ff; color:#17243c; bor
 #stage .video-play-action{display:block;margin:14px auto 6px;max-width:320px;text-align:center}
 #stage .video-play-action[hidden]{display:none!important}
 #stage .video-watch-note{text-align:center;color:var(--muted);font-size:14px;line-height:1.5;margin:10px auto;max-width:650px}
+
+/* Shown only inside the post-answer reveal (never during watching/voting). */
+.reveal .answer-explanation{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5;margin:12px 0 10px}
+.reveal .explanation-reveal-image{display:block;max-width:100%;width:auto;max-height:min(42vh,400px);height:auto;object-fit:contain;border-radius:10px;margin:12px auto;background:transparent}
+@media(max-width:650px){.reveal .explanation-reveal-image{max-height:240px}}

@@ -71,6 +71,11 @@ class GameTests(unittest.TestCase):
         self.assertIsNone(started.json()['deadline'])
         self.assertEqual(self.state(self.p1)['question']['context'], video['context'])
         self.assertEqual(self.state(self.p1)['phase'], 'watching')
+        # Presenter-only playback: player state never exposes the source URL.
+        player_question = self.state(self.p1)['question']
+        for secret_media in ('media', 'media_url', 'media_start', 'media_end'):
+            self.assertNotIn(secret_media, player_question)
+        self.assertIn('media_url', self.state()['question'])
         self.assertEqual(self.vote(self.p1, 'HUMAN').status_code, 409)
         revision = self.state()['revision']
         denied = self.client.post(f'/api/rooms/{self.code}/control', headers=self.p1,

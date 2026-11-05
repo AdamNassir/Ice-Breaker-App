@@ -211,6 +211,8 @@ class Question(BaseModel):
     image_highlight: ImageHighlight | None = None
     reveal_sources: list[RevealSource] = Field(default_factory=list, max_length=8)
     explanation: str = Field(default="", max_length=6000)
+    explanation_image: str = Field(default="", max_length=300)
+    explanation_image_alt: str = Field(default="", max_length=1000)
     technical_note: str = Field(default="", max_length=6000)
     discussion: str = Field(default="", max_length=2000)
     source: str = Field(default="", max_length=3000)
@@ -244,6 +246,7 @@ class Question(BaseModel):
         self.source_url = self.source_url.strip()
         self.media_url = self.media_url.strip()
         self.reveal_media = self.reveal_media.strip()
+        self.explanation_image = self.explanation_image.strip()
         self.technical_source_url = self.technical_source_url.strip()
         if not self.title:
             raise ValueError("Give the question a title.")
@@ -282,6 +285,13 @@ class Question(BaseModel):
                      '..' in path.parts or any(c in self.reveal_media for c in '\\%?#') or
                      path.suffix.lower() not in MEDIA_EXTENSIONS['image'])):
                 raise ValueError("Reveal images must be supported local files inside static/images, for image questions only.")
+        if self.explanation_image:
+            path = PurePosixPath(self.explanation_image)
+            if not is_public_icebreaker_blob(self.explanation_image, 'images') and (
+                    not self.explanation_image.startswith('/static/images/') or
+                    '..' in path.parts or any(char in self.explanation_image for char in '\\%?#') or
+                    path.suffix.lower() not in MEDIA_EXTENSIONS['image']):
+                raise ValueError('Explanation image must be a supported image from static/images or public IceBreaker Blob.')
         for value in (self.source_url, self.technical_source_url):
             if value:
                 parsed = urlsplit(value)
@@ -320,6 +330,13 @@ def validate_rounds(rounds, root=ROOT, allow_empty=False, *, require_media=True)
                 raise DeckError(f"Question {index}: reveal media must stay inside static/images.")
             if require_media and not media.is_file():
                 raise DeckError(f"Question {index}: the reveal image file is missing ({question.reveal_media}). Upload a replacement or clear the reveal image.")
+        if question.explanation_image and not is_public_icebreaker_blob(question.explanation_image, 'images'):
+            base = (Path(root) / 'static/images').resolve()
+            media = (Path(root) / question.explanation_image.lstrip('/')).resolve()
+            if not media.is_relative_to(base):
+                raise DeckError(f'Question {index}: explanation image must stay inside static/images.')
+            if require_media and not media.is_file():
+                raise DeckError(f'Question {index}: the explanation image file is missing ({question.explanation_image}). Upload a replacement or clear the explanation image.')
         result.append(question.model_dump(exclude_none=True))
     return result
 

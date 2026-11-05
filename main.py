@@ -227,6 +227,11 @@ def view(state, role, player_id):
         result["question"] = {k: question[k] for k in
                               ("title", "kind", "body", "media", "alt", "image_fit", "image_position",
                                "media_url", "media_start", "media_end", "difficulty", "context", "text_style", "news") if k in question}
+        if role == "player" and question["kind"] == "video":
+            # Video is shown on the projected presenter screen only.
+            # Don't send Blob/YouTube URLs or clip timestamps to phones.
+            for private_field in ("media", "media_url", "media_start", "media_end"):
+                result["question"].pop(private_field, None)
         if question["kind"] == "text":
             # Resolve presentation for snapshots created before the format field.
             # Keep the saved room content and private answer fields untouched.
@@ -235,7 +240,7 @@ def view(state, role, player_id):
             result["question"]["context"] = classification_context(result["question"]["context"])
         if state["phase"] == "revealed":
             result["reveal"] = {k: question[k] for k in
-                                ("answer", "explanation", "source", "source_url", "technical_note",
+                                ("answer", "explanation", "explanation_image", "explanation_image_alt", "source", "source_url", "technical_note",
                                  "discussion", "technical_source_url", "image_reveal",
                                  "image_highlight", "reveal_sources", "reveal_media", "reveal_alt") if k in question}
             result["reveal"]["distribution"] = {

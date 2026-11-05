@@ -379,8 +379,17 @@
         const revealed = s.phase === 'revealed' && s.reveal?.reveal_media;
         const image = revealed ? {...q, media: s.reveal.reveal_media, alt: s.reveal.reveal_alt || q.alt} : q;
         stage.append(imageFrame(image, s.reveal?.image_highlight, zoomView));
+      } else if (q.kind === 'video' && !host) {
+        // Only the presenter's display should ever instantiate or load video.
+        // Player API snapshots omit video links too, including during replay/reveal.
+        stage.append(waiting(s.phase === 'watching' ? 'Watch the presenter screen' : 'Video finished',
+          s.phase === 'watching'
+            ? 'The clip plays on the big screen. Voting will open automatically when it ends.'
+            : s.phase === 'revealed'
+              ? 'See the answer and short explanation below.'
+              : 'Choose AI or HUMAN before the timer runs out.', '▶'));
       } else if (q.kind === 'video' && s.phase !== 'watching') {
-        // Do not re-create a YouTube iframe (or replay the video) when the timer starts.
+        // Do not re-create an iframe (or replay the clip) when voting starts.
         stage.append(waiting('Clip completed', s.phase === 'revealed' ?
           'See the answer and explanation below.' : 'Now choose AI or HUMAN before time runs out.', '▶'));
       } else if (q.kind === 'audio' || q.kind === 'video') {
@@ -393,7 +402,7 @@
           if (playButton) playButton.hidden = false;
         }, isVideo && s.phase === 'watching' ? {
           hideControls: true, autoPlay: true,
-          onEnded: host ? () => beginVideoVoting(s.round_index) : undefined,
+          onEnded: () => beginVideoVoting(s.round_index),
           onPlaying: () => { playbackStarted = true; if (playButton) playButton.hidden = true; },
           onPlaybackBlocked: () => { if (playButton) playButton.hidden = false; }
         } : {});
@@ -407,9 +416,8 @@
           stage.append(playButton);
           // Some browsers silently block autoplay without emitting a failure event.
           setTimeout(() => { if (!playbackStarted && playButton.isConnected && state?.phase === 'watching') playButton.hidden = false; }, 3500);
-          stage.append(element('p', 'video-watch-note', host ?
-            'The clip starts with the round. Voting begins automatically when it ends. If playback is blocked, tap Play / resume video.' :
-            'The clip starts with the round where autoplay is permitted. The presenter controls when voting opens.'));
+          stage.append(element('p', 'video-watch-note',
+            'The clip plays only here. Voting begins for everyone when it ends. If autoplay is blocked, press Play / resume video.'));
         }
       } else if (q.kind === 'text') {
         if (q.text_style === 'news') {
@@ -432,10 +440,19 @@
     const panel = $('reveal'); panel.hidden = !s.reveal;
     if (!s.reveal) { panel.replaceChildren(); return; }
     const r = s.reveal;
-    const signature = JSON.stringify([s.round_index, r.answer, r.image_reveal, r.source_url, r.reveal_sources]);
+    const signature = JSON.stringify([s.round_index, r.answer, r.explanation, r.explanation_image, r.explanation_image_alt, r.image_reveal, r.source_url, r.reveal_sources]);
     if (panel.dataset.signature === signature) return;
     panel.dataset.signature = signature; panel.replaceChildren();
     panel.append(element('h3', '', r.answer));
+    if (r.explanation) panel.append(element('p','answer-explanation',r.explanation));
+    if (r.explanation_image) {
+      const img=element('img','explanation-reveal-image');
+      img.src=r.explanation_image;
+      img.alt=r.explanation_image_alt || 'Explanation illustration';
+      img.loading='lazy';
+      img.decoding='async';
+      panel.append(img);
+    }
     if (s.question?.kind === 'image' && r.answer === 'HUMAN' && r.image_reveal) {
       panel.append(element('p', 'photo-credit', r.image_reveal));
       if (r.source_url?.startsWith('https://')) {

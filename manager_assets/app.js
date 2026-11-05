@@ -29,9 +29,10 @@
   const formats = {
     image:{accept:'.jpg,.jpeg,.png,.webp,.gif,.avif,.bmp', extensions:['jpg','jpeg','png','webp','gif','avif','bmp'], help:'JPG, PNG, WebP, GIF, AVIF or BMP · up to 25 MB. Convert HEIC or SVG to PNG/JPG first.'},
     audio:{accept:'.mp3,.wav,.ogg,.opus,.flac,.m4a,.aac,.webm', extensions:['mp3','wav','ogg','opus','flac','m4a','aac','webm'], help:'MP3, WAV, OGG/Opus, FLAC, M4A, AAC or WebM · up to 25 MB. Playback depends on the browser; MP3/WAV are convenient choices.'},
-    video:{accept:'.mp4,.webm,.ogv,.mov,.m4v', extensions:['mp4','webm','ogv','mov','m4v'], help:'MP4, WebM, OGV, MOV or M4V · up to 25 MB. For phones, use MP4 with H.264 video and AAC audio. Convert AVI/MKV or incompatible MOV files first.'}
+    video:{accept:'.mp4,.webm,.ogv,.mov,.m4v', extensions:['mp4','webm','ogv','mov','m4v'], help:'MP4, WebM, OGV, MOV or M4V · up to 25 MB. For presenter playback, use MP4 with H.264 video and AAC audio. Video never appears on participant phones. Convert AVI/MKV or incompatible MOV files first.'}
   };
   const textFields = {title:'title', context:'context', alt:'alt', explanation:'explanation',
+    explanation_image:'explanation-image', explanation_image_alt:'explanation-image-alt',
     source:'source', source_url:'source-url', image_reveal:'image-reveal', technical_note:'technical-note',
     discussion:'discussion', technical_source_url:'technical-url', reveal_media:'reveal-media', reveal_alt:'reveal-alt'};
   const toolbar = ['add-question','add-image','add-audio','add-video','empty-add','empty-deck','starter-deck','import-deck','import-bundle','export-deck'];
@@ -59,6 +60,9 @@
     $('delete-question').disabled = busy || selected < 0;
     $('question-form').querySelectorAll('input,select,textarea,button').forEach(el => el.disabled = busy);
     $('media-file').disabled = busy || mediaBusy;
+    $('explanation-image-file').disabled = busy || mediaBusy;
+    $('explanation-image-choice').disabled = busy || mediaBusy;
+    $('explanation-image-clear').disabled = busy || mediaBusy;
     document.querySelectorAll('.question-item').forEach(el => el.disabled = busy);
   }
   function markDirty() { dirty = true; updateControls(); }
@@ -90,6 +94,17 @@
     if (q.media && !choices.some(row => row.path === q.media)) picker.append(new Option(q.media.split('/').pop(), q.media));
     choices.forEach(row => picker.append(new Option(row.name, row.path)));
     picker.value = q.media || '';
+  }
+  function chooseExplanationImage() {
+    const q=rounds[selected], picker=$('explanation-image-choice');
+    picker.replaceChildren(new Option('Choose a saved image (optional)', ''));
+    if (!q) return;
+    const choices=media.image || [];
+    if (q.explanation_image && !choices.some(item=>item.path===q.explanation_image)) {
+      picker.append(new Option(q.explanation_image.split('/').pop(),q.explanation_image));
+    }
+    choices.forEach(item=>picker.append(new Option(item.name,item.path)));
+    picker.value=q.explanation_image || '';
   }
   function showFields() {
     if (selected < 0) return;
@@ -136,7 +151,7 @@
     $('media-url').value = q.media_url || ''; $('media-mode').value = q.media_url ? 'link' : 'local';
     $('media-start').value = q.media_start ?? ''; $('media-end').value = q.media_end ?? '';
     $('image-position').value = q.image_position || 'center';
-    $('media-file').value = ''; showFields(); chooseMedia(); renderPreview(); updateControls();
+    $('media-file').value = ''; $('explanation-image-file').value = ''; showFields(); chooseMedia(); chooseExplanationImage(); renderPreview(); updateControls();
   }
   function renderPreview() {
     const q = rounds[selected]; if (!q) return;
@@ -160,6 +175,13 @@
     reveal.append(node('h3','',`Answer: ${q.answer || 'choose AI or HUMAN'}`));
     for (const [key,label] of [['image_reveal','Photo reveal'],['explanation','Explanation'],['technical_note','Technical detail'],['discussion','Discuss'],['source','Origin']]) {
       if (q[key]) reveal.append(node('strong','',label),node('p','',q[key]));
+    }
+    if (q.explanation_image) {
+      const img=node('img','explanation-preview-image');
+      img.src=q.explanation_image;
+      img.alt=q.explanation_image_alt || 'Explanation illustration';
+      img.style.objectFit='contain';
+      reveal.append(img);
     }
     for (const [key,label] of [['source_url','View source'],['technical_source_url','Technical reference']]) {
       if (q[key] && /^https:\/\//.test(q[key])) {const p=node('p'),a=node('a','',label);a.href=q[key];a.target='_blank';a.rel='noopener noreferrer';p.append(a);reveal.append(p);}
@@ -202,7 +224,7 @@
   for(const kind of Object.keys(formats))$('add-'+kind).addEventListener('click',()=>addQuestion(kind));
   $('question-form').addEventListener('submit',event=>event.preventDefault());
   $('question-form').addEventListener('input',event=>{
-    if(['media-file','media-choice'].includes(event.target.id))return;
+    if(['media-file','media-choice','explanation-image-file','explanation-image-choice'].includes(event.target.id))return;
     readEditor();markDirty();renderList();renderPreview();
   });
   $('kind').addEventListener('change',()=>{
@@ -213,6 +235,36 @@
   $('timer-mode').addEventListener('change',()=>{
     if($('timer-mode').value === 'local' && !$('seconds').value) $('seconds').value = '30';
     readEditor(); showFields(); markDirty(); renderList();
+  });
+  $('explanation-image-choice').addEventListener('change',()=>{
+    $('explanation-image').value=$('explanation-image-choice').value;
+    readEditor();markDirty();renderPreview();
+  });
+  $('explanation-image-clear').addEventListener('click',()=>{
+    $('explanation-image').value='';$('explanation-image-alt').value='';
+    readEditor();chooseExplanationImage();markDirty();renderPreview();
+  });
+  $('explanation-image-file').addEventListener('change',async()=>{
+    const file=$('explanation-image-file').files[0],q=rounds[selected];
+    if(!file||!q)return;
+    const suffix=file.name.split('.').pop().toLowerCase(),extension='.'+suffix;
+    if(!formats.image.extensions.includes(suffix)){
+      tell('Choose a JPG, PNG, WebP, GIF, AVIF or BMP explanation image.',true);
+      $('explanation-image-file').value='';return;
+    }
+    const limit=(isGlobal?4:25)*1024*1024;
+    if(file.size>limit){tell('Explanation image exceeds '+(isGlobal?4:25)+' MB.',true);$('explanation-image-file').value='';return;}
+    mediaBusy=true;updateControls();tell('Uploading explanation image…');
+    try {
+      const result=await api('/api/media?kind=image&extension='+encodeURIComponent(extension),'POST',file,true);
+      if (!media.image.some(item=>item.path===result.media)) media.image.push({path:result.media,name:result.media.split('/').pop()});
+      if(rounds.includes(q)){
+        q.explanation_image=result.media;
+        if(rounds[selected]===q){$('explanation-image').value=result.media;chooseExplanationImage();renderPreview();}
+        markDirty();tell('Explanation image uploaded. Save the deck to use it after reveal.');
+      }
+    }catch(error){tell(error.message,true)}
+    finally{mediaBusy=false;$('explanation-image-file').value='';updateControls()}
   });
   $('text-style').addEventListener('change',()=>{readEditor();showFields();markDirty();renderPreview();});
   $('media-mode').addEventListener('change',()=>{readEditor();showFields();markDirty();renderPreview();});

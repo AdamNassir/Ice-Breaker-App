@@ -40,3 +40,9 @@ html[data-theme="midnight"] .brand-logos img { mix-blend-mode:normal; }
 .topbar > .theme-toggle {margin-left:auto}}
 
 .news-editor{margin:18px 0;padding:16px;border:1px solid var(--line);border-radius:12px;background:#f8faff}.news-editor>summary{font-weight:800;color:var(--ink);margin-bottom:10px}.news-editor .fields.two{gap:0 18px}.news-editor label{display:block;font-size:12px}.news-editor fieldset{border:1px solid #cbd6e9;border-radius:10px;margin:12px 0}.news-editor fieldset legend{font-weight:800}.news-hero-upload{margin:15px 0}.news-editor details>summary{font-weight:700}.global-login{position:fixed;inset:0;display:grid;place-items:center;background:#111e38;z-index:100;overflow-y:auto;padding:20px}.global-login-panel{width:100%;max-width:470px;background:#fff;padding:38px;border-radius:22px;box-shadow:0 20px 70px #0004}.global-login-panel h1{font-size:31px}.global-login-panel button{display:block;width:100%;margin-top:15px}.global-login-panel [role=alert]{color:#9a1220}
+
+/* Optional explanation illustration in answer editor and preview. */
+.explanation-image-controls{margin:14px 0 18px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:#f8faff}
+.explanation-image-controls label{margin-top:10px}
+.explanation-image-controls button{margin-top:12px}
+.explanation-preview-image{display:block;width:100%;max-height:380px;object-fit:contain;margin-top:12px;border-radius:10px;background:#f8faff}

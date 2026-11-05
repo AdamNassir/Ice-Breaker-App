@@ -164,6 +164,7 @@ def read_bundle(data: bytes):
 def _media_locations(row):
     yield row, 'media'
     yield row, 'reveal_media'
+    yield row, 'explanation_image'
     news = row.get('news')
     if isinstance(news, dict):
         yield news, 'logo_url'
