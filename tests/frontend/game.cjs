@@ -99,7 +99,7 @@ function shared(w){w.eval(fs.readFileSync(project+'/static/newsarticle.js','utf8
   assert.deepEqual(placements.map(p=>p.querySelector('.final-score').textContent),['1750','1600','1400','1000','1000','750']);
   assert.deepEqual([...pd.querySelectorAll('#stage .final-medal')].map(p=>p.textContent),['🥇','🥈','🥉']);
   assert(!pd.querySelector('.bonus-link'));
-  if(role==='host') {assert(!pd.querySelector('.build-workflow'));assert(!pd.querySelector('.player-bonus'));assert(!pd.querySelector('#stage h1,#stage h2,#stage p'));}
+  if(role==='host') {assert(!pd.querySelector('.build-workflow'));assert(!pd.querySelector('.player-bonus'));assert.equal(pd.querySelector('.final-heading').textContent,'Final individual ranking');assert(pd.querySelector('.final-summary').textContent.includes('9 rounds completed'));}
   else {
    const panel=pd.querySelector('.player-bonus');assert(panel);
    assert.equal(panel.querySelector('h2').textContent,'Was this game made with AI or not ?');

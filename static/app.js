@@ -224,7 +224,18 @@
 
   function results(s) {
     const wrap = element('section', 'final-standings');
-    wrap.setAttribute('aria-label', 'Final placements');
+    const isTeamRanking = s.ranking_type === 'teams' || (s.ranking_type == null && s.teams?.length > 0);
+    const label = isTeamRanking ? 'Final team ranking' : 'Final individual ranking';
+    wrap.setAttribute('aria-label', label);
+    wrap.append(element('h2', 'final-heading', label));
+    const count = s.leaderboard.length;
+    const rounds = s.round_count;
+    wrap.append(element('p', 'final-summary', `${rounds} round${rounds === 1 ? '' : 's'} completed · ${count} ${isTeamRanking ? 'team' : 'player'}${count === 1 ? '' : 's'} ranked · Points`));
+    if (!count) {
+      wrap.append(element('p', 'final-empty', isTeamRanking ? 'No teams to rank.' : 'No players to rank.'));
+      if (!host) wrap.append(playerBonus(s.code));
+      return wrap;
+    }
     const ranks = [1, 2, 3].filter(rank => s.leaderboard.some(player => player.rank === rank));
     const podium = element('div', `final-podium podium-count-${ranks.length}`);
     for (const rank of ranks) {
@@ -513,7 +524,7 @@
     $('phase-label').textContent = labels[s.phase];
     $('round-label').textContent = s.phase === 'finished' ? `${s.round_count} rounds complete` : `Round ${s.round_number} / ${s.round_count}`;
     $('room-meta').textContent = `${s.player_count} player${s.player_count === 1 ? '' : 's'} · Room ${s.code}`;
-    if (!host) $('board-title').textContent = s.teams?.length ? 'Team standings' : (s.phase === 'finished' ? 'Final standings' : 'Leaderboard');
+    if (!host) $('board-title').textContent = s.ranking_type === 'teams' || s.teams?.length ? 'Team standings' : (s.phase === 'finished' ? 'Final standings' : 'Leaderboard');
     const progress = $('round-progress'); progress.replaceChildren();
     for (let i = 0; i < s.round_count; i++) {
       const node = element('span', i < s.round_index || s.phase === 'finished' || (i === s.round_index && s.phase === 'revealed') ? 'done' :

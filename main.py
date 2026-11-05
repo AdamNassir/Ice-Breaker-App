@@ -209,14 +209,22 @@ def view(state, role, player_id):
                            "streak": team.get("streak", 0), "correct": team.get("correct", 0),
                            "members": len(next(t["members"] for t in teams if t["id"] == tid))})
     team_board.sort(key=lambda t: (-t["score"], t["nickname"].casefold(), t["id"]))
-    for position, item in enumerate(team_board):
-        item["rank"] = 1 + next(i for i, t in enumerate(team_board) if t["score"] == item["score"])
+    # Competition ranking: tied teams share their rank; the next rank skips
+    # the occupied positions (1, 1, 3). Works for any deck size, up to 200.
+    last_team_score, team_rank = None, 0
+    for position, item in enumerate(team_board, 1):
+        if item["score"] != last_team_score:
+            team_rank = position
+        item["rank"] = team_rank
+        last_team_score = item["score"]
     result = {"code": state["code"], "title": state["title"], "phase": state["phase"],
               "round_index": state["index"], "round_number": state["index"] + 1,
               "round_count": len(state["rounds"]), "revision": state["revision"],
               "server_time": time.time(), "deadline": state["deadline"],
               "duration": state["duration"], "player_count": len(players),
               "answered_count": len(state["votes"]), "leaderboard": team_board if state.get("teams") else board, "question": None,
+              "ranking_type": "teams" if state.get("teams") else "players",
+              "completed_rounds": len(state["rounds"]) if state["phase"] == "finished" else state["index"] + (state["phase"] == "revealed"),
               "pool_deadline": state.get("pool_deadline") if state["phase"] == "pooling" else None,
               "team_results": state.get("team_results", {}) if state["phase"] == "revealed" else {},
               "me": None, "reveal": None,
@@ -478,7 +486,11 @@ def control(code: str, body: Control, authorization: str | None = Header(default
             state["revision"] += 1
         elif body.action == "next" and state["phase"] == "revealed":
             if state["index"] == len(state["rounds"]) - 1:
+                # Keep the final scoreboard stable; the timer no longer refers
+                # to the last question after the presenter shows the results.
                 state["phase"] = "finished"
+                state["deadline"] = None
+                state.pop("pool_deadline", None)
             else:
                 state["index"] += 1
                 state["votes"] = {}
