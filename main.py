@@ -23,6 +23,7 @@ from Content import ROUNDS
 from question_content import DeckError, load_rounds, validate_rounds, deck_bytes, text_presentation, classification_context, MEDIA_EXTENSIONS, MEDIA_FOLDERS, is_public_icebreaker_blob
 from store import Store
 from global_deck import get_shared_deck, put_shared_deck
+from deck_bundle_import import (MAX_ZIP, read_bundle, collect_assets, upload_assets, substitute_assets)
 
 app = FastAPI(title="AI or Human", docs_url=None, redoc_url=None, openapi_url=None)
 store = Store()
@@ -534,6 +535,57 @@ def global_put_deck(body: SaveSharedDeck, request: Request):
     except DeckError as error:
         raise HTTPException(422, str(error)) from error
     return put_shared_deck(store, load_rounds(ROOT, fallback=ROUNDS), body.revision, rounds)
+
+
+@app.post('/api/deck/import-bundle')
+async def global_import_bundle(request: Request, revision: str, mode: Literal['replace', 'append'] = 'replace',
+                               acknowledge_media_rights: bool = False):
+    """Import a validated ZIP atomically at the shared deck level.
+
+    The ZIP is parsed and every question validated before writes. External
+    sources are restricted to fixed, attributed publisher images; the caller
+    explicitly acknowledges permission/rights before we retrieve those files.
+    On failure, the saved deck stays untouched. Newly uploaded blobs can
+    remain unused if a later database conflict occurs.
+    """
+    _allow_deck_request(request)
+    if not request.headers.get('content-type', '').lower().startswith(('application/zip', 'application/octet-stream')):
+        raise HTTPException(415, 'Choose a .zip file.')
+    if len(revision) > 80:
+        raise HTTPException(422, 'Invalid saved-deck revision.')
+    if request.headers.get('content-length', '').isdigit() and int(request.headers['content-length']) > MAX_ZIP:
+        raise HTTPException(413, 'Vercel accepts ZIP uploads up to 4 MB.')
+    data = bytearray()
+    async for chunk in request.stream():
+        data.extend(chunk)
+        if len(data) > MAX_ZIP:
+            raise HTTPException(413, 'Vercel accepts ZIP uploads up to 4 MB.')
+    bundle_rounds, manifest_media, embedded = read_bundle(bytes(data))
+    if any(path not in embedded for path in manifest_media) and not acknowledge_media_rights:
+        raise HTTPException(422, 'Confirm that you have permission to use the credited publisher photographs.')
+
+    starter = load_rounds(ROOT, fallback=ROUNDS)
+    current = get_shared_deck(store, starter)
+    if revision != current['revision']:
+        raise HTTPException(409, 'The shared deck changed in another editor. Reload before importing.')
+    base = current['rounds'] if mode == 'append' else []
+    if len(base) + len(bundle_rounds) > 200:
+        raise HTTPException(422, 'The combined deck exceeds 200 questions.')
+
+    token = os.getenv('BLOB_READ_WRITE_TOKEN', '')
+    if manifest_media and not token:
+        raise HTTPException(503, 'Connect a PUBLIC Blob store to the IceBreaker Vercel deployment (BLOB_READ_WRITE_TOKEN).')
+    assets = collect_assets(manifest_media, embedded)
+    urls = upload_assets(assets, token)
+    try:
+        merged = validate_rounds(base + substitute_assets(bundle_rounds, urls), ROOT, require_media=True)
+    except DeckError as error:
+        raise HTTPException(422, str(error)) from error
+    saved = put_shared_deck(store, starter, revision, merged)
+    saved.update({'imported_count': len(bundle_rounds), 'uploaded_images': len(urls), 'mode': mode,
+                  'message': f'ZIP import completed: {len(bundle_rounds)} questions and {len(urls)} images. '
+                             'The global deck and new rooms now use the saved version.'})
+    return saved
 
 
 @app.get('/api/media')

@@ -34,7 +34,7 @@
   const textFields = {title:'title', context:'context', alt:'alt', explanation:'explanation',
     source:'source', source_url:'source-url', image_reveal:'image-reveal', technical_note:'technical-note',
     discussion:'discussion', technical_source_url:'technical-url', reveal_media:'reveal-media', reveal_alt:'reveal-alt'};
-  const toolbar = ['add-question','add-image','add-audio','add-video','empty-add','empty-deck','starter-deck','import-deck','export-deck'];
+  const toolbar = ['add-question','add-image','add-audio','add-video','empty-add','empty-deck','starter-deck','import-deck','import-bundle','export-deck'];
 
   function node(tag, className, text) {
     const value = document.createElement(tag);
@@ -294,6 +294,33 @@
       if(rounds.includes(q)&&['text','code','commit'].includes(q.kind)){q.body=text;if(rounds[selected]===q){$('body').value=text;renderPreview();}markDirty();tell('Text imported into the draft. Save the deck when ready.');}
     }catch(error){tell(error.message,true);}finally{$('text-file').value='';}
   });
+  // One-click ZIP import for the Vercel global deck. The server checks every
+  // entry and performs a single revision-checked database save after uploads.
+  // No ZIP library is needed in the browser (and no 4MB+ Vercel request).
+  if(isGlobal){
+    $('import-bundle').addEventListener('click',()=>$('bundle-file').click());
+    $('bundle-file').addEventListener('change',async()=>{
+      const file=$('bundle-file').files[0];if(!file)return;
+      try{
+        if(!loaded)throw new Error('Reload the saved deck first.');
+        if(dirty)throw new Error('Export or save your unsaved draft first.');
+        if(!file.name.toLowerCase().endsWith('.zip'))throw new Error('Choose a .zip bundle.');
+        if(file.size>4*1024*1024)throw new Error('The ZIP exceeds the 4 MB Vercel request limit.');
+        if(!confirm('Import questions and media from this ZIP into the SHARED deck?\nOK = continue; Cancel = no changes.'))return;
+        const replace=confirm('Replace the current question deck?\nOK = REPLACE it; Cancel = APPEND the imported questions.');
+        const permission=confirm('If the ZIP references photos hosted by publishers, confirm you have the necessary permissions to use them in your seminar.\nOK = confirm and continue; Cancel = stop.');
+        if(!permission)return;
+        busy=true;updateControls();tell('Importing ZIP, checking sources and uploading media…');
+        const params=new URLSearchParams({revision,mode:replace?'replace':'append',acknowledge_media_rights:'true'});
+        const response=await fetch('/api/deck/import-bundle?'+params.toString(),{method:'POST',headers:{'Content-Type':'application/zip'},body:file,cache:'no-store'});
+        const data=await response.json().catch(()=>({}));
+        if(!response.ok)throw new Error(data.detail||'ZIP upload failed.');
+        rounds=data.rounds;revision=data.revision;source=data.source;
+        selected=rounds.length?0:-1;dirty=false;loaded=true;renderList();loadEditor();
+        tell(`Imported ${data.imported_count} questions and ${data.uploaded_images} images into the shared deck.`);
+      }catch(error){tell(error.message,true)}finally{busy=false;$('bundle-file').value='';updateControls()}
+    });
+  }else $('import-bundle').hidden=true;
   $('import-deck').addEventListener('click',()=>$('deck-file').click());
   $('deck-file').addEventListener('change',async()=>{
     const file=$('deck-file').files[0];if(!file)return;

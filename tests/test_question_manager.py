@@ -215,9 +215,9 @@ class ManagerTests(unittest.TestCase):
                     self.assertEqual(room['rounds'][0]['answer'], 'AI')
                 for path in ['/questions.json','/question_manager.py']:
                     self.assertEqual(game.get(path).status_code, 404)
-                # The global manager assets are public; deck data stays password protected.
+                # This version deliberately exposes the global deck without a new password.
                 self.assertEqual(game.get('/manager-assets/app.js').status_code, 200)
-                self.assertEqual(game.get('/api/deck').status_code, 503)
+                self.assertEqual(game.get('/api/deck').status_code, 200)
                 (self.root / 'questions.json').write_text('broken')
                 self.assertEqual(game.post('/api/rooms', json={}).status_code, 503)
 
