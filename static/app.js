@@ -32,7 +32,9 @@
       try { sessionStorage.setItem(key(linkedCode), JSON.stringify({code:linkedCode,token:bridgedHost})); }
       catch (_) {}
     }
-    history.replaceState(null, '', location.pathname + location.search);
+    // Keep the private host token in the URL fragment. It is never sent to
+    // the server, but MUST survive address-bar copying into another browser.
+    // Previously we removed it here, so only the first browser worked.
   }
   const seminarHostMode = host && query.get('seminar') === '1';
   const seminarHostHint = document.getElementById('seminar-host-hint');
@@ -75,7 +77,11 @@
       storage.setItem(key(value.code), JSON.stringify(value));
       if (host) sessionStorage.setItem('icebreaker:last-host', value.code);
     } catch { notify('Browser storage is unavailable. Keep this tab open during the game.'); }
-    history.replaceState(null, '', `${host ? '/presenter' : '/'}?room=${value.code}` + (seminarReturn ? `&return_to=${encodeURIComponent(seminarReturn)}` : '') + (seminarHostMode ? '&seminar=1' : ''));
+    // A presenter link is a bearer credential: retaining its fragment makes
+    // it bookmarkable and usable on a different computer, without the room
+    // creation password. Never include the token in query params or API URLs.
+    const presenterFragment = host ? `#host_token=${encodeURIComponent(value.token)}` : '';
+    history.replaceState(null, '', `${host ? '/presenter' : '/'}?room=${encodeURIComponent(value.code)}` + (seminarReturn ? `&return_to=${encodeURIComponent(seminarReturn)}` : '') + (seminarHostMode ? '&seminar=1' : '') + presenterFragment);
     $('entry').hidden = true; $('game').hidden = false; $('leave').hidden = false;
     if (host) {
       $('share-code').textContent = value.code;
@@ -624,6 +630,12 @@
       try { await navigator.clipboard.writeText(playerLink); notify('Player link copied.'); }
       catch { notify('Clipboard access is unavailable here. Use the QR code or room code.'); }
     });
+    $('copy-presenter-link').addEventListener('click', async () => {
+      if (!session || !session.token) return;
+      const link = `${location.origin}/presenter?room=${encodeURIComponent(session.code)}${seminarHostMode ? '&seminar=1' : ''}#host_token=${encodeURIComponent(session.token)}`;
+      try { await navigator.clipboard.writeText(link); notify('Private presenter link copied. Anyone with this link can control the room.'); }
+      catch { notify('Clipboard unavailable. Copy the complete URL (including #host_token=) from the address bar.'); }
+    });
   } else {
     $('room-code').value = initialCode;
     document.querySelectorAll('[data-team-mode]').forEach(button => button.addEventListener('click', () => {
@@ -667,6 +679,12 @@
     const saved = initialCode && storage.getItem(key(initialCode));
     if (saved) saveSession(JSON.parse(saved));
   } catch { notify('Browser storage is unavailable. Keep this tab open during the game.'); }
+  // Never ask a remote presenter to create a *second* room when an incomplete
+  // Mercato link is pasted. Without the private token, room control is denied.
+  if (host && seminarHostMode && initialCode && !session) {
+    $('create-form').hidden = true;
+    $('seminar-link-help').hidden = false;
+  }
   document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
   setInterval(poll, 1500); // EDIT polling cadence here (milliseconds).
   setInterval(updateClock, 100);

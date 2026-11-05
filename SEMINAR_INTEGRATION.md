@@ -4,7 +4,7 @@ Ce déploiement d'IceBreaker est compatible avec la régie Organizer de LogicLev
 
 - `GET /api/integration/capabilities` signale la compatibilité avec les decks par salle et le passage de la régie.
 - `POST /api/rooms` avec le `PRESENTER_PASSWORD` peut inclure `deck` : un tableau de questions validé avec le même schéma que `questions.json`. Chaque salle en conserve une copie autonome, et l'API renvoie `deck_hash` pour confirmer le deck réellement utilisé.
-- L'URL de régie reçue de l'app séminaire est `/presenter?room=XXXXXX&seminar=1#host_token=<jeton>`; le navigateur lit le jeton une fois et retire le fragment. Dans ce mode seulement, aucun second QR ne s'affiche.
+- L'URL de régie reçue de l'app séminaire est `/presenter?room=XXXXXX&seminar=1#host_token=<jeton>`; le navigateur lit le jeton et conserve le fragment dans la barre d’adresse pour que le lien complet soit copiable vers un autre ordinateur. Le lien privé est un accès présentateur : ne pas le transmettre aux participants. Dans ce mode seulement, aucun second QR ne s'affiche.
 - Les joueurs arrivent directement dans la salle via `/?room=XXXXXX&return_to=<URL-du-seminaire>` et peuvent utiliser **Retour au Mercato** depuis le jeu. Le reste du jeu est inchangé.
 
 ## Déploiement
