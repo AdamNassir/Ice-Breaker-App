@@ -94,7 +94,6 @@
     const qr = $('join-qr'), status = $('qr-status'), retry = $('retry-qr');
     const attempt = ++qrAttempt;
     qr.hidden = true; retry.hidden = true;
-    if (seminarHostMode) {status.hidden = false;status.textContent = 'Les participants rejoignent la partie depuis l’application Séminaire, sans deuxième QR code.';return;}
     status.hidden = false; status.textContent = 'Creating QR code…';
     try {
       const result = await api(`/api/rooms/${value.code}/qr`);
